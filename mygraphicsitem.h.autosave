@@ -1,0 +1,14 @@
+#ifndef MYGRAPHICSITEM_H
+#define MYGRAPHICSITEM_H
+
+#include <QGraphicsItem>
+
+class MyGraphicsItem : public QGraphicsItem
+{
+public:
+    MyGraphicsItem();
+    
+protected
+};
+
+#endif // MYGRAPHICSITEM_H

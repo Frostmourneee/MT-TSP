@@ -1,0 +1,13 @@
+#ifndef MYQGRAPCHICSVIEW_H
+#define MYQGRAPCHICSVIEW_H
+
+
+class MyQGrapchicsView : public QGraphicsView
+{
+    Q_OBJECT;
+    
+public:
+    MyQGrapchicsView();
+};
+
+#endif // MYQGRAPCHICSVIEW_H
