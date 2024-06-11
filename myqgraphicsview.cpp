@@ -19,7 +19,7 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent) : QGraphicsView(parent)
     arrow->setVisible(false);
     scene->addItem(arrow);
 
-//qwdqwdqwd
+//First try to git!
 }
 
 void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
