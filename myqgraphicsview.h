@@ -34,6 +34,9 @@ private:
     QVector<Prey* > prey;
     QVector<Yerp* > yerp;
     QGraphicsScene* scene;
+    QGraphicsLineItem* coordLineX;
+    QGraphicsLineItem* coordLineY;
+    QVector<QGraphicsLineItem* > coordGridLine;
     QGraphicsTextItem* text;
     Arrow* arrow;
     QString doubleW2Decimals(double val);

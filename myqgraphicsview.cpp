@@ -19,7 +19,10 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent) : QGraphicsView(parent)
     arrow->setVisible(false);
     scene->addItem(arrow);
 
-//First try to git!
+    coordLineX = new QGraphicsLineItem();
+    coordLineY = new QGraphicsLineItem();
+    scene->addItem(coordLineX);
+    scene->addItem(coordLineY);
 }
 
 void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
@@ -187,7 +190,53 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
 {
     Q_UNUSED(e);
 
-    scene->setSceneRect(0, 0, width(), height());
+    int w = width();
+    int h = height();
+    scene->setSceneRect(0, 0, w, h);
+
+    coordLineX->setLine(-w*0.49, 0, w*0.49, 0); // Main absciss line
+    coordLineY->setLine(0, -h*0.49, 0, h*0.49); // Main ordinate line
+    coordLineX->setPos(w / 2., h / 2.);
+    coordLineY->setPos(w / 2., h / 2.);
+    coordLineX->setPen(QPen(QBrush(Qt::black, Qt::SolidPattern), 3));
+    coordLineY->setPen(QPen(QBrush(Qt::black, Qt::SolidPattern), 3));
+
+    for (QGraphicsLineItem* l : coordGridLine)
+    {
+        scene->removeItem(l);
+        delete(l);
+    }
+    coordGridLine.clear();
+
+    for (int i = 1; i < 0.98*w/(2*unit); i++) // Thin absciss lines, need to be renewed because amount of them isn't constant
+    {
+        QGraphicsLineItem* coordL = new QGraphicsLineItem(i*unit, -0.98*h/2., i*unit, 0.98*h/2.);
+        coordL->setPos(w / 2., h / 2.);
+        coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
+        coordGridLine.push_back(coordL);
+        scene->addItem(coordL);
+
+        coordL = new QGraphicsLineItem(-i*unit, -0.98*h/2., -i*unit, 0.98*h/2.);
+        coordL->setPos(w / 2., h / 2.);
+        coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
+        coordGridLine.push_back(coordL);
+        scene->addItem(coordL);
+    }
+
+    for (int i = 1; i < 0.98*h/(2*unit); i++) // Thin ordinate lines, need to be renewed because amount of them isn't constant
+    {
+        QGraphicsLineItem* coordL = new QGraphicsLineItem(-0.98*w/2., i*unit, 0.98*w/2., i*unit);
+        coordL->setPos(w / 2., h / 2.);
+        coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
+        coordGridLine.push_back(coordL);
+        scene->addItem(coordL);
+
+        coordL = new QGraphicsLineItem(-0.98*w/2., -i*unit, 0.98*w/2., -i*unit);
+        coordL->setPos(w / 2., h / 2.);
+        coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
+        coordGridLine.push_back(coordL);
+        scene->addItem(coordL);
+    }
 }
 
 QPointF MyQGraphicsView::sceneToCoords(QPointF scenePoint) // Translate point from Scene coords to convinient "maths" coords
@@ -195,16 +244,16 @@ QPointF MyQGraphicsView::sceneToCoords(QPointF scenePoint) // Translate point fr
     int w = width();
     int h = height();
 
-    QPointF pToLineX = scenePoint - QPointF(w/2, h/2);
-    return QPointF(pToLineX.x() / unit, -1 * pToLineX.y() / unit);
+    QPointF pToCoordLineX = scenePoint - QPointF(w/2, h/2); // Data will be stored with 2 decimals for convenience
+    return QPointF(round(pToCoordLineX.x()/unit * 100)/100, -1 * round(pToCoordLineX.y()/unit * 100)/100);
 }
 QPointF MyQGraphicsView::coordsToScene(QPointF coordPoint) // NOT LINEAR!!! Translate point from convinient "maths" coords to Scene coords
 {
     int w = width();
     int h = height();
 
-    QPointF pToLineXInverse = unit*coordPoint - QPointF(0, 2*unit*coordPoint.y());
-    return pToLineXInverse + QPointF(w/2, h/2);
+    QPointF pTocoordLineXInverse = unit*coordPoint - QPointF(0, 2*unit*coordPoint.y());
+    return pTocoordLineXInverse + QPointF(w/2, h/2);
 }
 
 QString MyQGraphicsView::doubleW2Decimals(double val)
@@ -242,4 +291,5 @@ void MyQGraphicsView::info()
     {
         qDebug() << "(" << y->getYerpNum() << "," << y->getSStart() << "," << y->getStart() << '\n';
     }
+    qDebug() << "Primitives in Scene" << scene->items().size();
 }
