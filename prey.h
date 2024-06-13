@@ -23,6 +23,9 @@ public:
     void setSEll(QGraphicsEllipseItem* ell) {sEll = ell;}
     void setEEll(QGraphicsEllipseItem* ell) {eEll = ell;}
     void setLine(QGraphicsLineItem* l) {line = l;}
+    void deleteSEll() {if (scene()->items().indexOf(sEll) != -1) scene()->removeItem(sEll); delete(sEll);}
+    void deleteEEll() {if (scene()->items().indexOf(eEll) != -1) scene()->removeItem(eEll); delete(eEll);}
+    void deleteLine() {if (scene()->items().indexOf(line) != -1) scene()->removeItem(line); delete(line);}
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;

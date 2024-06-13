@@ -39,6 +39,11 @@
     <addaction name="actionStart"/>
     <addaction name="actionSave_as"/>
     <addaction name="actionLoad_from_file"/>
+    <addaction name="actionClear"/>
+    <addaction name="actionExit"/>
+    <addaction name="actionFullscreen"/>
+    <addaction name="actionRandom"/>
+    <addaction name="actionBack"/>
    </widget>
    <addaction name="menuOptions"/>
   </widget>
@@ -74,6 +79,55 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+   <property name="toolTip">
+    <string>Clears the scene, restarts everything</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Q</string>
+   </property>
+  </action>
+  <action name="actionFullscreen">
+   <property name="text">
+    <string>Fullscreen</string>
+   </property>
+   <property name="shortcut">
+    <string>F11</string>
+   </property>
+  </action>
+  <action name="actionRandom">
+   <property name="text">
+    <string>Generate randomly</string>
+   </property>
+   <property name="toolTip">
+    <string>Generate preys and yerps randomly</string>
+   </property>
+   <property name="shortcut">
+    <string>G</string>
+   </property>
+  </action>
+  <action name="actionBack">
+   <property name="text">
+    <string>Back</string>
+   </property>
+   <property name="toolTip">
+    <string>Rollback change</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
    </property>
   </action>
  </widget>

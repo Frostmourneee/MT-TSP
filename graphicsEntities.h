@@ -2,6 +2,7 @@
 #define GRAPHICSENTITIES_H
 
 #include <QGraphicsItem>
+#include <QGraphicsScene>
 
 class GraphicsEntities : public QGraphicsItem
 {

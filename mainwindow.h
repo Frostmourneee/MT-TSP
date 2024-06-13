@@ -26,7 +26,7 @@ private:
     bool isDataReadyToStartProcess();
     bool userHasntSeenOnlyLatinLettersWarning = true;
     void saveDataToFile(FILE*);
-
+    void disableUIDueToCalcProcess();
 
 private slots:
     void on_actionStart_triggered();
@@ -34,5 +34,10 @@ private slots:
     void mouseMoveEvent(QMouseEvent *) override;
     void on_actionSave_as_triggered();
     void on_actionLoad_from_file_triggered();
+    void on_actionClear_triggered();
+    void on_actionExit_triggered();
+    void on_actionFullscreen_triggered();
+    void on_actionRandom_triggered();
+    void on_actionBack_triggered();
 };
 #endif // MAINWINDOW_H

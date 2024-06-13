@@ -14,7 +14,7 @@
 
 #define PI 3.1415926535
 
-enum class StatusScene {settingPreyStart, settingPreyEnd, settingPreyVelocity};
+enum class StatusScene {settingPreyStart, settingPreyEnd, settingPreyVelocity, disabled};
 class MyQGraphicsView : public QGraphicsView
 {
 
@@ -27,8 +27,10 @@ public:
     QGraphicsScene* getScene() {return scene;}
     StatusScene getStatus() {return status;}
     void info();
+    void setStatus(StatusScene s) {status = s;}
     void hideText() {text->hide();}
     void showText() {text->show();}
+    void clear();
 
 public slots:
     void mousePressEvent(QMouseEvent * e) override;

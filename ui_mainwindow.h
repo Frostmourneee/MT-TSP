@@ -29,6 +29,11 @@ public:
     QAction *actionStart;
     QAction *actionSave_as;
     QAction *actionLoad_from_file;
+    QAction *actionClear;
+    QAction *actionExit;
+    QAction *actionFullscreen;
+    QAction *actionRandom;
+    QAction *actionBack;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSpinBox *spinBox;
@@ -48,6 +53,16 @@ public:
         actionSave_as->setObjectName(QString::fromUtf8("actionSave_as"));
         actionLoad_from_file = new QAction(MainWindow);
         actionLoad_from_file->setObjectName(QString::fromUtf8("actionLoad_from_file"));
+        actionClear = new QAction(MainWindow);
+        actionClear->setObjectName(QString::fromUtf8("actionClear"));
+        actionExit = new QAction(MainWindow);
+        actionExit->setObjectName(QString::fromUtf8("actionExit"));
+        actionFullscreen = new QAction(MainWindow);
+        actionFullscreen->setObjectName(QString::fromUtf8("actionFullscreen"));
+        actionRandom = new QAction(MainWindow);
+        actionRandom->setObjectName(QString::fromUtf8("actionRandom"));
+        actionBack = new QAction(MainWindow);
+        actionBack->setObjectName(QString::fromUtf8("actionBack"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -77,6 +92,11 @@ public:
         menuOptions->addAction(actionStart);
         menuOptions->addAction(actionSave_as);
         menuOptions->addAction(actionLoad_from_file);
+        menuOptions->addAction(actionClear);
+        menuOptions->addAction(actionExit);
+        menuOptions->addAction(actionFullscreen);
+        menuOptions->addAction(actionRandom);
+        menuOptions->addAction(actionBack);
 
         retranslateUi(MainWindow);
 
@@ -106,6 +126,35 @@ public:
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(shortcut)
         actionLoad_from_file->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+L", nullptr));
+#endif // QT_CONFIG(shortcut)
+        actionClear->setText(QCoreApplication::translate("MainWindow", "Clear", nullptr));
+#if QT_CONFIG(tooltip)
+        actionClear->setToolTip(QCoreApplication::translate("MainWindow", "Clears the scene, restarts everything", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(shortcut)
+        actionClear->setShortcut(QCoreApplication::translate("MainWindow", "R", nullptr));
+#endif // QT_CONFIG(shortcut)
+        actionExit->setText(QCoreApplication::translate("MainWindow", "Exit", nullptr));
+#if QT_CONFIG(shortcut)
+        actionExit->setShortcut(QCoreApplication::translate("MainWindow", "Q", nullptr));
+#endif // QT_CONFIG(shortcut)
+        actionFullscreen->setText(QCoreApplication::translate("MainWindow", "Fullscreen", nullptr));
+#if QT_CONFIG(shortcut)
+        actionFullscreen->setShortcut(QCoreApplication::translate("MainWindow", "F11", nullptr));
+#endif // QT_CONFIG(shortcut)
+        actionRandom->setText(QCoreApplication::translate("MainWindow", "Generate randomly", nullptr));
+#if QT_CONFIG(tooltip)
+        actionRandom->setToolTip(QCoreApplication::translate("MainWindow", "Generate preys and yerps randomly", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(shortcut)
+        actionRandom->setShortcut(QCoreApplication::translate("MainWindow", "G", nullptr));
+#endif // QT_CONFIG(shortcut)
+        actionBack->setText(QCoreApplication::translate("MainWindow", "Back", nullptr));
+#if QT_CONFIG(tooltip)
+        actionBack->setToolTip(QCoreApplication::translate("MainWindow", "Rollback change", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(shortcut)
+        actionBack->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+Z", nullptr));
 #endif // QT_CONFIG(shortcut)
         menuOptions->setTitle(QCoreApplication::translate("MainWindow", "Options", nullptr));
     } // retranslateUi

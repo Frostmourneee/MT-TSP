@@ -16,7 +16,7 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent) : QGraphicsView(parent)
     scene->addItem(text);
 
     arrow = new Arrow(0, 0, 0, 0);
-    arrow->setVisible(false);
+    arrow->hide();
     scene->addItem(arrow);
 
     coordLineX = new QGraphicsLineItem();
@@ -58,8 +58,9 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
             preyInst->setStart(pMath);
             preyInst->setSEll(ellipse);
             prey.push_back(preyInst);
+            scene->addItem(preyInst);
 
-            arrow->setVisible(true);
+            arrow->show();
             arrow->setPen(QPen(QBrush(Qt::black), 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
             arrow->setLine(pScene, pScene); // For refreshing previous
 
@@ -91,12 +92,12 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
             line->setPen(pen);
             scene->addItem(line);
 
+            QPointF e_s = pMath - start;
             tmpPrey->setSEnd(pScene); // Data storage in Prey instance
             tmpPrey->setEnd(pMath);
             tmpPrey->setEEll(ellipse);
             tmpPrey->setLine(line);
-            tmpPrey->setAlpha(fabs(pMath.x() - start.x()) < 1.e-2 ?
-                        (pMath.y() - start.y() > 0 ? 90 : -90) : 180/PI * atan2(pMath.y() - start.y(), pMath.x() - start.x()));
+            tmpPrey->setAlpha(fabs(e_s.x()) < 1.e-2 ? (e_s.y() > 0 ? 90 : -90) : 180/PI * atan2(e_s.y(), e_s.x()));
 
             arrow->setPen(QPen(QBrush(Qt::black), 4, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin)); // Preparing for velocity arrow
             arrow->setLine(coordsToScene(tmpPrey->getStart()), coordsToScene(tmpPrey->getEnd()));
@@ -113,9 +114,13 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
             double alpha = tmpPrey->getAlpha();
             tmpPrey->setVel(v*cos(alpha*PI/180.), v*sin(alpha*PI/180.));
 
-            arrow->setVisible(false);
+            arrow->hide();
 
             status = StatusScene::settingPreyStart;
+            break;
+        }
+        default:
+        {
             break;
         }
     }
@@ -130,12 +135,14 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent * e)
     Prey* tmpPrey = prey.back();
 
     switch (status) {
-        case StatusScene::settingPreyStart: {
+        case StatusScene::settingPreyStart:
+        {
             textCoords(pMath.x(), pMath.y());
 
             break;
         }
-        case StatusScene::settingPreyEnd: {
+        case StatusScene::settingPreyEnd:
+        {
             if (e->modifiers().testFlag(Qt::ShiftModifier)) {
                 QPoint e_s = QPoint(pScene.toPoint().x() - coordsToScene(tmpPrey->getStart()).toPoint().x(),
                                     -pScene.toPoint().y() + coordsToScene(tmpPrey->getStart()).toPoint().y());
@@ -152,7 +159,8 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent * e)
 
             break;
         }
-        case StatusScene::settingPreyVelocity: {
+        case StatusScene::settingPreyVelocity:
+        {
             QPointF red = tmpPrey->getEnd(); // Preparing for velocity arrow
             QPointF blue = tmpPrey->getStart();
             QPointF resP;
@@ -182,6 +190,10 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent * e)
 
             tmpPrey->setV(v);
 
+            break;
+        }
+        default:
+        {
             break;
         }
     }
@@ -286,6 +298,32 @@ void MyQGraphicsView::textV(double v)
     text->setFont(QFont("Times", 12, QFont::Bold));
 }
 
+void MyQGraphicsView::clear()
+{
+    arrow->hide();
+    text->setFont(QFont("Times", 20, QFont::Bold));
+    text->setPlainText("Move the cursor in the \n       working area");
+    text->setPos(70, 70);
+
+    status = StatusScene::settingPreyStart;
+
+    for (Prey* p : prey)
+    {
+        p->deleteSEll();
+        p->deleteEEll();
+        p->deleteLine();
+        delete(p);
+    }
+    prey.clear();
+
+    for (Yerp* y : yerp)
+    {
+        scene->removeItem(y);
+        delete(y);
+    }
+    yerp.clear();
+
+}
 void MyQGraphicsView::info()
 {
     qDebug() << "Preys created" << prey.size() <<

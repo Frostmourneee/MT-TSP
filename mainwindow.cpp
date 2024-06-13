@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 
 //TODO укрупнение сетки
-//TODO после clear нужно добавить text = Переместите курсор
 //TODO подумать над плавностью смены сотых долей в координатах
 //TODO из-за симметрий быть может можно перебор уменьшить когда M = 2
 //TODO прямоугольник ограничивающий происходящее
@@ -55,7 +54,7 @@ void MainWindow::on_actionSave_as_triggered()
 }
 void MainWindow::on_actionLoad_from_file_triggered()
 {
-    //TODO clear()
+    on_actionClear_triggered();
     setFocus();
     if (userHasntSeenOnlyLatinLettersWarning)
     {
@@ -66,12 +65,12 @@ void MainWindow::on_actionLoad_from_file_triggered()
     if (strcmp(filename.toStdString().c_str(), "") == 0)
     {
         QMessageBox::critical(this, "MT-TSP", "Can't open the file");
-        //TODO clear();
+        on_actionClear_triggered();
         return;
     }
 
     FILE* f = fopen(filename.toStdString().c_str(), "r");
-    int M, N, r = GraphicsEntities::smallGraphicsUnit;;
+    int M, N, r = GraphicsEntities::smallGraphicsUnit;
     double x, y, alpha, v, xEnd, yEnd;
     char buffer1[256];
     char *tmpstr1;
@@ -104,7 +103,7 @@ void MainWindow::on_actionLoad_from_file_triggered()
     N = strtol(tmpstr1, &tmpstr1, 0); // Catching # of Yerps
     if (N < 0 || N > 12) {
         QMessageBox::critical(this, "MT-TSP", "Invalid amount of Preys");
-        //TODO clear()
+        on_actionClear_triggered();
         return;
     }
     fgets(buffer1, 256, f); // X, Y, alpha, v, xEnd, yEnd string
@@ -134,6 +133,7 @@ void MainWindow::on_actionLoad_from_file_triggered()
         ellipse->setPen(QPen(Qt::black));
         ellipse->setBrush(Qt::blue);
         view->getScene()->addItem(ellipse);
+        view->getScene()->addItem(preyInst);
 
         preyInst->setSStart(pScene);
         preyInst->setStart(pMath);
@@ -157,27 +157,12 @@ void MainWindow::on_actionLoad_from_file_triggered()
         preyInst->setEnd(pMathEnd);
         preyInst->setEEll(ellipse);
         preyInst->setLine(line);
-        preyInst->setAlpha(fabs(pMathEnd.x() - pMath.x()) < 1.e-2 ?
-                    (pMathEnd.y() - pMath.y() > 0 ? 90 : -90) : 180/PI * atan2(pMathEnd.y() - pMath.y(), pMathEnd.x() - pMath.x()));
+        preyInst->setAlpha(alpha);
         preyInst->setVel(v*cos(alpha*PI/180.), v*sin(alpha*PI/180.));
         preyInst->setV(v);
     }
 
     fclose(f);
-}
-
-void MainWindow::on_actionStart_triggered()
-{
-    setFocus();
-    if (!isDataReadyToStartProcess()) return;
-
-    view->setDisabled(true);
-    view->hideText();
-
-    FILE* initDataFile = fopen("initData.txt", "w+"); // Saving all the data to the default "initData.txt" file
-    saveDataToFile(initDataFile);
-
-
 }
 void MainWindow::saveDataToFile(FILE *f)
 {
@@ -262,8 +247,175 @@ QString MainWindow::yerpDataStrSave(double x, double y, int maxX, int maxY)
     return str;
 }
 
+bool MainWindow::isDataReadyToStartProcess()
+{
+    if (view->getStatus() == StatusScene::settingPreyEnd || view->getStatus() == StatusScene::settingPreyVelocity) return false;
+    if (view->prey.size() > 12)
+    {
+        QMessageBox::critical(this, "MT-TSP", "Should be less then 13 Preys");
+        return false;
+    }
+    if (view->prey.size() == 0 || view->yerp.size() == 0)
+    {
+        QMessageBox::information(this, "MT-TSP", "No Preys or Yerps");
+        return false;
+    }
+    return true;
+}
+
+void MainWindow::on_actionClear_triggered()
+{
+    setFocus();
+    view->clear();
+}
+void MainWindow::on_actionExit_triggered()
+{
+    exit(0);
+}
+void MainWindow::on_actionFullscreen_triggered()
+{
+    setFocus();
+    if (isMaximized()) showNormal();
+    else showMaximized();
+}
+void MainWindow::on_actionRandom_triggered()
+{
+    double xmax = QString::number(9.95, 'f', 2).toDouble();
+    double xmin = -10;
+    double ymax = 7;
+    double ymin = -7;
+    double maxVel1f = 7;
+    double minVel1f = 0;
+
+    if (xmax <= xmin || ymax <= ymin) {
+        QMessageBox::critical(this, "MT-TSP", "Invalid generation bounds\n");
+        return;
+    }
+
+    on_actionClear_triggered();
+    srand(time(NULL));
+    int M = rand()%2 + 1;
+    int N = rand()%12 + 1;
+    int r = GraphicsEntities::smallGraphicsUnit;
+
+    int parts;
+    double r2fValue, x, y, alpha, v, xEnd, yEnd;
+    for (int i = 0; i < M; i++) // Yerps generation
+    {
+        parts = (xmax-xmin)*100;
+        r2fValue = xmin + rand()%(parts + 1)*0.01;
+        if (r2fValue > xmax) r2fValue = xmax;
+        else if (r2fValue < xmin) r2fValue = xmin;
+        x = r2fValue;
+
+        parts = (ymax-ymin)*100;
+        r2fValue = ymin + rand()%(parts + 1)*0.01;
+        if (r2fValue > ymax) r2fValue = ymax;
+        else if (r2fValue < ymin) r2fValue = ymin;
+        y = r2fValue;
+
+        Yerp* yerpInst = new Yerp(view->yerp.size(), view->coordsToScene(QPointF(x, y)), QPointF(x, y));
+        view->getScene()->addItem(yerpInst);
+        view->yerp.push_back(yerpInst);
+    }
+
+    for (int i = 0; i < N; i++) // Preys generation
+    {
+        parts = (xmax-xmin)*100;
+        r2fValue = xmin + rand()%(parts + 1)*0.01;
+        if (r2fValue > xmax) r2fValue = xmax;
+        else if (r2fValue < xmin) r2fValue = xmin;
+        x = r2fValue;
+
+        parts = (ymax-ymin)*100;
+        do
+        {
+            r2fValue = ymin + rand()%(parts + 1)*0.01;
+            if (r2fValue > ymax) r2fValue = ymax;
+            else if (r2fValue < ymin) r2fValue = ymin;
+            y = r2fValue;
+        }
+        while (M == 1 ? QPointF(x, y) == view->yerp[0]->getStart() :
+                        (QPointF(x, y) == view->yerp[0]->getStart() || QPointF(x, y) == view->yerp[1]->getStart()));   // No need for Prey to start from the same position as Yerp
+
+        parts = (xmax-xmin)*100;
+        r2fValue = xmin + rand()%(parts + 1)*0.01;
+        if (r2fValue > xmax) r2fValue = xmax;
+        else if (r2fValue < xmin) r2fValue = xmin;
+        xEnd = r2fValue;
+
+        parts = (ymax-ymin)*100;
+        r2fValue = ymin + rand()%(parts + 1)*0.01;
+        if (r2fValue > ymax) r2fValue = ymax;
+        else if (r2fValue < ymin) r2fValue = ymin;
+        yEnd = r2fValue;
+
+        parts = (maxVel1f-minVel1f)*10;
+        r2fValue = minVel1f*0.1 + rand()%(parts + 1)*0.01;
+        v = r2fValue;
+        if (r2fValue >= maxVel1f*0.1) v = maxVel1f*0.1;
+
+        QPointF e_s(xEnd - x, yEnd - y);
+        alpha = (fabs(e_s.x()) < 1.e-2 ? (e_s.y() > 0 ? 90 : -90) : 180/PI * atan2(e_s.y(), e_s.x()));
+
+        Prey* preyInst = new Prey(); // Data storage in Prey and some rendering stuff
+        QPointF pScene = view->coordsToScene(QPointF(x, y));
+        QPointF pSceneEnd = view->coordsToScene(QPointF(xEnd, yEnd));
+        QPointF pMath = QPointF(x, y);
+        QPointF pMathEnd = QPointF(xEnd, yEnd);
+        QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(pScene.x() - r, pScene.y() - r, 2*r, 2*r);
+        ellipse->setPen(QPen(Qt::black));
+        ellipse->setBrush(Qt::blue);
+        view->getScene()->addItem(ellipse);
+        view->getScene()->addItem(preyInst);
+
+        preyInst->setSStart(pScene);
+        preyInst->setStart(pMath);
+        preyInst->setSEll(ellipse);
+        view->prey.push_back(preyInst);
+
+        ellipse = new QGraphicsEllipseItem(pSceneEnd.x() - r, pSceneEnd.y() - r, 2*r, 2*r);
+        ellipse->setPen(QPen(Qt::black));
+        ellipse->setBrush(Qt::red);
+        view->getScene()->addItem(ellipse);
+
+        QVector<qreal> dashes; // Line between Start and End
+        dashes << 5.0 << 5.0;
+        QPen pen = QPen(QBrush(QColor(0, 0, 0, 80)), 2, Qt::DashLine, Qt::RoundCap, Qt::BevelJoin);
+        pen.setDashPattern(dashes);
+        QGraphicsLineItem* line = new QGraphicsLineItem(QLineF(pScene, pSceneEnd));
+        line->setPen(pen);
+        view->getScene()->addItem(line);
+
+        preyInst->setSEnd(pSceneEnd); // Data storage in Prey instance
+        preyInst->setEnd(pMathEnd);
+        preyInst->setEEll(ellipse);
+        preyInst->setLine(line);
+        preyInst->setAlpha(alpha);
+        preyInst->setVel(v*cos(alpha*PI/180.), v*sin(alpha*PI/180.));
+        preyInst->setV(v);
+    }
+}
+void MainWindow::on_actionStart_triggered()
+{
+    setFocus();
+    if (!isDataReadyToStartProcess()) return;
+
+    disableUIDueToCalcProcess();
+
+    FILE* initDataFile = fopen("initData.txt", "w+"); // Saving all the data to the default "initData.txt" file
+    saveDataToFile(initDataFile);
+
+
+}
+void MainWindow::on_actionBack_triggered()
+{
+    setFocus();
+
+}
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
+    qDebug() << e->key();
     switch (e->key()) {
         case Qt::Key_I:
         case 1064: {
@@ -278,6 +430,18 @@ void MainWindow::mouseMoveEvent(QMouseEvent * e) {
     Q_UNUSED(e);
 
     view->hideText();
+}
+
+void MainWindow::disableUIDueToCalcProcess()
+{
+    view->setDisabled(true);
+    view->hideText();
+    view->setStatus(StatusScene::disabled);
+    ui->actionClear->setEnabled(false);
+    ui->actionStart->setEnabled(false);
+    ui->actionLoad_from_file->setEnabled(false);
+    ui->actionRandom->setEnabled(false);
+    ui->actionBack->setEnabled(false);
 }
 
 int MainWindow::signs(double r)
@@ -295,21 +459,4 @@ int MainWindow::signs(double r)
     }
 
     return tmp++;
-}
-
-bool MainWindow::isDataReadyToStartProcess()
-{
-    if (view->getStatus() != StatusScene::settingPreyStart) return false;
-    if (view->prey.size() > 12)
-    {
-        QMessageBox::critical(this, "MT-TSP", "Should be less then 13 Preys");
-        return false;
-    }
-    if (view->prey.size() == 0 || view->yerp.size() == 0)
-    {
-        QMessageBox::information(this, "MT-TSP", "No Preys or Yerps");
-        return false;
-    }
-
-    return true;
 }
