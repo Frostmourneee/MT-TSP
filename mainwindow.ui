@@ -14,7 +14,10 @@
    <string>MT-TSP</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QSpinBox" name="spinBox"/>
+    </item>
     <item>
      <layout class="QVBoxLayout" name="vLScene"/>
     </item>
@@ -34,6 +37,8 @@
      <string>Options</string>
     </property>
     <addaction name="actionStart"/>
+    <addaction name="actionSave_as"/>
+    <addaction name="actionLoad_from_file"/>
    </widget>
    <addaction name="menuOptions"/>
   </widget>
@@ -46,7 +51,29 @@
     <string>Start optimal plans calculation process</string>
    </property>
    <property name="shortcut">
-    <string>Return</string>
+    <string>Shift+Return</string>
+   </property>
+  </action>
+  <action name="actionSave_as">
+   <property name="text">
+    <string>Save as</string>
+   </property>
+   <property name="toolTip">
+    <string>Choose file to save data about preys and yerps</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionLoad_from_file">
+   <property name="text">
+    <string>Load from file</string>
+   </property>
+   <property name="toolTip">
+    <string>Choose file to load data about preys and yerps</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
  </widget>

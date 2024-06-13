@@ -85,10 +85,10 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
 
             QVector<qreal> dashes; // Line between Start and End
             dashes << 5.0 << 5.0;
-            QPen* pen = new QPen(QBrush(QColor(0, 0, 0, 80)), 2, Qt::DashLine, Qt::RoundCap, Qt::BevelJoin);
-            pen->setDashPattern(dashes);
+            QPen pen = QPen(QBrush(QColor(0, 0, 0, 80)), 2, Qt::DashLine, Qt::RoundCap, Qt::BevelJoin);
+            pen.setDashPattern(dashes);
             QGraphicsLineItem* line = new QGraphicsLineItem(QLineF(arrow->getStart(), arrow->getEnd()));
-            line->setPen(*pen);
+            line->setPen(pen);
             scene->addItem(line);
 
             tmpPrey->setSEnd(pScene); // Data storage in Prey instance
@@ -271,22 +271,17 @@ QPointF MyQGraphicsView::coordsToScene(QPointF coordPoint) // NOT LINEAR!!! Tran
     return pTocoordLineXInverse + QPointF(w/2, h/2);
 }
 
-QString MyQGraphicsView::doubleW2Decimals(double val)
-{
-    QString valStr = QString::number(val);
-
-    if (valStr.indexOf('.') == -1) return valStr+QString(".00");
-    else return valStr.split('.')[1].size() == 2 ? valStr : valStr+QString("0");
-}
 void MyQGraphicsView::textCoords(double x, double y)
 {
+    QString xStr = x < 0 ? QString::number(x, 'f', 2) : " " + QString::number(x, 'f', 2);
+    QString yStr = y < 0 ? QString::number(y, 'f', 2) : " " + QString::number(y, 'f', 2);
     text->setFont(QFont("Times", 12, QFont::Bold));
-    text->setPlainText(QString("%1; %2").arg(doubleW2Decimals(x)).arg(doubleW2Decimals(y)));
+    text->setPlainText(QString("%1; %2").arg(xStr).arg(yStr));
     text->setPos(QPointF(5, 5));
 }
 void MyQGraphicsView::textV(double v)
 {
-    text->setPlainText(tr("V = %1").arg(doubleW2Decimals(v)));
+    text->setPlainText(tr("V = %1").arg(QString::number(v, 'f', 2)));
     text->setPos(QPointF(5, 5));
     text->setFont(QFont("Times", 12, QFont::Bold));
 }
@@ -304,7 +299,8 @@ void MyQGraphicsView::info()
     qDebug() << "(yerpNum, sStart, start)" << '\n';
     for (Yerp* y : yerp)
     {
-        qDebug() << "(" << y->getYerpNum() << "," << y->getSStart() << "," << y->getStart() << y->pos() << '\n';
+        qDebug() << "(" << y->getYerpNum() << "," << y->getSStart() << "," << y->getStart() << '\n';
     }
     qDebug() << "Primitives in Scene" << scene->items().size();
 }
+

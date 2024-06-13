@@ -22,6 +22,7 @@ SOURCES += \
     mainwindow.cpp \
     myqgraphicsview.cpp \
     prey.cpp \
+    solver.cpp \
     yerp.cpp
 
 HEADERS += \
@@ -30,6 +31,7 @@ HEADERS += \
     mainwindow.h \
     myqgraphicsview.h \
     prey.h \
+    solver.h \
     yerp.h
 
 FORMS += \

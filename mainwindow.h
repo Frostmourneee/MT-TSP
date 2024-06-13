@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <myqgraphicsview.h>
+#include <QFileDialog>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,10 +20,19 @@ public:
 private:
     Ui::MainWindow *ui;
     MyQGraphicsView* view;
+    QString preyDataStrSave(double, double, double, double, double, double, int, int, int, int, int, int);
+    QString yerpDataStrSave(double, double, int, int);
+    int signs(double);
+    bool isDataReadyToStartProcess();
+    bool userHasntSeenOnlyLatinLettersWarning = true;
+    void saveDataToFile(FILE*);
+
 
 private slots:
     void on_actionStart_triggered();
     void keyPressEvent(QKeyEvent *) override;
     void mouseMoveEvent(QMouseEvent *) override;
+    void on_actionSave_as_triggered();
+    void on_actionLoad_from_file_triggered();
 };
 #endif // MAINWINDOW_H
