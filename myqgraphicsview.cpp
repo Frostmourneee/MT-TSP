@@ -135,13 +135,13 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent * e)
     Prey* tmpPrey = prey.back();
 
     switch (status) {
-        case StatusScene::settingPreyStart:
+        case StatusScene::settingPreyStart: // Just moving the cursor
         {
             textCoords(pMath.x(), pMath.y());
 
             break;
         }
-        case StatusScene::settingPreyEnd:
+        case StatusScene::settingPreyEnd: // Moving with Arrow
         {
             if (e->modifiers().testFlag(Qt::ShiftModifier)) {
                 QPoint e_s = QPoint(pScene.toPoint().x() - coordsToScene(tmpPrey->getStart()).toPoint().x(),
@@ -159,7 +159,7 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent * e)
 
             break;
         }
-        case StatusScene::settingPreyVelocity:
+        case StatusScene::settingPreyVelocity: // Moving while velocity setting
         {
             QPointF red = tmpPrey->getEnd(); // Preparing for velocity arrow
             QPointF blue = tmpPrey->getStart();
@@ -187,7 +187,6 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent * e)
             }
             v = int(v*100. + 1.e-5) / 100.0;
             textV(v);
-
             tmpPrey->setV(v);
 
             break;
@@ -298,6 +297,60 @@ void MyQGraphicsView::textV(double v)
     text->setFont(QFont("Times", 12, QFont::Bold));
 }
 
+void MyQGraphicsView::backAction()
+{
+    switch (status) {
+        case StatusScene::settingPreyStart: // Rollback to previous Prey velocity choosing
+        {
+            if (!yerp.isEmpty()) // Firstly Yerps will be removed
+            {
+                scene->removeItem(yerp.last());
+                delete(yerp.last());
+                yerp.removeLast();
+                return;
+            }
+
+            if (prey.isEmpty()) return;
+            Prey* lastPrey = prey.last();
+            arrow->setPen(QPen(QBrush(Qt::black), 4, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+            arrow->setLine(lastPrey->getSStart(), lastPrey->getSEnd());
+            arrow->show();
+            textV(0.99);
+
+            status = StatusScene::settingPreyVelocity;
+
+            break;
+        }
+        case StatusScene::settingPreyEnd: // Rollback to looking for Prey Start point
+        {
+            arrow->hide();
+            prey.last()->deleteSEll();
+            delete(prey.last());
+            prey.removeLast();
+            status = StatusScene::settingPreyStart;
+
+            break;
+        }
+        case StatusScene::settingPreyVelocity: // Rollback to looking for Prey End point
+        {
+            Prey* lastPrey = prey.last();
+            lastPrey->deleteLine();
+            lastPrey->deleteEEll();
+
+            QPointF pSceneCursorPos = mapFromGlobal(QCursor::pos());
+            arrow->setPen(QPen(QBrush(Qt::black), 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+            arrow->setLine(lastPrey->getSStart(), pSceneCursorPos);
+            textCoords(lastPrey->getEnd().x(), sceneToCoords(pSceneCursorPos).y());
+            status = StatusScene::settingPreyEnd;
+
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+}
 void MyQGraphicsView::clear()
 {
     arrow->hide();
@@ -324,6 +377,7 @@ void MyQGraphicsView::clear()
     yerp.clear();
 
 }
+
 void MyQGraphicsView::info()
 {
     qDebug() << "Preys created" << prey.size() <<

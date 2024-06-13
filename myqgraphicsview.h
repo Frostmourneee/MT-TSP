@@ -31,6 +31,7 @@ public:
     void hideText() {text->hide();}
     void showText() {text->show();}
     void clear();
+    void backAction();
 
 public slots:
     void mousePressEvent(QMouseEvent * e) override;

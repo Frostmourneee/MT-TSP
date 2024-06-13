@@ -411,11 +411,10 @@ void MainWindow::on_actionStart_triggered()
 void MainWindow::on_actionBack_triggered()
 {
     setFocus();
-
+    view->backAction();
 }
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
-    qDebug() << e->key();
     switch (e->key()) {
         case Qt::Key_I:
         case 1064: {
