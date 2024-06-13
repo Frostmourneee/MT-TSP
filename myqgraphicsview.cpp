@@ -237,6 +237,21 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
         coordGridLine.push_back(coordL);
         scene->addItem(coordL);
     }
+
+    for (Prey* p : prey) // Prey's ellipses and dotted line repositioning
+    {
+        int rad = GraphicsEntities::smallGraphicsUnit;
+        p->setSStart(coordsToScene(p->getStart()));
+        p->setSEnd(coordsToScene(p->getEnd()));
+
+        QPointF st = p->getSStart();
+        QPointF e = p->getSEnd();
+        p->getSEll()->setRect(st.x() - rad, st.y() - rad, 2*rad, 2*rad);
+        p->getEEll()->setRect(e.x() - rad, e.y() - rad, 2*rad, 2*rad);
+        p->getLine()->setLine(QLineF(st, e));
+    }
+
+    for (Yerp* y : yerp) y->setSStart(coordsToScene(y->getStart())); // Yerp's repositioning
 }
 
 QPointF MyQGraphicsView::sceneToCoords(QPointF scenePoint) // Translate point from Scene coords to convinient "maths" coords
@@ -289,7 +304,7 @@ void MyQGraphicsView::info()
     qDebug() << "(yerpNum, sStart, start)" << '\n';
     for (Yerp* y : yerp)
     {
-        qDebug() << "(" << y->getYerpNum() << "," << y->getSStart() << "," << y->getStart() << '\n';
+        qDebug() << "(" << y->getYerpNum() << "," << y->getSStart() << "," << y->getStart() << y->pos() << '\n';
     }
     qDebug() << "Primitives in Scene" << scene->items().size();
 }

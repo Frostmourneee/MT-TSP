@@ -9,6 +9,7 @@ class Prey : public GraphicsEntities
 public:
     QGraphicsEllipseItem* getSEll() {return sEll;}
     QGraphicsEllipseItem* getEEll() {return eEll;}
+    QGraphicsLineItem* getLine() {return line;}
     QPointF getEnd() {return end;}
     QPointF getSEnd() {return sEnd;}
     double getVx() {return vx;}

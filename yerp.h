@@ -9,7 +9,7 @@ class Yerp : public GraphicsEntities
 public:
     Yerp(int num, QPointF sSt, QPointF st) : yerpNum{num}
     {sStart = sSt; start = st;}
-
+    void setSStart(QPointF sSt) override {prepareGeometryChange(); sStart = sSt;}
     int getYerpNum() {return yerpNum;}
 
 private:
