@@ -2,8 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <myqgraphicsview.h>
+#include <QThread>
 #include <QFileDialog>
+#include <solver.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,7 +20,9 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QThread* thread;
     MyQGraphicsView* view;
+    Solver* solver;
     QString preyDataStrSave(double, double, double, double, double, double, int, int, int, int, int, int);
     QString yerpDataStrSave(double, double, int, int);
     int signs(double);
@@ -27,6 +30,10 @@ private:
     bool userHasntSeenOnlyLatinLettersWarning = true;
     void saveDataToFile(FILE*);
     void disableUIDueToCalcProcess();
+    void enableUIAfterCalcProcess();
+
+signals:
+    void solve(MyQGraphicsView* view);
 
 private slots:
     void on_actionStart_triggered();
@@ -39,5 +46,6 @@ private slots:
     void on_actionFullscreen_triggered();
     void on_actionRandom_triggered();
     void on_actionBack_triggered();
+    void solvingEnded();
 };
 #endif // MAINWINDOW_H

@@ -16,6 +16,8 @@ public:
     double getVy() {return vy;}
     double getAlpha() {return alpha;} // Degrees
     double getV() {return v;}
+    double getDieTime() {return dieTime;}
+    double getYerpNum() {return yerpNum;}
     void setEnd(QPointF e) {end = e;}
     void setSEnd(QPointF sE) {sEnd = sE;}
     void setAlpha(double ang) {alpha = ang;}
@@ -23,6 +25,8 @@ public:
     void setSEll(QGraphicsEllipseItem* ell) {sEll = ell;}
     void setEEll(QGraphicsEllipseItem* ell) {eEll = ell;}
     void setLine(QGraphicsLineItem* l) {line = l;}
+    void setDieTime(double t) {dieTime = t;}
+    void setYerpNum(int num) {yerpNum = num;}
     void deleteSEll() {if (scene()->items().indexOf(sEll) != -1) scene()->removeItem(sEll); delete(sEll);}
     void deleteEEll() {if (scene()->items().indexOf(eEll) != -1) scene()->removeItem(eEll); delete(eEll);}
     void deleteLine() {if (scene()->items().indexOf(line) != -1) scene()->removeItem(line); delete(line);}
@@ -39,6 +43,8 @@ private:
     QPointF sEnd; // Stored in Scene coords
     double alpha;
     double v;
+    double dieTime; // Interception moment
+    int yerpNum; // Interceptor id
 };
 
 #endif // PREY_H
