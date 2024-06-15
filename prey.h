@@ -3,6 +3,7 @@
 
 #include <graphicsEntities.h>
 #include <QGraphicsEllipseItem>
+#include <QDebug>
 
 class Prey : public GraphicsEntities
 {
@@ -34,6 +35,7 @@ public:
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
     QRectF boundingRect() const override;
+    void advance(int phase) override;
 
 private:
     QGraphicsEllipseItem* sEll;

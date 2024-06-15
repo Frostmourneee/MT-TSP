@@ -3,6 +3,7 @@
 
 #include <QGraphicsItem>
 #include <QGraphicsScene>
+#include <QPainter>
 
 class GraphicsEntities : public QGraphicsItem
 {
@@ -20,8 +21,8 @@ public:
 protected:
     QPointF start; // Stored in Scene coords for Arrow, in Math coords for Prey, Yerp
     QPointF sStart; // For Prey and Yerp
-    double vx;
-    double vy;
+    double vx = 0;
+    double vy = 0;
 };
 
 #endif // GRAPHICSENTITIES_H

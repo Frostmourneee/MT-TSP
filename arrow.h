@@ -3,7 +3,6 @@
 
 #include <graphicsEntities.h>
 #include <math.h>
-#include <QPainter>
 
 class Arrow : public GraphicsEntities
 {

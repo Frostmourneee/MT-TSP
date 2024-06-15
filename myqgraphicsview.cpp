@@ -28,15 +28,15 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent) : QGraphicsView(parent)
     genRect->setPen(QPen(QBrush(Qt::blue), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
     genRect->setBrush(QBrush(Qt::transparent));
     scene->addItem(genRect);
+
+    timer = new QTimer(this);
+    timer->setSingleShot(false);
+    connect(timer, SIGNAL(timeout()), scene, SLOT(advance()));
+    timer->start(10);
 }
 
 void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
 {
-    if (e->button() == Qt::MidButton) // Test button
-    {
-//        QPoint p = mapToScene(e->pos()).toPoint();
-//        qDebug() << itemAt(p) << (itemAt(p) == genRect);
-    }
     if (e->button() != Qt::LeftButton && e->button() != Qt::RightButton) return;
 
     QPointF pScene = mapToScene(e->pos()); // Scene coords

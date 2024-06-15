@@ -11,6 +11,7 @@
 #include <QGuiApplication>
 #include <QDebug>
 #include <QMessageBox>
+#include <QTimer>
 
 #define PI 3.1415926535
 
@@ -28,6 +29,7 @@ public:
     QRectF getGenRect() {return genRect->rect();}
     QGraphicsScene* getScene() {return scene;}
     StatusScene getStatus() {return status;}
+    int getUnit() {return unit;}
     void info();
     void setStatus(StatusScene s) {status = s;}
     void setVisibleText(bool b) {text->setVisible(b);}
@@ -50,6 +52,7 @@ private:
     QGraphicsRectItem* genRect;
     QGraphicsTextItem* text;
     Arrow* arrow;
+    QTimer* timer;
     StatusScene status = StatusScene::settingPreyStart;
     GenRectSide side = GenRectSide::noSide;
     int unit{50}; // Pixels per 1 coord unit
