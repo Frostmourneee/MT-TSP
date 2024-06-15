@@ -89,14 +89,15 @@ public:
         MainWindow->setStatusBar(statusbar);
 
         menubar->addAction(menuOptions->menuAction());
-        menuOptions->addAction(actionStart);
-        menuOptions->addAction(actionSave_as);
-        menuOptions->addAction(actionLoad_from_file);
-        menuOptions->addAction(actionExit);
-        menuOptions->addAction(actionFullscreen);
         menuOptions->addAction(actionRandom);
+        menuOptions->addAction(actionStart);
         menuOptions->addAction(actionBack);
         menuOptions->addAction(actionClear);
+        menuOptions->addAction(actionFullscreen);
+        menuOptions->addAction(actionExit);
+        menuOptions->addSeparator();
+        menuOptions->addAction(actionSave_as);
+        menuOptions->addAction(actionLoad_from_file);
 
         retranslateUi(MainWindow);
 
@@ -106,7 +107,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MT-TSP", nullptr));
-        actionStart->setText(QCoreApplication::translate("MainWindow", "Start calculation", nullptr));
+        actionStart->setText(QCoreApplication::translate("MainWindow", "Start calculation\tShift+Enter", nullptr));
 #if QT_CONFIG(tooltip)
         actionStart->setToolTip(QCoreApplication::translate("MainWindow", "Start optimal plans calculation process", nullptr));
 #endif // QT_CONFIG(tooltip)
@@ -156,7 +157,7 @@ public:
 #if QT_CONFIG(shortcut)
         actionClear->setShortcut(QCoreApplication::translate("MainWindow", "R", nullptr));
 #endif // QT_CONFIG(shortcut)
-        menuOptions->setTitle(QCoreApplication::translate("MainWindow", "Options", nullptr));
+        menuOptions->setTitle(QCoreApplication::translate("MainWindow", "Actions", nullptr));
     } // retranslateUi
 
 };

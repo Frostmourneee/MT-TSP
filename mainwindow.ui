@@ -34,16 +34,17 @@
    </property>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
-     <string>Options</string>
+     <string>Actions</string>
     </property>
-    <addaction name="actionStart"/>
-    <addaction name="actionSave_as"/>
-    <addaction name="actionLoad_from_file"/>
-    <addaction name="actionExit"/>
-    <addaction name="actionFullscreen"/>
     <addaction name="actionRandom"/>
+    <addaction name="actionStart"/>
     <addaction name="actionBack"/>
     <addaction name="actionClear"/>
+    <addaction name="actionFullscreen"/>
+    <addaction name="actionExit"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_as"/>
+    <addaction name="actionLoad_from_file"/>
    </widget>
    <addaction name="menuOptions"/>
   </widget>

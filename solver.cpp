@@ -73,6 +73,8 @@ void Solver::solve(MyQGraphicsView* view)
         free(curPlan1);
         free(curPlan2);
 
+        emit solvingEnded();
+
         clock_t clockEnd = clock();
         qDebug("Time spent: %lf\n", (double)(clockEnd-clockBegin)/CLOCKS_PER_SEC);
         return;
