@@ -4,7 +4,6 @@
 //TODO укрупнение сетки
 //TODO подумать над плавностью смены сотых долей в координатах
 //TODO из-за симметрий быть может можно перебор уменьшить когда M = 2
-//TODO прямоугольник ограничивающий происходящее
 //TODO тесты
 //TODO сортировка по иксам работает?
 //TODO нельзя задать план из двузначной цели
@@ -17,13 +16,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    setFixedSize(QSize(1440, 900));
-    setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+    setMinimumSize(QSize(800, 600));
+    resize(QSize(1440, 900));
     setMouseTracking(true);
     centralWidget()->setMouseTracking(true);
 
     view = new MyQGraphicsView(this);
     ui->vLScene->addWidget(view);
+    view->setRectangle(QRectF(20, 20, 1318, 773));
     view->setFocus();
 
     thread = new QThread(this);
@@ -62,10 +62,13 @@ void MainWindow::on_actionFullscreen_triggered()
 }
 void MainWindow::on_actionRandom_triggered()
 {
-    double xmax = QString::number(9.95, 'f', 2).toDouble();
-    double xmin = -10;
-    double ymax = 7;
-    double ymin = -7;
+    QRectF genRect = view->getGenRect();
+    QPointF genLeft = view->sceneToCoords(QPointF(genRect.x(), genRect.y()));
+    QPointF genRight = view->sceneToCoords(QPointF(genRect.x()+genRect.width(), genRect.y()+genRect.height()));
+    double xmax = QString::number(genRight.x(), 'f', 2).toDouble();
+    double xmin = QString::number(genLeft.x(), 'f', 2).toDouble();
+    double ymax = QString::number(genLeft.y(), 'f', 2).toDouble();
+    double ymin = QString::number(genRight.y(), 'f', 2).toDouble();
     double maxVel1f = 7;
     double minVel1f = 0;
 

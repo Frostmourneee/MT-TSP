@@ -11,7 +11,7 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent) : QGraphicsView(parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     text = new QGraphicsTextItem("Move the cursor in the \n       working area");
-    text->setPos(70, 70);
+    text->setPos(70, 50);
     text->setFont(QFont("Times", 20, QFont::Bold));
     scene->addItem(text);
 
@@ -23,16 +23,26 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent) : QGraphicsView(parent)
     coordLineY = new QGraphicsLineItem();
     scene->addItem(coordLineX);
     scene->addItem(coordLineY);
+
+    genRect = new QGraphicsRectItem(0, 0, 100, 100);
+    genRect->setPen(QPen(QBrush(Qt::blue), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+    genRect->setBrush(QBrush(Qt::transparent));
+    scene->addItem(genRect);
 }
 
 void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
 {
+    if (e->button() == Qt::MidButton) // Test button
+    {
+//        QPoint p = mapToScene(e->pos()).toPoint();
+//        qDebug() << itemAt(p) << (itemAt(p) == genRect);
+    }
     if (e->button() != Qt::LeftButton && e->button() != Qt::RightButton) return;
 
     QPointF pScene = mapToScene(e->pos()); // Scene coords
     QPointF pMath = sceneToCoords(pScene); // Convinient "maths" coords
 
-    if (e->button() == Qt::RightButton)
+    if (e->button() == Qt::RightButton && status == StatusScene::settingPreyStart)
     {
         if (yerp.size() == 2) return;
 
@@ -47,6 +57,26 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
     switch (status) {
         case StatusScene::settingPreyStart: // Click borns the preyStart point
         {
+            if (onGenRect(pScene)) // Start resizing genRect
+            {
+                setCursor(QCursor(Qt::ClosedHandCursor));
+                status = StatusScene::draggingGenRect;
+
+                QRectF rect = genRect->rect();
+                double x = pScene.x();
+                double y = pScene.y();
+                bool ts = fabs(y-rect.y()) < 5; // Top side of rect
+                bool rs = fabs(x-(rect.x()+rect.width())) < 5; // Right side of rect
+                bool bs = fabs(y-(rect.y()+rect.height())) < 5; // Bot side of rect
+                bool ls = fabs(x-rect.x()) < 5; // Left side of genRect
+
+                if (ts) side = GenRectSide::topSide;
+                else if (rs) side = GenRectSide::rightSide;
+                else if (bs) side = GenRectSide::botSide;
+                else if (ls) side = GenRectSide::leftSide;
+                return;
+            }
+
             int r = GraphicsEntities::smallGraphicsUnit; // Blue Start point creation
             QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(pScene.x() - r, pScene.y() - r, 2*r, 2*r);
             ellipse->setPen(QPen(Qt::black));
@@ -125,15 +155,70 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
         }
     }
 }
-void MyQGraphicsView::mouseMoveEvent(QMouseEvent * e)
+void MyQGraphicsView::mouseMoveEvent(QMouseEvent* e)
 {
     text->show();
-    if (e->buttons() != Qt::NoButton) return; // We need only movement without any signals
+    if (e->buttons() != Qt::NoButton && e->buttons() != Qt::LeftButton) return; // We need only movement or movement with Qt::LeftButton
 
     QPointF pScene = mapToScene(e->pos()); // Scene coords
     QPointF pMath = sceneToCoords(pScene); // Convinient "maths" coords
-    Prey* tmpPrey = prey.back();
+    if (onGenRect(pScene))
+    {
+        if (status == StatusScene::settingPreyStart) setCursor(QCursor(Qt::OpenHandCursor));
+        if (status == StatusScene::draggingGenRect)
+        {
+            QRectF rect = genRect->rect();
+            double x = pScene.x();
+            double y = pScene.y();
 
+            switch (side)
+            {
+                case GenRectSide::topSide:
+                {
+                    if (y < 20) return;
+
+                    double deltaY = y-rect.y();
+                    QRectF newRect = QRectF(rect.x(), y, rect.width(), rect.height() - deltaY);
+                    genRect->setRect(newRect);
+                    break;
+                }
+                case GenRectSide::rightSide:
+                {
+                    if (x > width()-20) return;
+
+                    double deltaX = x-(rect.x()+rect.width());
+                    QRectF newRect = QRectF(rect.x(), rect.y(), rect.width() + deltaX, rect.height());
+                    genRect->setRect(newRect);
+                    break;
+                }
+                case GenRectSide::botSide:
+                {
+                    if (y > height()-20) return;
+
+                    double deltaY = y-(rect.y()+rect.height());
+                    QRectF newRect = QRectF(rect.x(), rect.y(), rect.width(), rect.height() + deltaY);
+                    genRect->setRect(newRect);
+                    break;
+                }
+                case GenRectSide::leftSide:
+                {
+                    if (x < 20) return;
+
+                    double deltaX = x-rect.x();
+                    QRectF newRect = QRectF(x, rect.y(), rect.width() - deltaX, rect.height());
+                    genRect->setRect(newRect);
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+        }
+    }
+    else if (status != StatusScene::draggingGenRect) setCursor(QCursor(Qt::ArrowCursor));
+
+    Prey* tmpPrey = prey.back();
     switch (status) {
         case StatusScene::settingPreyStart: // Just moving the cursor
         {
@@ -197,6 +282,17 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent * e)
         }
     }
 }
+void MyQGraphicsView::mouseReleaseEvent(QMouseEvent *e)
+{
+    if (status == StatusScene::draggingGenRect)
+    {
+        status = StatusScene::settingPreyStart;
+        side = GenRectSide::noSide;
+        setCursor(QCursor(Qt::ArrowCursor));
+    }
+
+    Q_UNUSED(e);
+}
 void MyQGraphicsView::resizeEvent(QResizeEvent *e)
 {
     Q_UNUSED(e);
@@ -204,6 +300,12 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
     int w = width();
     int h = height();
     scene->setSceneRect(0, 0, w, h);
+
+    QRectF rect = genRect->rect();
+    double needRectW = rect.width() < w-20-rect.x() ? rect.width() : w-20-rect.x();
+    double needRectH = rect.height() < h-20-rect.y() ? rect.height() : h-20-rect.y();
+    QRectF newRect = QRectF(rect.x(), rect.y(), needRectW, needRectH).normalized();
+    genRect->setRect(newRect);
 
     coordLineX->setLine(-w*0.49, 0, w*0.49, 0); // Main absciss line
     coordLineY->setLine(0, -h*0.49, 0, h*0.49); // Main ordinate line
@@ -288,12 +390,12 @@ void MyQGraphicsView::textCoords(double x, double y)
     QString yStr = y < 0 ? QString::number(y, 'f', 2) : " " + QString::number(y, 'f', 2);
     text->setFont(QFont("Times", 12, QFont::Bold));
     text->setPlainText(QString("%1; %2").arg(xStr).arg(yStr));
-    text->setPos(QPointF(5, 5));
+    text->setPos(QPointF(20, 20));
 }
 void MyQGraphicsView::textV(double v)
 {
     text->setPlainText(tr("V = %1").arg(QString::number(v, 'f', 2)));
-    text->setPos(QPointF(5, 5));
+    text->setPos(QPointF(20, 20));
     text->setFont(QFont("Times", 12, QFont::Bold));
 }
 
@@ -373,6 +475,17 @@ void MyQGraphicsView::clear()
     }
     yerp.clear();
 
+}
+
+bool MyQGraphicsView::onGenRect(QPointF pScene)
+{
+    double x = pScene.x();
+    double y = pScene.y();
+
+    QRectF rect = genRect->rect();
+    return fabs(x-rect.x()) < 5 || fabs(x-(rect.x()+rect.width())) < 5 ||
+           fabs(y-rect.y()) < 5 || fabs(y-(rect.y()+rect.height())) < 5 ||
+           status == StatusScene::draggingGenRect;
 }
 
 void MyQGraphicsView::info()
