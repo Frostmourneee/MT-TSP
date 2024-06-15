@@ -28,10 +28,10 @@ public:
     StatusScene getStatus() {return status;}
     void info();
     void setStatus(StatusScene s) {status = s;}
-    void hideText() {text->hide();}
-    void showText() {text->show();}
+    void setVisibleText(bool b) {text->setVisible(b);}
     void clear();
     void backAction();
+    void textCoords(double x, double y);
 
 public slots:
     void mousePressEvent(QMouseEvent * e) override;
@@ -49,7 +49,6 @@ private:
     int unit{50}; // Pixels per 1 coord unit
     double distSqr(QPointF a, QPointF b) {return (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y());};
     double clamp(double value, double min, double max) {return value > max ? max : value < min ? min : value;};
-    void textCoords(double x, double y);
     void textV(double v);
 };
 

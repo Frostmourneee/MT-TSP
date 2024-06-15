@@ -27,9 +27,9 @@ public:
     void setLine(QGraphicsLineItem* l) {line = l;}
     void setDieTime(double t) {dieTime = t;}
     void setYerpNum(int num) {yerpNum = num;}
-    void deleteSEll() {if (scene()->items().indexOf(sEll) != -1) scene()->removeItem(sEll); delete(sEll);}
-    void deleteEEll() {if (scene()->items().indexOf(eEll) != -1) scene()->removeItem(eEll); delete(eEll);}
-    void deleteLine() {if (scene()->items().indexOf(line) != -1) scene()->removeItem(line); delete(line);}
+    void deleteSEll() {if (sEll == NULL) return; if (scene()->items().indexOf(sEll) != -1) scene()->removeItem(sEll); delete sEll; sEll = NULL;}
+    void deleteEEll() {if (eEll == NULL) return; if (scene()->items().indexOf(eEll) != -1) scene()->removeItem(eEll); delete eEll; eEll = NULL;}
+    void deleteLine() {if (line == NULL) return; if (scene()->items().indexOf(line) != -1) scene()->removeItem(line); delete line; line = NULL;}
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;

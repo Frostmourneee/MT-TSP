@@ -43,7 +43,12 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionClear_triggered()
 {
     setFocus();
+
     view->clear();
+    QPointF pMathCursorPos = view->sceneToCoords(view->mapFromGlobal(QCursor::pos()));
+    double x = pMathCursorPos.x();
+    double y = pMathCursorPos.y();
+    view->textCoords(x + 0.02, y - 0.02);
 }
 void MainWindow::on_actionExit_triggered()
 {
@@ -178,7 +183,7 @@ void MainWindow::on_actionStart_triggered()
     setFocus();
     if (!isDataReadyToStartProcess()) return;
 
-    disableUIDueToCalcProcess();
+    enableUI(false);
 
     FILE* initDataFile = fopen("initData.txt", "w+"); // Saving all the data to the default "initData.txt" file
     saveDataToFile(initDataFile);
@@ -188,7 +193,7 @@ void MainWindow::on_actionStart_triggered()
 }
 void MainWindow::solvingEnded()
 {
-    enableUIAfterCalcProcess();
+    enableUI(true);
 
     thread->exit(0);
 }
@@ -441,30 +446,19 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 void MainWindow::mouseMoveEvent(QMouseEvent * e) {
     Q_UNUSED(e);
 
-    view->hideText();
+    view->setVisibleText(false);
 }
 
-void MainWindow::disableUIDueToCalcProcess()
+void MainWindow::enableUI(bool shouldEnable)
 {
-    view->setDisabled(true);
-    view->hideText();
-    view->setStatus(StatusScene::disabled);
-    ui->actionClear->setEnabled(false);
-    ui->actionStart->setEnabled(false);
-    ui->actionLoad_from_file->setEnabled(false);
-    ui->actionRandom->setEnabled(false);
-    ui->actionBack->setEnabled(false);
-}
-void MainWindow::enableUIAfterCalcProcess()
-{
-    view->setEnabled(true);
-    view->showText();
-    view->setStatus(StatusScene::settingPreyStart);
-    ui->actionClear->setEnabled(true);
-    ui->actionStart->setEnabled(true);
-    ui->actionLoad_from_file->setEnabled(true);
-    ui->actionRandom->setEnabled(true);
-    ui->actionBack->setEnabled(true);
+    view->setEnabled(shouldEnable);
+    view->setVisibleText(shouldEnable);
+    view->setStatus(shouldEnable ? StatusScene::settingPreyStart : StatusScene::disabled);
+    ui->actionClear->setEnabled(shouldEnable);
+    ui->actionStart->setEnabled(shouldEnable);
+    ui->actionLoad_from_file->setEnabled(shouldEnable);
+    ui->actionRandom->setEnabled(shouldEnable);
+    ui->actionBack->setEnabled(shouldEnable);
 }
 
 int MainWindow::signs(double r)

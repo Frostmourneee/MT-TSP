@@ -127,7 +127,7 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
 }
 void MyQGraphicsView::mouseMoveEvent(QMouseEvent * e)
 {
-    showText();
+    text->show();
     if (e->buttons() != Qt::NoButton) return; // We need only movement without any signals
 
     QPointF pScene = mapToScene(e->pos()); // Scene coords
@@ -215,7 +215,7 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
     for (QGraphicsLineItem* l : coordGridLine)
     {
         scene->removeItem(l);
-        delete(l);
+        delete l;
     }
     coordGridLine.clear();
 
@@ -305,7 +305,7 @@ void MyQGraphicsView::backAction()
             if (!yerp.isEmpty()) // Firstly Yerps will be removed
             {
                 scene->removeItem(yerp.last());
-                delete(yerp.last());
+                delete yerp.last();
                 yerp.removeLast();
                 return;
             }
@@ -325,7 +325,7 @@ void MyQGraphicsView::backAction()
         {
             arrow->hide();
             prey.last()->deleteSEll();
-            delete(prey.last());
+            delete prey.last();
             prey.removeLast();
             status = StatusScene::settingPreyStart;
 
@@ -340,7 +340,7 @@ void MyQGraphicsView::backAction()
             QPointF pSceneCursorPos = mapFromGlobal(QCursor::pos());
             arrow->setPen(QPen(QBrush(Qt::black), 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
             arrow->setLine(lastPrey->getSStart(), pSceneCursorPos);
-            textCoords(lastPrey->getEnd().x(), sceneToCoords(pSceneCursorPos).y());
+            textCoords(sceneToCoords(pSceneCursorPos).x(), sceneToCoords(pSceneCursorPos).y());
             status = StatusScene::settingPreyEnd;
 
             break;
@@ -354,9 +354,6 @@ void MyQGraphicsView::backAction()
 void MyQGraphicsView::clear()
 {
     arrow->hide();
-    text->setFont(QFont("Times", 20, QFont::Bold));
-    text->setPlainText("Move the cursor in the \n       working area");
-    text->setPos(70, 70);
 
     status = StatusScene::settingPreyStart;
 
@@ -365,14 +362,14 @@ void MyQGraphicsView::clear()
         p->deleteSEll();
         p->deleteEEll();
         p->deleteLine();
-        delete(p);
+        delete p;
     }
     prey.clear();
 
     for (Yerp* y : yerp)
     {
         scene->removeItem(y);
-        delete(y);
+        delete y;
     }
     yerp.clear();
 

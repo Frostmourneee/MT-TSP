@@ -23,14 +23,13 @@ private:
     QThread* thread;
     MyQGraphicsView* view;
     Solver* solver;
+    bool userHasntSeenOnlyLatinLettersWarning = true;
     QString preyDataStrSave(double, double, double, double, double, double, int, int, int, int, int, int);
     QString yerpDataStrSave(double, double, int, int);
     int signs(double);
     bool isDataReadyToStartProcess();
-    bool userHasntSeenOnlyLatinLettersWarning = true;
     void saveDataToFile(FILE*);
-    void disableUIDueToCalcProcess();
-    void enableUIAfterCalcProcess();
+    void enableUI(bool);
 
 signals:
     void solve(MyQGraphicsView* view);
@@ -41,11 +40,11 @@ private slots:
     void mouseMoveEvent(QMouseEvent *) override;
     void on_actionSave_as_triggered();
     void on_actionLoad_from_file_triggered();
-    void on_actionClear_triggered();
     void on_actionExit_triggered();
     void on_actionFullscreen_triggered();
     void on_actionRandom_triggered();
     void on_actionBack_triggered();
     void solvingEnded();
+    void on_actionClear_triggered();
 };
 #endif // MAINWINDOW_H

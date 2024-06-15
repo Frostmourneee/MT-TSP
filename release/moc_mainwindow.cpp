@@ -44,12 +44,12 @@ QT_MOC_LITERAL(8, 90, 14), // "mouseMoveEvent"
 QT_MOC_LITERAL(9, 105, 12), // "QMouseEvent*"
 QT_MOC_LITERAL(10, 118, 26), // "on_actionSave_as_triggered"
 QT_MOC_LITERAL(11, 145, 33), // "on_actionLoad_from_file_trigg..."
-QT_MOC_LITERAL(12, 179, 24), // "on_actionClear_triggered"
-QT_MOC_LITERAL(13, 204, 23), // "on_actionExit_triggered"
-QT_MOC_LITERAL(14, 228, 29), // "on_actionFullscreen_triggered"
-QT_MOC_LITERAL(15, 258, 25), // "on_actionRandom_triggered"
-QT_MOC_LITERAL(16, 284, 23), // "on_actionBack_triggered"
-QT_MOC_LITERAL(17, 308, 12) // "solvingEnded"
+QT_MOC_LITERAL(12, 179, 23), // "on_actionExit_triggered"
+QT_MOC_LITERAL(13, 203, 29), // "on_actionFullscreen_triggered"
+QT_MOC_LITERAL(14, 233, 25), // "on_actionRandom_triggered"
+QT_MOC_LITERAL(15, 259, 23), // "on_actionBack_triggered"
+QT_MOC_LITERAL(16, 283, 12), // "solvingEnded"
+QT_MOC_LITERAL(17, 296, 24) // "on_actionClear_triggered"
 
     },
     "MainWindow\0solve\0\0MyQGraphicsView*\0"
@@ -57,11 +57,11 @@ QT_MOC_LITERAL(17, 308, 12) // "solvingEnded"
     "keyPressEvent\0QKeyEvent*\0mouseMoveEvent\0"
     "QMouseEvent*\0on_actionSave_as_triggered\0"
     "on_actionLoad_from_file_triggered\0"
-    "on_actionClear_triggered\0"
     "on_actionExit_triggered\0"
     "on_actionFullscreen_triggered\0"
     "on_actionRandom_triggered\0"
-    "on_actionBack_triggered\0solvingEnded"
+    "on_actionBack_triggered\0solvingEnded\0"
+    "on_actionClear_triggered"
 };
 #undef QT_MOC_LITERAL
 
@@ -125,12 +125,12 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 3: _t->mouseMoveEvent((*reinterpret_cast< QMouseEvent*(*)>(_a[1]))); break;
         case 4: _t->on_actionSave_as_triggered(); break;
         case 5: _t->on_actionLoad_from_file_triggered(); break;
-        case 6: _t->on_actionClear_triggered(); break;
-        case 7: _t->on_actionExit_triggered(); break;
-        case 8: _t->on_actionFullscreen_triggered(); break;
-        case 9: _t->on_actionRandom_triggered(); break;
-        case 10: _t->on_actionBack_triggered(); break;
-        case 11: _t->solvingEnded(); break;
+        case 6: _t->on_actionExit_triggered(); break;
+        case 7: _t->on_actionFullscreen_triggered(); break;
+        case 8: _t->on_actionRandom_triggered(); break;
+        case 9: _t->on_actionBack_triggered(); break;
+        case 10: _t->solvingEnded(); break;
+        case 11: _t->on_actionClear_triggered(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
