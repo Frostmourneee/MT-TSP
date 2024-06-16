@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-//TODO укрупнение сетки
+//TODO Zoom
+//TODO Убрать геттеры и сеттеры
 //TODO подумать над плавностью смены сотых долей в координатах
 //TODO из-за симметрий быть может можно перебор уменьшить когда M = 2
 //TODO тесты
@@ -218,7 +219,7 @@ void MainWindow::on_actionLoad_from_file_triggered()
 
     FILE* f = fopen(filename.toStdString().c_str(), "r");
     int M, N;
-    double x, y, alpha, v, xEnd, yEnd;
+    double x, y, v, xEnd, yEnd;
     char buffer1[256];
     char *tmpstr1;
     fgets(buffer1, 256, f); // Yerps # string
@@ -261,7 +262,7 @@ void MainWindow::on_actionLoad_from_file_triggered()
         tmpstr1 = strtok(NULL," ");
         y = strtod(tmpstr1, &tmpstr1);
         tmpstr1 = strtok(NULL," ");
-        alpha = strtod(tmpstr1, &tmpstr1);
+        v = strtod(tmpstr1, &tmpstr1);
         tmpstr1 = strtok(NULL," ");
         v = strtod(tmpstr1, &tmpstr1);
         tmpstr1 = strtok(NULL," ");

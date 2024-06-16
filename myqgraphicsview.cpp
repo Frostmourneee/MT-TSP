@@ -51,7 +51,6 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
         return;
     }
 
-    Prey* tmpPrey = prey.back();
     switch (status) {
         case StatusScene::settingPreyStart: // Click borns the preyStart point
         {
@@ -104,6 +103,7 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
                 pMath = sceneToCoords(pScene);
             }
 
+            Prey* tmpPrey = prey.back();
             QPointF start = tmpPrey->getStart();
             if (fabs((start-pMath).x()) < 0.3 &&
                 fabs((start-pMath).y()) < 0.3) return; // Too close Start and End seems weird
@@ -141,6 +141,7 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
         {
             textCoords(pMath.x(), pMath.y());
 
+            Prey* tmpPrey = prey.back();
             double v = tmpPrey->getV();
             double alpha = tmpPrey->getAlpha();
             tmpPrey->setVel(v*cos(alpha*PI/180.), v*sin(alpha*PI/180.));
@@ -219,7 +220,6 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent* e)
     }
     else if (status != StatusScene::draggingGenRect) setCursor(QCursor(Qt::ArrowCursor));
 
-    Prey* tmpPrey = prey.back();
     switch (status) {
         case StatusScene::settingPreyStart: // Just moving the cursor
         {
@@ -229,6 +229,7 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent* e)
         }
         case StatusScene::settingPreyEnd: // Moving with Arrow
         {
+            Prey* tmpPrey = prey.back();
             if (e->modifiers().testFlag(Qt::ShiftModifier)) {
                 QPoint e_s = QPoint(pScene.toPoint().x() - coordsToScene(tmpPrey->getStart()).toPoint().x(),
                                     -pScene.toPoint().y() + coordsToScene(tmpPrey->getStart()).toPoint().y());
@@ -247,6 +248,7 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent* e)
         }
         case StatusScene::settingPreyVelocity: // Moving while velocity setting
         {
+            Prey* tmpPrey = prey.back();
             QPointF red = tmpPrey->getEnd(); // Preparing for velocity arrow
             QPointF blue = tmpPrey->getStart();
             QPointF resP;
