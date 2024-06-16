@@ -67,10 +67,12 @@ void MainWindow::on_actionClear_triggered()
     setFocus();
 
     view->clear();
+    changeUIDueRefreshing(true);
     QPointF pMathCursorPos = view->sceneToCoords(view->mapFromGlobal(QCursor::pos()));
     double x = pMathCursorPos.x();
     double y = pMathCursorPos.y();
     view->textCoords(x + 0.02, y - 0.02);
+    view->timer->start(10);
 }
 void MainWindow::on_actionExit_triggered()
 {
@@ -167,13 +169,15 @@ void MainWindow::on_actionStart_triggered()
     setFocus();
     if (!isDataReadyToStartProcess()) return;
 
-    enableUI(false);
+    changeUIDueSolving(false);
+    changeUIDueRefreshing(false);
 
     FILE* initDataFile = fopen("initData.txt", "w+"); // Saving all the data to the default "initData.txt" file
     saveDataToFile(initDataFile);
 
     thread->start();
     emit solve(view);
+
 }
 void MainWindow::on_actionBack_triggered()
 {
@@ -329,6 +333,7 @@ void MainWindow::saveDataToFile(FILE *f)
                                                        maxSignsX, maxSignsY, maxSignsAlpha, maxSignsV, maxSignsXEnd, maxSignsYEnd).toStdString().c_str());
     fclose(f);
 }
+
 QString MainWindow::preyDataStrSave(double x, double y, double alpha, double v, double xEnd, double yEnd, int maxX, int maxY, int maxAlpha, int maxV, int maxXEnd, int maxYEnd)
 {
     QString str = "";
@@ -357,13 +362,24 @@ QString MainWindow::yerpDataStrSave(double x, double y, int maxX, int maxY)
 
     return str;
 }
+void MainWindow::on_rBConstruction_toggled(bool checked)
+{
+    if (!checked) return;
+
+    view->setStatus(StatusScene::settingPreyStart);
+    view->timer->start(10);
+    changeUIDueRefreshing(true);
+}
 
 void MainWindow::solvingEnded()
 {
     thread->exit(0);
-    enableUI(true);
+    changeUIDueSolving(true);
 
     ui->progressBar->setValue(0);
+    view->timer->stop();
+
+    for (Prey* p : view->prey) p->setPos(p->getSStart());
 }
 
 void MainWindow::changeProgressBar(long long vC, long long vAll)
@@ -387,14 +403,20 @@ bool MainWindow::isDataReadyToStartProcess()
     return true;
 }
 
-void MainWindow::enableUI(bool shouldEnable)
+void MainWindow::changeUIDueSolving(bool shouldEnable)
 {
     view->setEnabled(shouldEnable);
     view->setVisibleText(shouldEnable);
-    view->setStatus(shouldEnable ? StatusScene::settingPreyStart : StatusScene::disabled);
+    view->setStatus(shouldEnable ? StatusScene::inAnimationMode : StatusScene::disabled);
     ui->actionClear->setEnabled(shouldEnable);
-    ui->actionStart->setEnabled(shouldEnable);
     ui->actionLoad_from_file->setEnabled(shouldEnable);
+    ui->rBAnimation->setEnabled(shouldEnable);
+    ui->rBAnimation->setChecked(shouldEnable);
+
+}
+void MainWindow::changeUIDueRefreshing(bool shouldEnable)
+{
+    ui->actionStart->setEnabled(shouldEnable);
     ui->actionRandom->setEnabled(shouldEnable);
     ui->actionBack->setEnabled(shouldEnable);
 }

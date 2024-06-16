@@ -17,7 +17,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QProgressBar>
-#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QRadioButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -37,7 +37,9 @@ public:
     QAction *actionClear;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
-    QSpinBox *spinBox;
+    QVBoxLayout *verticalLayout_2;
+    QRadioButton *rBConstruction;
+    QRadioButton *rBAnimation;
     QVBoxLayout *vLScene;
     QProgressBar *progressBar;
     QMenuBar *menubar;
@@ -69,10 +71,21 @@ public:
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        spinBox = new QSpinBox(centralwidget);
-        spinBox->setObjectName(QString::fromUtf8("spinBox"));
+        verticalLayout_2 = new QVBoxLayout();
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        rBConstruction = new QRadioButton(centralwidget);
+        rBConstruction->setObjectName(QString::fromUtf8("rBConstruction"));
+        rBConstruction->setChecked(true);
 
-        horizontalLayout->addWidget(spinBox);
+        verticalLayout_2->addWidget(rBConstruction);
+
+        rBAnimation = new QRadioButton(centralwidget);
+        rBAnimation->setObjectName(QString::fromUtf8("rBAnimation"));
+
+        verticalLayout_2->addWidget(rBAnimation);
+
+
+        horizontalLayout->addLayout(verticalLayout_2);
 
         vLScene = new QVBoxLayout();
         vLScene->setObjectName(QString::fromUtf8("vLScene"));
@@ -165,6 +178,8 @@ public:
 #if QT_CONFIG(shortcut)
         actionClear->setShortcut(QCoreApplication::translate("MainWindow", "R", nullptr));
 #endif // QT_CONFIG(shortcut)
+        rBConstruction->setText(QCoreApplication::translate("MainWindow", "Construction mode", nullptr));
+        rBAnimation->setText(QCoreApplication::translate("MainWindow", "Animation mode", nullptr));
         menuOptions->setTitle(QCoreApplication::translate("MainWindow", "Actions", nullptr));
     } // retranslateUi
 

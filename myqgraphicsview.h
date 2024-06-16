@@ -16,14 +16,12 @@
 #define PI 3.1415926535
 
 enum class GenRectSide {noSide, topSide, rightSide, botSide, leftSide};
-enum class StatusScene {settingPreyStart, settingPreyEnd, settingPreyVelocity, disabled, draggingGenRect};
+enum class StatusScene {settingPreyStart, settingPreyEnd, settingPreyVelocity, disabled, draggingGenRect, inAnimationMode};
 class MyQGraphicsView : public QGraphicsView
 {
 
 public:
     MyQGraphicsView(QWidget *parent = 0);
-    QVector<Prey* > prey;
-    QVector<Yerp* > yerp;
     QPointF sceneToCoords(QPointF);
     QPointF coordsToScene(QPointF);
     QRectF getGenRect() {return genRect->rect();}
@@ -39,6 +37,9 @@ public:
     void textCoords(double x, double y);
     void createYerp(QPointF);
     void createPreyOnFullInfo(QPointF, QPointF, double);
+    QVector<Prey* > prey;
+    QVector<Yerp* > yerp;
+    QTimer* timer;
 
 public slots:
     void mousePressEvent(QMouseEvent* e) override;
@@ -54,7 +55,6 @@ private:
     QGraphicsRectItem* genRect;
     QGraphicsTextItem* text;
     Arrow* arrow;
-    QTimer* timer;
     StatusScene status = StatusScene::settingPreyStart;
     GenRectSide side = GenRectSide::noSide;
     int unit{50}; // Pixels per 1 coord unit

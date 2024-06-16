@@ -29,7 +29,8 @@ private:
     int signs(double);
     bool isDataReadyToStartProcess();
     void saveDataToFile(FILE*);
-    void enableUI(bool);
+    void changeUIDueSolving(bool);
+    void changeUIDueRefreshing(bool);
 
 signals:
     void solve(MyQGraphicsView* view);
@@ -47,5 +48,6 @@ private slots:
     void on_actionClear_triggered();
     void solvingEnded();
     void changeProgressBar(long long vC, long long vAll);
+    void on_rBConstruction_toggled(bool checked);
 };
 #endif // MAINWINDOW_H

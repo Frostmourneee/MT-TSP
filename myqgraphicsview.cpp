@@ -356,14 +356,16 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
 
     for (Prey* p : prey) // Prey's ellipses and dotted line repositioning
     {
-        int rad = GraphicsEntities::smallGraphicsUnit;
+        QPointF newSStart = coordsToScene(p->getStart());
+        QPointF delta = newSStart-p->getSStart();
+        p->moveBy(delta.x(), delta.y());
         p->setSStart(coordsToScene(p->getStart()));
         p->setSEnd(coordsToScene(p->getEnd()));
 
         QPointF st = p->getSStart();
         QPointF e = p->getSEnd();
-        p->getSEll()->setRect(st.x() - rad, st.y() - rad, 2*rad, 2*rad);
-        p->getEEll()->setRect(e.x() - rad, e.y() - rad, 2*rad, 2*rad);
+        p->getSEll()->setPos(st);
+        p->getEEll()->setPos(e);
         p->getLine()->setLine(QLineF(st, e));
     }
 
