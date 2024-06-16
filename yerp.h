@@ -7,12 +7,11 @@
 class Yerp : public GraphicsEntities
 {
 public:
-    Yerp(int num, QPointF sSt, QPointF st) : yerpNum{num}
-    {sStart = sSt; start = st;}
+    Yerp(int num, QPointF st) : yerpNum{num}
+    {start = st;}
     QVector<int> plan;
     QVector<int> plan4AP; // For all Preys
     int getYerpNum() {return yerpNum;}
-    void setSStart(QPointF sSt) override {prepareGeometryChange(); sStart = sSt;}
 
 private:
     QPen pen = QPen(Qt::red, 3);

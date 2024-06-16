@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1440</width>
-    <height>900</height>
+    <width>639</width>
+    <height>420</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,15 @@
      <widget class="QSpinBox" name="spinBox"/>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="vLScene"/>
+     <layout class="QVBoxLayout" name="vLScene">
+      <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -28,7 +36,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1440</width>
+     <width>639</width>
      <height>21</height>
     </rect>
    </property>

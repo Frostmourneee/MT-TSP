@@ -42,13 +42,11 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
     QPointF pScene = mapToScene(e->pos()); // Scene coords
     QPointF pMath = sceneToCoords(pScene); // Convinient "maths" coords
 
-    if (e->button() == Qt::RightButton && status == StatusScene::settingPreyStart)
+    if (e->button() == Qt::RightButton)
     {
-        if (yerp.size() == 2) return;
+        if (yerp.size() == 2 || status != StatusScene::settingPreyStart) return;
 
-        Yerp* yerpInst = new Yerp(yerp.size(), pScene, pMath); // Click born Yerp instance
-        scene->addItem(yerpInst);
-        yerp.push_back(yerpInst);
+        createYerp(pMath);
 
         return;
     }
@@ -78,13 +76,15 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
             }
 
             int r = GraphicsEntities::smallGraphicsUnit; // Blue Start point creation
-            QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(pScene.x() - r, pScene.y() - r, 2*r, 2*r);
+            QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(-r, -r, 2*r, 2*r);
+            ellipse->setPos(pScene);
             ellipse->setPen(QPen(Qt::black));
             ellipse->setBrush(Qt::blue);
             scene->addItem(ellipse);
 
             Prey* preyInst = new Prey(); // Data storage in Prey instance
             preyInst->setSStart(pScene);
+            preyInst->setPos(pScene);
             preyInst->setStart(pMath);
             preyInst->setSEll(ellipse);
             prey.push_back(preyInst);
@@ -109,7 +109,8 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
                 fabs((start-pMath).y()) < 0.3) return; // Too close Start and End seems weird
 
             int r = GraphicsEntities::smallGraphicsUnit; // Red end point creation
-            QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(pScene.x() - r, pScene.y() - r, 2*r, 2*r);
+            QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(-r, -r, 2*r, 2*r);
+            ellipse->setPos(pScene);
             ellipse->setPen(QPen(Qt::black));
             ellipse->setBrush(Qt::red);
             scene->addItem(ellipse);
@@ -364,9 +365,61 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
         p->getLine()->setLine(QLineF(st, e));
     }
 
-    for (Yerp* y : yerp) y->setSStart(coordsToScene(y->getStart())); // Yerp's repositioning
+    for (Yerp* y : yerp) y->setPos(coordsToScene(y->getStart())); // Yerp's repositioning
 }
+void MyQGraphicsView::createYerp(QPointF pMath)
+{
+    if (yerp.size() == 2) return;
 
+    Yerp* yerpInst = new Yerp(yerp.size(), pMath); // Click born Yerp instance
+    yerpInst->setPos(coordsToScene(pMath));
+    scene->addItem(yerpInst);
+    yerp.push_back(yerpInst);
+}
+void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
+{
+    Prey* preyInst = new Prey(); // Data storage in Prey and some rendering stuff
+    QPointF pScene = coordsToScene(st);
+    QPointF pSceneEnd = coordsToScene(end);
+    QPointF e_s = end-st;
+    double alpha = (fabs(e_s.x()) < 1.e-2 ? (e_s.y() > 0 ? 90 : -90) : 180/PI * atan2(e_s.y(), e_s.x()));
+    int r = GraphicsEntities::smallGraphicsUnit;
+
+    QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(-r, -r, 2*r, 2*r);
+    ellipse->setPos(pScene);
+    ellipse->setPen(QPen(Qt::black));
+    ellipse->setBrush(Qt::blue);
+    getScene()->addItem(ellipse);
+    getScene()->addItem(preyInst);
+
+    preyInst->setSStart(pScene);
+    preyInst->setPos(pScene);
+    preyInst->setStart(st);
+    preyInst->setSEll(ellipse);
+    prey.push_back(preyInst);
+
+    ellipse = new QGraphicsEllipseItem(-r, -r, 2*r, 2*r);
+    ellipse->setPos(pSceneEnd);
+    ellipse->setPen(QPen(Qt::black));
+    ellipse->setBrush(Qt::red);
+    getScene()->addItem(ellipse);
+
+    QVector<qreal> dashes; // Line between Start and End
+    dashes << 5.0 << 5.0;
+    QPen pen = QPen(QBrush(QColor(0, 0, 0, 80)), 2, Qt::DashLine, Qt::RoundCap, Qt::BevelJoin);
+    pen.setDashPattern(dashes);
+    QGraphicsLineItem* line = new QGraphicsLineItem(QLineF(pScene, pSceneEnd));
+    line->setPen(pen);
+    getScene()->addItem(line);
+
+    preyInst->setSEnd(pSceneEnd); // Data storage in Prey instance
+    preyInst->setEnd(end);
+    preyInst->setEEll(ellipse);
+    preyInst->setLine(line);
+    preyInst->setAlpha(alpha);
+    preyInst->setVel(v*cos(alpha*PI/180.), v*sin(alpha*PI/180.));
+    preyInst->setV(v);
+}
 QPointF MyQGraphicsView::sceneToCoords(QPointF scenePoint) // Translate point from Scene coords to convinient "maths" coords
 {
     int w = width();
@@ -392,6 +445,7 @@ void MyQGraphicsView::textCoords(double x, double y)
     text->setPlainText(QString("%1; %2").arg(xStr).arg(yStr));
     text->setPos(QPointF(20, 20));
 }
+
 void MyQGraphicsView::textV(double v)
 {
     text->setPlainText(tr("V = %1").arg(QString::number(v, 'f', 2)));
@@ -501,7 +555,7 @@ void MyQGraphicsView::info()
     qDebug() << "(yerpNum, sStart, start)" << '\n';
     for (Yerp* y : yerp)
     {
-        qDebug() << "(" << y->getYerpNum() << "," << y->getSStart() << "," << y->getStart() << '\n';
+        qDebug() << "(" << y->getYerpNum() << "," << coordsToScene(y->getStart()) << "," << y->getStart() << '\n';
     }
     qDebug() << "Primitives in Scene" << scene->items().size();
 }

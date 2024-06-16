@@ -35,16 +35,17 @@ signals:
     void solve(MyQGraphicsView* view);
 
 private slots:
-    void on_actionStart_triggered();
     void keyPressEvent(QKeyEvent *) override;
     void mouseMoveEvent(QMouseEvent *) override;
+    void on_actionStart_triggered();
     void on_actionSave_as_triggered();
     void on_actionLoad_from_file_triggered();
     void on_actionExit_triggered();
     void on_actionFullscreen_triggered();
     void on_actionRandom_triggered();
     void on_actionBack_triggered();
-    void solvingEnded();
     void on_actionClear_triggered();
+    void solvingEnded();
+    void changeProgressBar(long long vC, long long vAll);
 };
 #endif // MAINWINDOW_H

@@ -8,6 +8,9 @@ void Solver::solve(MyQGraphicsView* view)
     resT = 0.;
     M = view->yerp.size();
     N = view->prey.size();
+    vC = 0;
+    vAll = vars(M, N);
+    prevPercent = 0;
 
     curPlan = (int*)malloc(N*sizeof(int));
     mx = (double*)malloc(M*sizeof(double));
@@ -217,6 +220,10 @@ double Solver::timeOneYerp(double bestT, int *realPlan, int rPSize, int yerpNum,
 }
 double Solver::planOneM(double bestT, int *plan, int rPSize, int yerpNum, bool shouldIgnoreOptimization)
 {
+    vC++;
+    if ((int) ((double)vC / vAll * 100) != prevPercent) emit changeProgressBar(vC, vAll);
+    prevPercent = (int) ((double)vC / vAll * 100);
+
     double T = 0.;
 
     for(int i = 0; i < rPSize; i++) {
@@ -280,6 +287,33 @@ void Solver::fillIMAndYerpNum(MyQGraphicsView* view, int *plan, int rPSize, int 
     fullReset();
 }
 
+long long Solver::vars(int M, int N)
+{
+    long long res = 0;
+
+    if (M == 1) res = fact(N);
+    else if (M == 2) {
+        for (int i = 0; i <= N; i++) res += C(N, i)*(fact(i)+fact(N-i));
+    }
+
+    return res;
+}
+long long Solver::C(int n, int k)
+{
+    if (k > n - k) k = n - k;
+
+    long long tmpProd = 1;
+    for (int i = 0; i < k; i++) tmpProd *= (n-i);
+
+    return tmpProd / fact(k);
+}
+long long Solver::fact(int N)
+{
+    long long res = 1;
+    for (int i = 2; i <= N; i++) res *= i;
+
+    return res;
+}
 void Solver::swap(int *a, int *b)
 {
     int t = *a;

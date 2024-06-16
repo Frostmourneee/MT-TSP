@@ -16,6 +16,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
@@ -38,6 +39,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QSpinBox *spinBox;
     QVBoxLayout *vLScene;
+    QProgressBar *progressBar;
     QMenuBar *menubar;
     QMenu *menuOptions;
     QStatusBar *statusbar;
@@ -46,7 +48,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(1440, 900);
+        MainWindow->resize(639, 420);
         actionStart = new QAction(MainWindow);
         actionStart->setObjectName(QString::fromUtf8("actionStart"));
         actionSave_as = new QAction(MainWindow);
@@ -74,13 +76,19 @@ public:
 
         vLScene = new QVBoxLayout();
         vLScene->setObjectName(QString::fromUtf8("vLScene"));
+        progressBar = new QProgressBar(centralwidget);
+        progressBar->setObjectName(QString::fromUtf8("progressBar"));
+        progressBar->setValue(0);
+
+        vLScene->addWidget(progressBar);
+
 
         horizontalLayout->addLayout(vLScene);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1440, 21));
+        menubar->setGeometry(QRect(0, 0, 639, 21));
         menuOptions = new QMenu(menubar);
         menuOptions->setObjectName(QString::fromUtf8("menuOptions"));
         MainWindow->setMenuBar(menubar);
@@ -107,7 +115,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MT-TSP", nullptr));
-        actionStart->setText(QCoreApplication::translate("MainWindow", "Start calculation\tShift+Enter", nullptr));
+        actionStart->setText(QCoreApplication::translate("MainWindow", "Start calculation", nullptr));
 #if QT_CONFIG(tooltip)
         actionStart->setToolTip(QCoreApplication::translate("MainWindow", "Start optimal plans calculation process", nullptr));
 #endif // QT_CONFIG(tooltip)

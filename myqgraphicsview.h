@@ -37,6 +37,8 @@ public:
     void clear();
     void backAction();
     void textCoords(double x, double y);
+    void createYerp(QPointF);
+    void createPreyOnFullInfo(QPointF, QPointF, double);
 
 public slots:
     void mousePressEvent(QMouseEvent* e) override;

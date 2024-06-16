@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     centralWidget()->setMouseTracking(true);
 
     view = new MyQGraphicsView(this);
-    ui->vLScene->addWidget(view);
+    ui->vLScene->insertWidget(0, view);
     view->setRectangle(QRectF(20, 20, 1318, 773));
     view->setFocus();
 
@@ -32,12 +32,33 @@ MainWindow::MainWindow(QWidget *parent)
     solver = new Solver();
     connect(this, SIGNAL(solve(MyQGraphicsView*)), solver, SLOT(solve(MyQGraphicsView*)));
     connect(solver, SIGNAL(solvingEnded()), this, SLOT(solvingEnded()));
+    connect(solver, SIGNAL(changeProgressBar(long long, long long)), this, SLOT(changeProgressBar(long long, long long)));
     solver->moveToThread(thread);
+
+    ui->progressBar->setStyleSheet("text-align: center");
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *e)
+{
+    switch (e->key()) {
+        case Qt::Key_I:
+        case 1064: {
+            if (!e->modifiers().testFlag(Qt::ControlModifier)) return; // +Ctrl pressed
+
+            view->info();
+            break;
+        }
+    }
+}
+void MainWindow::mouseMoveEvent(QMouseEvent * e) {
+    Q_UNUSED(e);
+
+    view->setVisibleText(false);
 }
 
 void MainWindow::on_actionClear_triggered()
@@ -81,10 +102,9 @@ void MainWindow::on_actionRandom_triggered()
     srand(time(NULL));
     int M = rand()%2 + 1;
     int N = rand()%12 + 1;
-    int r = GraphicsEntities::smallGraphicsUnit;
 
     int parts;
-    double r2fValue, x, y, alpha, v, xEnd, yEnd;
+    double r2fValue, x, y, v, xEnd, yEnd;
     for (int i = 0; i < M; i++) // Yerps generation
     {
         parts = (xmax-xmin)*100;
@@ -99,9 +119,7 @@ void MainWindow::on_actionRandom_triggered()
         else if (r2fValue < ymin) r2fValue = ymin;
         y = r2fValue;
 
-        Yerp* yerpInst = new Yerp(view->yerp.size(), view->coordsToScene(QPointF(x, y)), QPointF(x, y));
-        view->getScene()->addItem(yerpInst);
-        view->yerp.push_back(yerpInst);
+        view->createYerp(QPointF(x, y));
     }
 
     for (int i = 0; i < N; i++) // Preys generation
@@ -140,45 +158,7 @@ void MainWindow::on_actionRandom_triggered()
         v = r2fValue;
         if (r2fValue >= maxVel1f*0.1) v = maxVel1f*0.1;
 
-        QPointF e_s(xEnd - x, yEnd - y);
-        alpha = (fabs(e_s.x()) < 1.e-2 ? (e_s.y() > 0 ? 90 : -90) : 180/PI * atan2(e_s.y(), e_s.x()));
-
-        Prey* preyInst = new Prey(); // Data storage in Prey and some rendering stuff
-        QPointF pScene = view->coordsToScene(QPointF(x, y));
-        QPointF pSceneEnd = view->coordsToScene(QPointF(xEnd, yEnd));
-        QPointF pMath = QPointF(x, y);
-        QPointF pMathEnd = QPointF(xEnd, yEnd);
-        QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(pScene.x() - r, pScene.y() - r, 2*r, 2*r);
-        ellipse->setPen(QPen(Qt::black));
-        ellipse->setBrush(Qt::blue);
-        view->getScene()->addItem(ellipse);
-        view->getScene()->addItem(preyInst);
-
-        preyInst->setSStart(pScene);
-        preyInst->setStart(pMath);
-        preyInst->setSEll(ellipse);
-        view->prey.push_back(preyInst);
-
-        ellipse = new QGraphicsEllipseItem(pSceneEnd.x() - r, pSceneEnd.y() - r, 2*r, 2*r);
-        ellipse->setPen(QPen(Qt::black));
-        ellipse->setBrush(Qt::red);
-        view->getScene()->addItem(ellipse);
-
-        QVector<qreal> dashes; // Line between Start and End
-        dashes << 5.0 << 5.0;
-        QPen pen = QPen(QBrush(QColor(0, 0, 0, 80)), 2, Qt::DashLine, Qt::RoundCap, Qt::BevelJoin);
-        pen.setDashPattern(dashes);
-        QGraphicsLineItem* line = new QGraphicsLineItem(QLineF(pScene, pSceneEnd));
-        line->setPen(pen);
-        view->getScene()->addItem(line);
-
-        preyInst->setSEnd(pSceneEnd); // Data storage in Prey instance
-        preyInst->setEnd(pMathEnd);
-        preyInst->setEEll(ellipse);
-        preyInst->setLine(line);
-        preyInst->setAlpha(alpha);
-        preyInst->setVel(v*cos(alpha*PI/180.), v*sin(alpha*PI/180.));
-        preyInst->setV(v);
+        view->createPreyOnFullInfo(QPointF(x, y), QPointF(xEnd, yEnd), v);
     }
 }
 void MainWindow::on_actionStart_triggered()
@@ -193,12 +173,6 @@ void MainWindow::on_actionStart_triggered()
 
     thread->start();
     emit solve(view);
-}
-void MainWindow::solvingEnded()
-{
-    enableUI(true);
-
-    thread->exit(0);
 }
 void MainWindow::on_actionBack_triggered()
 {
@@ -243,7 +217,7 @@ void MainWindow::on_actionLoad_from_file_triggered()
     }
 
     FILE* f = fopen(filename.toStdString().c_str(), "r");
-    int M, N, r = GraphicsEntities::smallGraphicsUnit;
+    int M, N;
     double x, y, alpha, v, xEnd, yEnd;
     char buffer1[256];
     char *tmpstr1;
@@ -265,9 +239,7 @@ void MainWindow::on_actionLoad_from_file_triggered()
         tmpstr1 = strtok(NULL," ");
         y = strtod(tmpstr1, &tmpstr1);
 
-        Yerp* yerpInst = new Yerp(view->yerp.size(), view->coordsToScene(QPointF(x, y)), QPointF(x, y));
-        view->getScene()->addItem(yerpInst);
-        view->yerp.push_back(yerpInst);
+        view->createYerp(QPointF(x, y));
     }
 
     fgets(buffer1, 256, f);
@@ -297,42 +269,7 @@ void MainWindow::on_actionLoad_from_file_triggered()
         tmpstr1 = strtok(NULL," ");
         yEnd = strtod(tmpstr1, &tmpstr1);
 
-        Prey* preyInst = new Prey(); // Data storage in Prey and some rendering stuff
-        QPointF pScene = view->coordsToScene(QPointF(x, y));
-        QPointF pSceneEnd = view->coordsToScene(QPointF(xEnd, yEnd));
-        QPointF pMath = QPointF(x, y);
-        QPointF pMathEnd = QPointF(xEnd, yEnd);
-        QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(pScene.x() - r, pScene.y() - r, 2*r, 2*r);
-        ellipse->setPen(QPen(Qt::black));
-        ellipse->setBrush(Qt::blue);
-        view->getScene()->addItem(ellipse);
-        view->getScene()->addItem(preyInst);
-
-        preyInst->setSStart(pScene);
-        preyInst->setStart(pMath);
-        preyInst->setSEll(ellipse);
-        view->prey.push_back(preyInst);
-
-        ellipse = new QGraphicsEllipseItem(pSceneEnd.x() - r, pSceneEnd.y() - r, 2*r, 2*r);
-        ellipse->setPen(QPen(Qt::black));
-        ellipse->setBrush(Qt::red);
-        view->getScene()->addItem(ellipse);
-
-        QVector<qreal> dashes; // Line between Start and End
-        dashes << 5.0 << 5.0;
-        QPen pen = QPen(QBrush(QColor(0, 0, 0, 80)), 2, Qt::DashLine, Qt::RoundCap, Qt::BevelJoin);
-        pen.setDashPattern(dashes);
-        QGraphicsLineItem* line = new QGraphicsLineItem(QLineF(pScene, pSceneEnd));
-        line->setPen(pen);
-        view->getScene()->addItem(line);
-
-        preyInst->setSEnd(pSceneEnd); // Data storage in Prey instance
-        preyInst->setEnd(pMathEnd);
-        preyInst->setEEll(ellipse);
-        preyInst->setLine(line);
-        preyInst->setAlpha(alpha);
-        preyInst->setVel(v*cos(alpha*PI/180.), v*sin(alpha*PI/180.));
-        preyInst->setV(v);
+        view->createPreyOnFullInfo(QPointF(x, y), QPointF(xEnd, yEnd), v);
     }
 
     fclose(f);
@@ -419,6 +356,20 @@ QString MainWindow::yerpDataStrSave(double x, double y, int maxX, int maxY)
 
     return str;
 }
+
+void MainWindow::solvingEnded()
+{
+    thread->exit(0);
+    enableUI(true);
+
+    ui->progressBar->setValue(0);
+}
+
+void MainWindow::changeProgressBar(long long vC, long long vAll)
+{
+    ui->progressBar->setValue((int) ((double)vC / vAll * 100));
+}
+
 bool MainWindow::isDataReadyToStartProcess()
 {
     if (view->getStatus() == StatusScene::settingPreyEnd || view->getStatus() == StatusScene::settingPreyVelocity) return false;
@@ -433,23 +384,6 @@ bool MainWindow::isDataReadyToStartProcess()
         return false;
     }
     return true;
-}
-void MainWindow::keyPressEvent(QKeyEvent *e)
-{
-    switch (e->key()) {
-        case Qt::Key_I:
-        case 1064: {
-            if (!e->modifiers().testFlag(Qt::ControlModifier)) return; // +Ctrl pressed
-
-            view->info();
-            break;
-        }
-    }
-}
-void MainWindow::mouseMoveEvent(QMouseEvent * e) {
-    Q_UNUSED(e);
-
-    view->setVisibleText(false);
 }
 
 void MainWindow::enableUI(bool shouldEnable)

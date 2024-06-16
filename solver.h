@@ -13,6 +13,7 @@ public:
 
 signals:
     void solvingEnded();
+    void changeProgressBar(long long vC, long long vAll); // Vars calculated and vars at all
 
 private:
     double timeOneYerp(double bestT, int* realPlan, int rPSize, int yerpNum, bool shouldIgnoreOptimization);
@@ -20,6 +21,9 @@ private:
     double oneIntercept(int preyNum, int yerpNum);
     void resetOne(int yerpNum);
     void fullReset();
+    long long vars(int M, int N);
+    long long C(int, int);
+    long long fact(int);
     void swap (int *a, int *b);
     void fillIMAndYerpNum(MyQGraphicsView* view, int* plan, int rPSize, int yerpNum);
     int M; // Yerps
@@ -42,6 +46,9 @@ private:
     int* curPlan; // Best plan for only 1 Yerp
     int* curPlan1; // Best plan for 1st Yerp
     int* curPlan2; // Best plan for 2nd Yerp
+    int prevPercent; // For progressBar
+    long long vC; // For progressBar, vars calculated
+    long long vAll; // For progressBar, vars at all
 
 private slots:
     void solve(MyQGraphicsView* view);

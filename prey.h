@@ -4,6 +4,7 @@
 #include <graphicsEntities.h>
 #include <QGraphicsEllipseItem>
 #include <QDebug>
+#include <math.h>
 
 class Prey : public GraphicsEntities
 {
@@ -12,6 +13,7 @@ public:
     QGraphicsEllipseItem* getEEll() {return eEll;}
     QGraphicsLineItem* getLine() {return line;}
     QPointF getEnd() {return end;}
+    QPointF getSStart() {return sStart;}
     QPointF getSEnd() {return sEnd;}
     double getVx() {return vx;}
     double getVy() {return vy;}
@@ -20,6 +22,7 @@ public:
     double getDieTime() {return dieTime;}
     double getYerpNum() {return yerpNum;}
     void setEnd(QPointF e) {end = e;}
+    void setSStart(QPointF sS) {sStart = sS;}
     void setSEnd(QPointF sE) {sEnd = sE;}
     void setAlpha(double ang) {alpha = ang;}
     void setV(double velAbs) {v = velAbs;}
@@ -42,6 +45,7 @@ private:
     QGraphicsEllipseItem* eEll;
     QGraphicsLineItem* line;
     QPointF end; // Stored in Math coords
+    QPointF sStart; // Stored in Scene coords
     QPointF sEnd; // Stored in Scene coords
     double alpha;
     double v;

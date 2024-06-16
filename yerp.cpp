@@ -10,17 +10,17 @@ void Yerp::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
     int rad = GraphicsEntities::smallGraphicsUnit;
     if (yerpNum == 0) {
-        painter->drawLine(QLineF(sStart + QPointF(0, -2*rad), sStart + QPointF(0, 2*rad)));
-        painter->drawLine(QLineF(sStart + QPointF(-2*rad+4, 2*rad), sStart + QPointF(2*rad-4, 2*rad)));
-        painter->drawLine(QLineF(sStart + QPointF(0, -2*rad), sStart + QPointF(-2*rad+4, -4)));
+        painter->drawLine(QLineF(QPointF(0, -2*rad), QPointF(0, 2*rad)));
+        painter->drawLine(QLineF(QPointF(-2*rad+4, 2*rad), QPointF(2*rad-4, 2*rad)));
+        painter->drawLine(QLineF(QPointF(0, -2*rad), QPointF(-2*rad+4, -4)));
     } else if (yerpNum == 1) {
         QPolygon pol;
-        pol << QPoint(sStart.x() - 2*rad, sStart.y() - rad) <<
-               QPoint(sStart.x() - rad, sStart.y() - 2*rad) <<
-               QPoint(sStart.x(), sStart.y() - 2*rad) <<
-               QPoint(sStart.x() + rad, sStart.y() - rad) <<
-               QPoint(sStart.x() - 2*rad, sStart.y() + 2*rad) <<
-               QPoint(sStart.x() + rad, sStart.y() + 2*rad);
+        pol << QPoint(-2*rad,  -rad) <<
+               QPoint(-rad,  -2*rad) <<
+               QPoint(0,  -2*rad) <<
+               QPoint(rad, -rad) <<
+               QPoint(-2*rad,  2*rad) <<
+               QPoint(rad,  2*rad);
 
         painter->drawPolyline(pol);
     }
@@ -28,5 +28,5 @@ void Yerp::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 QRectF Yerp::boundingRect() const
 {
     int rad = GraphicsEntities::smallGraphicsUnit;
-    return QRectF(sStart.x() - 3*rad, sStart.y() - 3*rad, 6*rad, 6*rad);
+    return QRectF(-3*rad, -3*rad, 6*rad, 6*rad);
 }
