@@ -2,8 +2,6 @@
 #include "ui_mainwindow.h"
 
 //TODO Zoom
-//TODO исправить иконку перемотки
-//TODO Убрать геттеры и сеттеры
 //TODO подумать над плавностью смены сотых долей в координатах
 //TODO из-за симметрий быть может можно перебор уменьшить когда M = 2
 //TODO тесты
@@ -19,13 +17,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     setMinimumSize(QSize(800, 600));
-    resize(QSize(1440, 900));
+    resize(QSize(800, 600));
+
     setMouseTracking(true);
     centralWidget()->setMouseTracking(true);
 
     view = new MyQGraphicsView(this);
     ui->vLScene->insertWidget(0, view);
-    view->setRectangle(QRectF(20, 20, 1318, 773));
+    view->genRect->setRect(QRectF(20, 20, 1318, 773));
     view->setFocus();
 
     thread = new QThread(this);
@@ -78,7 +77,7 @@ void MainWindow::on_actionClear_triggered()
     setFocus();
 
     view->clear();
-    view->getGenRect()->show();
+    view->genRect->show();
     ui->rBConstruction->setChecked(true);
     ui->rBAnimation->setEnabled(false);
     ui->dSBTime->setValue(0);
@@ -106,7 +105,7 @@ void MainWindow::on_actionFullscreen_triggered()
 }
 void MainWindow::on_actionRandom_triggered()
 {
-    QRectF genRect = view->getGenRect()->rect();
+    QRectF genRect = view->genRect->rect();
     QPointF genLeft = view->sceneToCoords(QPointF(genRect.x(), genRect.y()));
     QPointF genRight = view->sceneToCoords(QPointF(genRect.x()+genRect.width(), genRect.y()+genRect.height()));
     double xmax = QString::number(genRight.x(), 'f', 2).toDouble();
@@ -199,7 +198,7 @@ void MainWindow::on_actionStart_triggered()
     ui->actionRandom->setEnabled(false);
     ui->actionBack->setEnabled(false);
     view->setVisibleText(false);
-    view->getGenRect()->hide();
+    view->genRect->hide();
 
     FILE* initDataFile = fopen("initData.txt", "w+"); // Saving all the data to the default "initData.txt" file
     saveDataToFile(initDataFile);
@@ -396,7 +395,7 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     if (!checked) return;
 
     view->setStatus(StatusScene::settingPreyStart);
-    view->getGenRect()->show();
+    view->genRect->show();
     ui->rBAnimation->setEnabled(false);
     ui->actionStart->setEnabled(true);
     ui->actionRandom->setEnabled(true);
@@ -412,9 +411,9 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
 
     for (Prey* p : view->prey)
     {
-        p->getSEll()->show();
-        p->getEEll()->show();
-        p->getLine()->show();
+        p->sEll->show();
+        p->eEll->show();
+        p->line->show();
         p->setPos(p->getSStart());
         p->setIsDied(false);
     }
@@ -448,9 +447,9 @@ void MainWindow::solvingEnded()
 
     for (Prey* p : view->prey)
     {
-        p->getSEll()->hide();
-        p->getEEll()->hide();
-        p->getLine()->hide();
+        p->sEll->hide();
+        p->eEll->hide();
+        p->line->hide();
         p->setPos(p->getSStart());
     }
 }
@@ -584,30 +583,30 @@ void MainWindow::on_playButton_clicked()
 }
 void MainWindow::on_speedUpButton_clicked()
 {
-    int step = view->timer->interval();
-    switch (step) {
+    int tick = view->timer->interval();
+    switch (tick) {
         case 10:
         {
-            step = 5;
+            tick = 5;
             break;
         }
         case 5:
         {
-            step = 2;
+            tick = 2;
             break;
         }
         case 2:
         {
-            step = 1;
+            tick = 1;
             break;
         }
         case 1:
         {
-            step = 10;
+            tick = 10;
             break;
         }
     }
-    view->timer->setInterval(step);
+    view->timer->setInterval(tick);
 }
 
 void MainWindow::changeProgressBar(long long vC, long long vAll)

@@ -85,7 +85,7 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
             preyInst->setSStart(pScene);
             preyInst->setPos(pScene);
             preyInst->setStart(pMath);
-            preyInst->setSEll(ellipse);
+            preyInst->sEll = ellipse;
             prey.push_back(preyInst);
             scene->addItem(preyInst);
 
@@ -126,8 +126,8 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
             QPointF e_s = pMath - start;
             tmpPrey->setSEnd(pScene); // Data storage in Prey instance
             tmpPrey->setEnd(pMath);
-            tmpPrey->setEEll(ellipse);
-            tmpPrey->setLine(line);
+            tmpPrey->eEll = ellipse;
+            tmpPrey->line = line;
             tmpPrey->setAlpha(fabs(e_s.x()) < 1.e-2 ? (e_s.y() > 0 ? 90 : -90) : 180/PI * atan2(e_s.y(), e_s.x()));
 
             arrow->setPen(QPen(QBrush(Qt::black), 4, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin)); // Preparing for velocity arrow
@@ -292,6 +292,13 @@ void MyQGraphicsView::mouseReleaseEvent(QMouseEvent *e)
 
     Q_UNUSED(e);
 }
+void MyQGraphicsView::wheelEvent(QWheelEvent *e)
+{
+    m_scale += e->angleDelta().y() / qreal(600);
+    m_scale = qMax(qreal(0.1), qMin(qreal(4), m_scale));
+    if (!prey.isEmpty()) prey[0]->setTransform(QTransform::fromScale(m_scale, m_scale), true);
+    qDebug() << m_scale;
+}
 void MyQGraphicsView::resizeEvent(QResizeEvent *e)
 {
     Q_UNUSED(e);
@@ -355,17 +362,23 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
         QPointF newSStart = coordsToScene(p->getStart());
         QPointF delta = newSStart-p->getSStart();
         p->moveBy(delta.x(), delta.y());
-        p->setSStart(coordsToScene(p->getStart()));
+        p->setSStart(newSStart);
         p->setSEnd(coordsToScene(p->getEnd()));
 
         QPointF st = p->getSStart();
         QPointF e = p->getSEnd();
-        p->getSEll()->setPos(st);
-        p->getEEll()->setPos(e);
-        p->getLine()->setLine(QLineF(st, e));
+        p->sEll->setPos(st);
+        p->eEll->setPos(e);
+        p->line->setLine(QLineF(st, e));
     }
 
-    for (Yerp* y : yerp) y->setPos(coordsToScene(y->getStart())); // Yerp's repositioning
+    for (Yerp* y : yerp) // Yerp's repositioning
+    {
+        QPointF newSStart = coordsToScene(y->getStart());
+        QPointF delta = newSStart-y->getSStart();
+        y->moveBy(delta.x(), delta.y());
+        y->setSStart(newSStart);
+    }
 }
 void MyQGraphicsView::createYerp(QPointF pMath)
 {
@@ -373,6 +386,7 @@ void MyQGraphicsView::createYerp(QPointF pMath)
 
     Yerp* yerpInst = new Yerp(yerp.size(), pMath); // Click born Yerp instance
     yerpInst->setPos(coordsToScene(pMath));
+    yerpInst->setSStart(coordsToScene(pMath));
     scene->addItem(yerpInst);
     yerp.push_back(yerpInst);
 }
@@ -389,20 +403,20 @@ void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
     ellipse->setPos(pScene);
     ellipse->setPen(QPen(Qt::black));
     ellipse->setBrush(Qt::blue);
-    getScene()->addItem(ellipse);
-    getScene()->addItem(preyInst);
+    scene->addItem(ellipse);
+    scene->addItem(preyInst);
 
     preyInst->setSStart(pScene);
     preyInst->setPos(pScene);
     preyInst->setStart(st);
-    preyInst->setSEll(ellipse);
+    preyInst->sEll = ellipse;
     prey.push_back(preyInst);
 
     ellipse = new QGraphicsEllipseItem(-r, -r, 2*r, 2*r);
     ellipse->setPos(pSceneEnd);
     ellipse->setPen(QPen(Qt::black));
     ellipse->setBrush(Qt::red);
-    getScene()->addItem(ellipse);
+    scene->addItem(ellipse);
 
     QVector<qreal> dashes; // Line between Start and End
     dashes << 5.0 << 5.0;
@@ -410,12 +424,12 @@ void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
     pen.setDashPattern(dashes);
     QGraphicsLineItem* line = new QGraphicsLineItem(QLineF(pScene, pSceneEnd));
     line->setPen(pen);
-    getScene()->addItem(line);
+    scene->addItem(line);
 
     preyInst->setSEnd(pSceneEnd); // Data storage in Prey instance
     preyInst->setEnd(end);
-    preyInst->setEEll(ellipse);
-    preyInst->setLine(line);
+    preyInst->eEll = ellipse;
+    preyInst->line = line;
     preyInst->setAlpha(alpha);
     preyInst->setVel(v*cos(alpha*PI/180.), v*sin(alpha*PI/180.));
     preyInst->setV(v);
