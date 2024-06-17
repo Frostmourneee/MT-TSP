@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 //TODO Zoom
+//TODO исправить иконку перемотки
 //TODO Убрать геттеры и сеттеры
 //TODO подумать над плавностью смены сотых долей в координатах
 //TODO из-за симметрий быть может можно перебор уменьшить когда M = 2
@@ -37,6 +38,10 @@ MainWindow::MainWindow(QWidget *parent)
     solver->moveToThread(thread);
 
     ui->progressBar->setStyleSheet("text-align: center");
+    ui->playButton->setIcon(QIcon("playIcon.png"));
+    ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
+
+    connect(view->timer, SIGNAL(timeout()), this, SLOT(sliderTick()));
 }
 
 MainWindow::~MainWindow()
@@ -54,6 +59,12 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
             view->info();
             break;
         }
+
+    case Qt::Key_T: // Test key
+        {
+
+            break;
+        }
     }
 }
 void MainWindow::mouseMoveEvent(QMouseEvent * e) {
@@ -67,7 +78,16 @@ void MainWindow::on_actionClear_triggered()
     setFocus();
 
     view->clear();
-    changeUIDueRefreshing(true);
+    view->getGenRect()->show();
+    ui->rBConstruction->setChecked(true);
+    ui->rBAnimation->setEnabled(false);
+    ui->dSBTime->setValue(0);
+    ui->sliderTime->setValue(0);
+    ui->playButton->setIcon(QIcon("playIcon.png"));
+    ui->playButton->setEnabled(false);
+    ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
+    ui->speedUpButton->setEnabled(false);
+
     QPointF pMathCursorPos = view->sceneToCoords(view->mapFromGlobal(QCursor::pos()));
     double x = pMathCursorPos.x();
     double y = pMathCursorPos.y();
@@ -86,7 +106,7 @@ void MainWindow::on_actionFullscreen_triggered()
 }
 void MainWindow::on_actionRandom_triggered()
 {
-    QRectF genRect = view->getGenRect();
+    QRectF genRect = view->getGenRect()->rect();
     QPointF genLeft = view->sceneToCoords(QPointF(genRect.x(), genRect.y()));
     QPointF genRight = view->sceneToCoords(QPointF(genRect.x()+genRect.width(), genRect.y()+genRect.height()));
     double xmax = QString::number(genRight.x(), 'f', 2).toDouble();
@@ -169,8 +189,17 @@ void MainWindow::on_actionStart_triggered()
     setFocus();
     if (!isDataReadyToStartProcess()) return;
 
-    changeUIDueSolving(false);
-    changeUIDueRefreshing(false);
+    view->setEnabled(false);
+    view->setStatus(StatusScene::disabled);
+    ui->actionClear->setEnabled(false);
+    ui->actionLoad_from_file->setEnabled(false);
+    ui->rBConstruction->setEnabled(false);
+    ui->rBAnimation->setChecked(true);
+    ui->actionStart->setEnabled(false);
+    ui->actionRandom->setEnabled(false);
+    ui->actionBack->setEnabled(false);
+    view->setVisibleText(false);
+    view->getGenRect()->hide();
 
     FILE* initDataFile = fopen("initData.txt", "w+"); // Saving all the data to the default "initData.txt" file
     saveDataToFile(initDataFile);
@@ -367,19 +396,218 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     if (!checked) return;
 
     view->setStatus(StatusScene::settingPreyStart);
+    view->getGenRect()->show();
+    ui->rBAnimation->setEnabled(false);
+    ui->actionStart->setEnabled(true);
+    ui->actionRandom->setEnabled(true);
+    ui->actionBack->setEnabled(true);
+
     view->timer->start(10);
-    changeUIDueRefreshing(true);
+    ui->dSBTime->setValue(0);
+    ui->sliderTime->setValue(0);
+    ui->playButton->setIcon(QIcon("playIcon.png"));
+    ui->playButton->setEnabled(false);
+    ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
+    ui->speedUpButton->setEnabled(false);
+
+    for (Prey* p : view->prey)
+    {
+        p->getSEll()->show();
+        p->getEEll()->show();
+        p->getLine()->show();
+        p->setPos(p->getSStart());
+        p->setIsDied(false);
+    }
+
+    for (Yerp* y : view->yerp) {
+        y->setVel(0, 0);
+        y->setPos(view->coordsToScene(y->getStart()));
+    }
 }
 
 void MainWindow::solvingEnded()
 {
     thread->exit(0);
-    changeUIDueSolving(true);
+
+    view->setEnabled(true);
+    view->setStatus(StatusScene::animationMode);
+    ui->actionClear->setEnabled(true);
+    ui->actionLoad_from_file->setEnabled(true);
+    ui->rBConstruction->setEnabled(true);
+    ui->rBAnimation->setEnabled(true);
+    ui->rBAnimation->setChecked(true);
 
     ui->progressBar->setValue(0);
+    ui->dSBTime->setMaximum(solver->getResT());
+    ui->dSBTime->setValue(0);
+    ui->sliderTime->setMaximum(100*solver->getResT()-(int)(solver->getResT()*100) < 0.5 ? (int)(solver->getResT()*100):(int)(solver->getResT()*100)+1);
+    ui->sliderTime->setValue(0);
+    ui->playButton->setEnabled(true);
+    ui->speedUpButton->setEnabled(true);
     view->timer->stop();
 
-    for (Prey* p : view->prey) p->setPos(p->getSStart());
+    for (Prey* p : view->prey)
+    {
+        p->getSEll()->hide();
+        p->getEEll()->hide();
+        p->getLine()->hide();
+        p->setPos(p->getSStart());
+    }
+}
+
+void MainWindow::sliderTick() // Timer calls every 10ms
+{
+    if (view->getStatus() != StatusScene::animationMode) return;
+
+    ui->sliderTime->setValue(ui->sliderTime->value() + ui->sliderTime->singleStep());
+}
+void MainWindow::on_sliderTime_valueChanged(int newV)
+{
+    if (view->getStatus() != StatusScene::animationMode) return;
+
+    if (sliderVsDSBTime) {
+        sliderVsDSBTime = false;
+        ui->dSBTime->setValue(newV / 100.0);
+    } else sliderVsDSBTime = true;
+}
+void MainWindow::on_dSBTime_valueChanged(double newV)
+{
+    if (view->getStatus() != StatusScene::animationMode) return;
+
+    if (sliderVsDSBTime) {
+        sliderVsDSBTime = false;
+        ui->sliderTime->setValue((int)(newV*100));
+    } else sliderVsDSBTime = true;
+
+    for (Prey* p : view->prey) {
+        if (newV == 0) p->setPos(p->getSStart());
+
+        if (newV - p->getDieTime() > 0) {p->setIsDied(true); p->update();}
+        else if (newV - p->getDieTime() < 0) {p->setIsDied(false); p->update();}
+        else {
+            p->setIsDied(true);
+            p->update();
+
+            p->setPos(view->coordsToScene(p->getStart()+newV*QPointF(p->getVx(), p->getVy())));
+        } // The die moment itself
+    }
+
+    for (Yerp* y : view->yerp) {
+        if (y->plan.isEmpty()) continue;
+        if (newV == 0) y->setPos(view->coordsToScene(y->getStart()));
+
+        if (newV >= view->prey[y->plan.last()]->getDieTime()) { // Yerp killed every Prey devoted to it
+            y->setVel(0, 0);
+            continue;
+        }
+
+        double alpha;
+        QPointF start, end;
+        if (newV < view->prey[y->plan[0]]->getDieTime()) {
+            start = y->getStart(), end = view->prey[y->plan[0]]->getDiePoint();
+        } else {
+            for (int i = 0; i < y->plan.size()-1; i++) {
+                if (view->prey[y->plan[i]]->getDieTime() <= newV && newV < view->prey[y->plan[i+1]]->getDieTime()) {
+                    start = view->prey[y->plan[i]]->getDiePoint(), end = view->prey[y->plan[i+1]]->getDiePoint();
+                }
+            }
+        }
+
+        alpha = (fabs((end-start).x()) < 1.e-2 ? ((end-start).y() > 0 ? PI/2. : -PI/2.) : // Angle in radians
+                                                 atan2((end-start).y(), (end-start).x()));
+        y->setVel(cos(alpha), sin(alpha));
+    }
+
+    if (newV == ui->dSBTime->maximum()) { // Animation has ended
+        ui->playButton->setIcon(QIcon("playIcon.png"));
+        ui->sliderTime->setEnabled(true);
+        view->timer->stop();
+    } // Animation has ended
+
+    //===============// Placing positions via mouse click
+    if (view->timer->isActive()) return;
+    QPointF newP;
+    for (Prey* p : view->prey) {
+        if (p->getIsDied()) {
+            p->setPos(view->coordsToScene(p->getDiePoint()));
+            continue;
+        }
+
+        newP = p->getStart() + newV*QPointF(p->getVx(), p->getVy());
+        p->setPos(view->coordsToScene(newP));
+    }
+
+    for (auto y : view->yerp) {
+        if (y->plan.isEmpty()) continue;
+        if (newV >= view->prey[y->plan.last()]->getDieTime()) {
+            y->setPos(view->coordsToScene(view->prey[y->plan.last()]->getDiePoint()));
+            continue;
+        } // Yerp killed every Prey devoted to it
+
+        if (newV < view->prey[y->plan[0]]->getDieTime()) {
+            newP = y->getStart() + newV*QPointF(y->getVx(), y->getVy());
+        } else {
+            for (int i = 0; i < y->plan.size()-1; i++) {
+                double t_i0 = view->prey[y->plan[i]]->getDieTime();
+                double t_i1 = view->prey[y->plan[i+1]]->getDieTime();
+
+                if (t_i0 <= newV && newV < t_i1) {
+                    newP = view->prey[y->plan[i]]->getDiePoint() + (newV-t_i0)*QPointF(y->getVx(), y->getVy());
+                }
+            }
+
+            if (newV == view->prey[y->plan.last()]->getDieTime()) {
+                newP = view->prey[y->plan.last()]->getDiePoint();
+            } // Sync at last moment
+        }
+
+        y->setPos(view->coordsToScene(newP));
+    }
+    //===============//
+}
+void MainWindow::on_playButton_clicked()
+{
+    if (view->getStatus() != StatusScene::animationMode) return;
+
+    if (view->timer->isActive()) {
+        view->timer->stop();
+        ui->playButton->setIcon(QIcon("playIcon.png"));
+        ui->sliderTime->setEnabled(true);
+    } else {
+        view->timer->start(10);
+        ui->playButton->setIcon(QIcon("pauseIcon.png"));
+        ui->sliderTime->setEnabled(false);
+        if (ui->dSBTime->value() == ui->dSBTime->maximum()) { // Pressed when the whole animation was played
+            ui->sliderTime->setValue(0);
+        }
+    }
+}
+void MainWindow::on_speedUpButton_clicked()
+{
+    int step = view->timer->interval();
+    switch (step) {
+        case 10:
+        {
+            step = 5;
+            break;
+        }
+        case 5:
+        {
+            step = 2;
+            break;
+        }
+        case 2:
+        {
+            step = 1;
+            break;
+        }
+        case 1:
+        {
+            step = 10;
+            break;
+        }
+    }
+    view->timer->setInterval(step);
 }
 
 void MainWindow::changeProgressBar(long long vC, long long vAll)
@@ -401,24 +629,6 @@ bool MainWindow::isDataReadyToStartProcess()
         return false;
     }
     return true;
-}
-
-void MainWindow::changeUIDueSolving(bool shouldEnable)
-{
-    view->setEnabled(shouldEnable);
-    view->setVisibleText(shouldEnable);
-    view->setStatus(shouldEnable ? StatusScene::inAnimationMode : StatusScene::disabled);
-    ui->actionClear->setEnabled(shouldEnable);
-    ui->actionLoad_from_file->setEnabled(shouldEnable);
-    ui->rBAnimation->setEnabled(shouldEnable);
-    ui->rBAnimation->setChecked(shouldEnable);
-
-}
-void MainWindow::changeUIDueRefreshing(bool shouldEnable)
-{
-    ui->actionStart->setEnabled(shouldEnable);
-    ui->actionRandom->setEnabled(shouldEnable);
-    ui->actionBack->setEnabled(shouldEnable);
 }
 
 int MainWindow::signs(double r)

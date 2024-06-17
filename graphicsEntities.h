@@ -12,6 +12,8 @@ public:
     { }
 
     QPointF getStart() {return start;};
+    double getVx() {return vx;}
+    double getVy() {return vy;}
     void setStart(QPointF st) {start = st;}
     void setVel(double velx, double vely) {vx = velx; vy = vely;}
     static const int smallGraphicsUnit = 5; // Pixels

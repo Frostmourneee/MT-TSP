@@ -1,4 +1,5 @@
 #include "yerp.h"
+#include "mainwindow.h"
 
 void Yerp::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -29,4 +30,11 @@ QRectF Yerp::boundingRect() const
 {
     int rad = GraphicsEntities::smallGraphicsUnit;
     return QRectF(-3*rad, -3*rad, 6*rad, 6*rad);
+}
+void Yerp::advance(int phase)
+{
+    if (!phase || (vx == 0 && vy == 0)) return;
+
+    int unit = dynamic_cast<MyQGraphicsView*>(scene()->parent())->getUnit();
+    moveBy(vx*unit/100., -vy*unit/100.); // Timer shots 100 p/s, so movement velocity is 100*2*V pixels per second
 }

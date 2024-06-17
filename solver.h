@@ -10,6 +10,7 @@ class Solver : public QObject
 public:
     Solver(QObject *parent = nullptr) : QObject(parent)
     { }
+    double getResT() {return resT;}
 
 signals:
     void solvingEnded();

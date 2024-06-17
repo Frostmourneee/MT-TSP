@@ -12,12 +12,15 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QProgressBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -36,12 +39,17 @@ public:
     QAction *actionBack;
     QAction *actionClear;
     QWidget *centralwidget;
-    QHBoxLayout *horizontalLayout;
+    QHBoxLayout *horizontalLayout_2;
     QVBoxLayout *verticalLayout_2;
     QRadioButton *rBConstruction;
     QRadioButton *rBAnimation;
     QVBoxLayout *vLScene;
     QProgressBar *progressBar;
+    QHBoxLayout *horizontalLayout;
+    QPushButton *playButton;
+    QPushButton *speedUpButton;
+    QDoubleSpinBox *dSBTime;
+    QSlider *sliderTime;
     QMenuBar *menubar;
     QMenu *menuOptions;
     QStatusBar *statusbar;
@@ -69,8 +77,8 @@ public:
         actionClear->setObjectName(QString::fromUtf8("actionClear"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
-        horizontalLayout = new QHBoxLayout(centralwidget);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout_2 = new QHBoxLayout(centralwidget);
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         verticalLayout_2 = new QVBoxLayout();
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         rBConstruction = new QRadioButton(centralwidget);
@@ -81,11 +89,12 @@ public:
 
         rBAnimation = new QRadioButton(centralwidget);
         rBAnimation->setObjectName(QString::fromUtf8("rBAnimation"));
+        rBAnimation->setEnabled(false);
 
         verticalLayout_2->addWidget(rBAnimation);
 
 
-        horizontalLayout->addLayout(verticalLayout_2);
+        horizontalLayout_2->addLayout(verticalLayout_2);
 
         vLScene = new QVBoxLayout();
         vLScene->setObjectName(QString::fromUtf8("vLScene"));
@@ -95,8 +104,52 @@ public:
 
         vLScene->addWidget(progressBar);
 
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        playButton = new QPushButton(centralwidget);
+        playButton->setObjectName(QString::fromUtf8("playButton"));
+        playButton->setEnabled(false);
+        playButton->setMinimumSize(QSize(32, 32));
+        playButton->setMaximumSize(QSize(32, 32));
+        playButton->setIconSize(QSize(32, 32));
+        playButton->setAutoDefault(false);
+        playButton->setFlat(true);
 
-        horizontalLayout->addLayout(vLScene);
+        horizontalLayout->addWidget(playButton);
+
+        speedUpButton = new QPushButton(centralwidget);
+        speedUpButton->setObjectName(QString::fromUtf8("speedUpButton"));
+        speedUpButton->setEnabled(false);
+        speedUpButton->setMinimumSize(QSize(32, 32));
+        speedUpButton->setMaximumSize(QSize(32, 32));
+        speedUpButton->setIconSize(QSize(32, 32));
+        speedUpButton->setAutoDefault(false);
+        speedUpButton->setFlat(true);
+
+        horizontalLayout->addWidget(speedUpButton);
+
+        dSBTime = new QDoubleSpinBox(centralwidget);
+        dSBTime->setObjectName(QString::fromUtf8("dSBTime"));
+        dSBTime->setMinimumSize(QSize(80, 28));
+        dSBTime->setFrame(true);
+        dSBTime->setAlignment(Qt::AlignCenter);
+        dSBTime->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
+        horizontalLayout->addWidget(dSBTime);
+
+        sliderTime = new QSlider(centralwidget);
+        sliderTime->setObjectName(QString::fromUtf8("sliderTime"));
+        sliderTime->setMaximum(10000000);
+        sliderTime->setPageStep(1);
+        sliderTime->setOrientation(Qt::Horizontal);
+
+        horizontalLayout->addWidget(sliderTime);
+
+
+        vLScene->addLayout(horizontalLayout);
+
+
+        horizontalLayout_2->addLayout(vLScene);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -121,6 +174,10 @@ public:
         menuOptions->addAction(actionLoad_from_file);
 
         retranslateUi(MainWindow);
+
+        playButton->setDefault(false);
+        speedUpButton->setDefault(false);
+
 
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
@@ -180,6 +237,14 @@ public:
 #endif // QT_CONFIG(shortcut)
         rBConstruction->setText(QCoreApplication::translate("MainWindow", "Construction mode", nullptr));
         rBAnimation->setText(QCoreApplication::translate("MainWindow", "Animation mode", nullptr));
+        playButton->setText(QString());
+#if QT_CONFIG(shortcut)
+        playButton->setShortcut(QCoreApplication::translate("MainWindow", "Space", nullptr));
+#endif // QT_CONFIG(shortcut)
+        speedUpButton->setText(QString());
+#if QT_CONFIG(shortcut)
+        speedUpButton->setShortcut(QCoreApplication::translate("MainWindow", "Up", nullptr));
+#endif // QT_CONFIG(shortcut)
         menuOptions->setTitle(QCoreApplication::translate("MainWindow", "Actions", nullptr));
     } // retranslateUi
 

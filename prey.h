@@ -15,12 +15,12 @@ public:
     QPointF getEnd() {return end;}
     QPointF getSStart() {return sStart;}
     QPointF getSEnd() {return sEnd;}
-    double getVx() {return vx;}
-    double getVy() {return vy;}
+    QPointF getDiePoint() {return start+dieTime*QPointF(vx, vy);}
     double getAlpha() {return alpha;} // Degrees
     double getV() {return v;}
     double getDieTime() {return dieTime;}
     double getYerpNum() {return yerpNum;}
+    bool getIsDied() {return isDied;}
     void setEnd(QPointF e) {end = e;}
     void setSStart(QPointF sS) {sStart = sS;}
     void setSEnd(QPointF sE) {sEnd = sE;}
@@ -31,6 +31,7 @@ public:
     void setLine(QGraphicsLineItem* l) {line = l;}
     void setDieTime(double t) {dieTime = t;}
     void setYerpNum(int num) {yerpNum = num;}
+    void setIsDied(bool b) {isDied = b;}
     void deleteSEll() {if (sEll == NULL) return; if (scene()->items().indexOf(sEll) != -1) scene()->removeItem(sEll); delete sEll; sEll = NULL;}
     void deleteEEll() {if (eEll == NULL) return; if (scene()->items().indexOf(eEll) != -1) scene()->removeItem(eEll); delete eEll; eEll = NULL;}
     void deleteLine() {if (line == NULL) return; if (scene()->items().indexOf(line) != -1) scene()->removeItem(line); delete line; line = NULL;}
@@ -51,6 +52,7 @@ private:
     double v;
     double dieTime; // Interception moment
     int yerpNum; // Interceptor id
+    bool isDied = false;
 };
 
 #endif // PREY_H

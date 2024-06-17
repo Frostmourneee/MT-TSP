@@ -19,23 +19,25 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
-    QThread* thread;
-    MyQGraphicsView* view;
-    Solver* solver;
-    bool userHasntSeenOnlyLatinLettersWarning = true;
     QString preyDataStrSave(double, double, double, double, double, double, int, int, int, int, int, int);
     QString yerpDataStrSave(double, double, int, int);
     int signs(double);
     bool isDataReadyToStartProcess();
     void saveDataToFile(FILE*);
-    void changeUIDueSolving(bool);
-    void changeUIDueRefreshing(bool);
+    Ui::MainWindow *ui;
+    QThread* thread;
+    MyQGraphicsView* view;
+    Solver* solver;
+    bool userHasntSeenOnlyLatinLettersWarning = true;
+    bool sliderVsDSBTime = true; // Technical bool which needs to prevent the recursion in changing values of sliderTime and dSBTime
 
 signals:
     void solve(MyQGraphicsView* view);
 
 private slots:
+    void solvingEnded();
+    void sliderTick();
+    void changeProgressBar(long long vC, long long vAll);
     void keyPressEvent(QKeyEvent *) override;
     void mouseMoveEvent(QMouseEvent *) override;
     void on_actionStart_triggered();
@@ -46,8 +48,11 @@ private slots:
     void on_actionRandom_triggered();
     void on_actionBack_triggered();
     void on_actionClear_triggered();
-    void solvingEnded();
-    void changeProgressBar(long long vC, long long vAll);
     void on_rBConstruction_toggled(bool checked);
+    void on_dSBTime_valueChanged(double arg1);
+    void on_sliderTime_valueChanged(int value);
+    void on_playButton_clicked();
+    void on_dSBTime_editingFinished() {setFocus();}
+    void on_speedUpButton_clicked();
 };
 #endif // MAINWINDOW_H

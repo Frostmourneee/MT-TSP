@@ -280,7 +280,7 @@ void Solver::fillIMAndYerpNum(MyQGraphicsView* view, int *plan, int rPSize, int 
 
     for(int i = 0; i < rPSize; i++) {
         T += oneIntercept(plan[i], yerpNum);
-        view->prey[plan[i]]->setDieTime(T);
+        view->prey[plan[i]]->setDieTime(QString::number(T, 'f', 2).toDouble());
         view->prey[plan[i]]->setYerpNum(yerpNum);
     }
 

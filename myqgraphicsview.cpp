@@ -221,12 +221,6 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent* e)
     else if (status != StatusScene::draggingGenRect) setCursor(QCursor(Qt::ArrowCursor));
 
     switch (status) {
-        case StatusScene::settingPreyStart: // Just moving the cursor
-        {
-            textCoords(pMath.x(), pMath.y());
-
-            break;
-        }
         case StatusScene::settingPreyEnd: // Moving with Arrow
         {
             Prey* tmpPrey = prey.back();
@@ -279,8 +273,10 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent* e)
 
             break;
         }
-        default:
+        default: // Just moving the cursor
         {
+            textCoords(pMath.x(), pMath.y());
+
             break;
         }
     }
@@ -472,6 +468,8 @@ void MyQGraphicsView::backAction()
 
             if (prey.isEmpty()) return;
             Prey* lastPrey = prey.last();
+            lastPrey->setVel(0, 0);
+            lastPrey->setPos(lastPrey->getSStart());
             arrow->setPen(QPen(QBrush(Qt::black), 4, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
             arrow->setLine(lastPrey->getSStart(), lastPrey->getSEnd());
             arrow->show();

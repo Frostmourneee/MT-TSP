@@ -1,4 +1,5 @@
 #include "prey.h"
+#include <mainwindow.h>
 
 void Prey::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -14,20 +15,18 @@ void Prey::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 //                             sStart.y() - 2*rad, 4*rad, 4*rad);
 //    }
 
-//    if (isDied) {
-//        painter->setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-//        painter->setBrush(Qt::red);
+    if (isDied) {
+        painter->setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+        painter->setBrush(Qt::red);
 
-//        painter->drawLine(sStart.x() - rad,
-//                          sStart.y() - rad, sStart.x() + rad, sStart.y() + rad);
-//        painter->drawLine(sStart.x() - rad,
-//                          sStart.y() + rad, sStart.x() + rad, sStart.y() - rad);
-//    } else {
+        painter->drawLine(-rad, -rad, rad, rad);
+        painter->drawLine(-rad, rad, rad, -rad);
+    } else {
         painter->setPen(QPen(Qt::black, 1));
-        painter->setBrush(QBrush(QColor(0, 0, 255, 80)));
+        painter->setBrush(QBrush(QColor(0, 0, 255, dynamic_cast<MyQGraphicsView*>(scene()->parent())->getStatus() == StatusScene::animationMode ? 255 : 80)));
 
         painter->drawEllipse(-rad, -rad, 2*rad, 2*rad);
-//    }
+    }
 }
 QRectF Prey::boundingRect() const
 {
@@ -36,12 +35,12 @@ QRectF Prey::boundingRect() const
 }
 void Prey::advance(int phase)
 {
-    //if (!phase || (vx == 0 && vy == 0) || isDied) return;
-    if (!phase || (vx == 0 && vy == 0)) return;
+    if (!phase || (vx == 0 && vy == 0) || isDied) return;
 
-    moveBy(2*vx, -2*vy); // Timer shots 100 p/s, so movement velocity is 100*2*V pixels per second
+    int unit = dynamic_cast<MyQGraphicsView*>(scene()->parent())->getUnit();
+    moveBy(vx*unit/100., -vy*unit/100.); // Timer shots 100 p/s, so movement velocity is 100*2*V pixels per second
 
-//    if (dynamic_cast<MainWindow*>(scene()->parent()->parent()->parent())->isGifMode()) return;
+    if (dynamic_cast<MyQGraphicsView*>(scene()->parent())->getStatus() == StatusScene::animationMode) return;
     QLineF e_s = QLineF(sStart, sEnd);
     QLineF cur_s = QLineF(sStart, pos());
 

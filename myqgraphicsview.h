@@ -16,16 +16,16 @@
 #define PI 3.1415926535
 
 enum class GenRectSide {noSide, topSide, rightSide, botSide, leftSide};
-enum class StatusScene {settingPreyStart, settingPreyEnd, settingPreyVelocity, disabled, draggingGenRect, inAnimationMode};
+enum class StatusScene {settingPreyStart, settingPreyEnd, settingPreyVelocity, disabled, draggingGenRect, animationMode};
 class MyQGraphicsView : public QGraphicsView
 {
 
 public:
     MyQGraphicsView(QWidget *parent = 0);
+    QGraphicsRectItem* getGenRect() {return genRect;}
+    QGraphicsScene* getScene() {return scene;}
     QPointF sceneToCoords(QPointF);
     QPointF coordsToScene(QPointF);
-    QRectF getGenRect() {return genRect->rect();}
-    QGraphicsScene* getScene() {return scene;}
     StatusScene getStatus() {return status;}
     int getUnit() {return unit;}
     void info();
