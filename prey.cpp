@@ -38,7 +38,7 @@ void Prey::advance(int phase)
     if (!phase || (vx == 0 && vy == 0) || isDied) return;
 
     int unit = dynamic_cast<MyQGraphicsView*>(scene()->parent())->getUnit();
-    moveBy(vx*unit/100., -vy*unit/100.); // Timer shots 100 p/s, so movement velocity is 100*2*V pixels per second
+    moveBy(vx*unit/100., -vy*unit/100.); // Timer shots 100 p/s, so movement velocity is V*unit pixels per second
 
     if (dynamic_cast<MyQGraphicsView*>(scene()->parent())->getStatus() == StatusScene::animationMode) return;
     QLineF e_s = QLineF(sStart, sEnd);

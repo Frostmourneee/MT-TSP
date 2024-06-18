@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 //TODO Zoom
+//TODO добавить йерпам ласт цель и первую цель для удобства в коде
 //TODO подумать над плавностью смены сотых долей в координатах
 //TODO из-за симметрий быть может можно перебор уменьшить когда M = 2
 //TODO тесты
@@ -469,55 +470,60 @@ void MainWindow::on_sliderTime_valueChanged(int newV)
         ui->dSBTime->setValue(newV / 100.0);
     } else sliderVsDSBTime = true;
 }
-void MainWindow::on_dSBTime_valueChanged(double newV)
+void MainWindow::on_dSBTime_valueChanged(double newT)
 {
     if (view->getStatus() != StatusScene::animationMode) return;
 
     if (sliderVsDSBTime) {
         sliderVsDSBTime = false;
-        ui->sliderTime->setValue((int)(newV*100));
+        ui->sliderTime->setValue((int)(newT*100));
     } else sliderVsDSBTime = true;
 
     for (Prey* p : view->prey) {
-        if (newV == 0) p->setPos(p->getSStart());
+        if (newT == 0) p->setPos(p->getSStart()); // Initial time moment
 
-        if (newV - p->getDieTime() > 0) {p->setIsDied(true); p->update();}
-        else if (newV - p->getDieTime() < 0) {p->setIsDied(false); p->update();}
+        if (newT - p->getDieTime() > 0) {p->setIsDied(true); p->update();}
+        else if (newT - p->getDieTime() < 0) {p->setIsDied(false); p->update();}
         else {
             p->setIsDied(true);
             p->update();
 
-            p->setPos(view->coordsToScene(p->getStart()+newV*QPointF(p->getVx(), p->getVy())));
+            p->setPos(view->coordsToScene(p->getStart()+newT*QPointF(p->getVx(), p->getVy())));
         } // The die moment itself
     }
 
     for (Yerp* y : view->yerp) {
-        if (y->plan.isEmpty()) continue;
-        if (newV == 0) y->setPos(view->coordsToScene(y->getStart()));
+        if (y->plan.isEmpty()) continue; // Yerp has no Preys to kill
+        if (newT == 0) y->setPos(view->coordsToScene(y->getStart())); // Initial time moment
 
-        if (newV >= view->prey[y->plan.last()]->getDieTime()) { // Yerp killed every Prey devoted to it
+        if (newT >= y->lastPrey->getDieTime()) { // Yerp killed every Prey devoted to it
             y->setVel(0, 0);
             continue;
         }
 
         double alpha;
         QPointF start, end;
-        if (newV < view->prey[y->plan[0]]->getDieTime()) {
-            start = y->getStart(), end = view->prey[y->plan[0]]->getDiePoint();
+        if (newT < y->firstPrey->getDieTime()) {
+            start = y->getStart();
+            end = y->firstPrey->getDiePoint();
         } else {
             for (int i = 0; i < y->plan.size()-1; i++) {
-                if (view->prey[y->plan[i]]->getDieTime() <= newV && newV < view->prey[y->plan[i+1]]->getDieTime()) {
-                    start = view->prey[y->plan[i]]->getDiePoint(), end = view->prey[y->plan[i+1]]->getDiePoint();
+                Prey* prevPrey = view->prey[y->plan[i]];
+                Prey* nextPrey = view->prey[y->plan[i+1]];
+
+                if (prevPrey->getDieTime() <= newT && newT < nextPrey->getDieTime()) {
+                    start = prevPrey->getDiePoint();
+                    end = nextPrey->getDiePoint();
                 }
             }
         }
 
-        alpha = (fabs((end-start).x()) < 1.e-2 ? ((end-start).y() > 0 ? PI/2. : -PI/2.) : // Angle in radians
+        alpha = (fabs((end-start).x()) < 1.e-4 ? ((end-start).y() > 0 ? PI/2. : -PI/2.) : // Angle in radians
                                                  atan2((end-start).y(), (end-start).x()));
         y->setVel(cos(alpha), sin(alpha));
     }
 
-    if (newV == ui->dSBTime->maximum()) { // Animation has ended
+    if (newT == ui->dSBTime->maximum()) { // Animation has ended
         ui->playButton->setIcon(QIcon("playIcon.png"));
         ui->sliderTime->setEnabled(true);
         view->timer->stop();
@@ -532,31 +538,33 @@ void MainWindow::on_dSBTime_valueChanged(double newV)
             continue;
         }
 
-        newP = p->getStart() + newV*QPointF(p->getVx(), p->getVy());
+        newP = p->getStart() + newT*QPointF(p->getVx(), p->getVy());
         p->setPos(view->coordsToScene(newP));
     }
 
-    for (auto y : view->yerp) {
+    for (Yerp* y : view->yerp) {
         if (y->plan.isEmpty()) continue;
-        if (newV >= view->prey[y->plan.last()]->getDieTime()) {
-            y->setPos(view->coordsToScene(view->prey[y->plan.last()]->getDiePoint()));
+        if (newT >= y->lastPrey->getDieTime()) {
+            y->setPos(view->coordsToScene(y->lastPrey->getDiePoint()));
             continue;
         } // Yerp killed every Prey devoted to it
 
-        if (newV < view->prey[y->plan[0]]->getDieTime()) {
-            newP = y->getStart() + newV*QPointF(y->getVx(), y->getVy());
+        if (newT < y->firstPrey->getDieTime()) {
+            newP = y->getStart() + newT*QPointF(y->getVx(), y->getVy());
         } else {
             for (int i = 0; i < y->plan.size()-1; i++) {
-                double t_i0 = view->prey[y->plan[i]]->getDieTime();
-                double t_i1 = view->prey[y->plan[i+1]]->getDieTime();
+                Prey* prevPrey = view->prey[y->plan[i]];
+                Prey* nextPrey = view->prey[y->plan[i+1]];
+                double t_i0 = prevPrey->getDieTime();
+                double t_i1 = nextPrey->getDieTime();
 
-                if (t_i0 <= newV && newV < t_i1) {
-                    newP = view->prey[y->plan[i]]->getDiePoint() + (newV-t_i0)*QPointF(y->getVx(), y->getVy());
+                if (t_i0 <= newT && newT < t_i1) {
+                    newP = prevPrey->getDiePoint() + (newT-t_i0)*QPointF(y->getVx(), y->getVy());
                 }
             }
 
-            if (newV == view->prey[y->plan.last()]->getDieTime()) {
-                newP = view->prey[y->plan.last()]->getDiePoint();
+            if (newT == y->lastPrey->getDieTime()) {
+                newP = y->lastPrey->getDiePoint();
             } // Sync at last moment
         }
 

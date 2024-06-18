@@ -26,7 +26,7 @@ private:
     long long C(int, int);
     long long fact(int);
     void swap (int *a, int *b);
-    void fillIMAndYerpNum(MyQGraphicsView* view, int* plan, int rPSize, int yerpNum);
+    void storeInterceptionInfo(MyQGraphicsView* view, int* plan, int rPSize, int yerpNum);
     int M; // Yerps
     int N; // Preys
     int k1; // 1st optimal plan size

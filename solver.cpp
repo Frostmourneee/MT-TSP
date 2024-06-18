@@ -54,7 +54,7 @@ void Solver::solve(MyQGraphicsView* view)
     if (M == 1) {
         for (int i = 0; i < N; i++) curPlan[i] = i;
         resT = timeOneYerp(resT, curPlan, N, 0, false);
-        fillIMAndYerpNum(view, curPlan, N, 0); // Filling IMs and yerpNums
+        storeInterceptionInfo(view, curPlan, N, 0); // Filling IMs and yerpNums
 
         view->yerp[0]->plan.clear();
         view->yerp[0]->plan4AP.clear();
@@ -96,13 +96,13 @@ void Solver::solve(MyQGraphicsView* view)
             resT = mTourTime[i];
             k1 = N;
             k2 = 0;
-            fillIMAndYerpNum(view, planFirst, N, 0);
+            storeInterceptionInfo(view, planFirst, N, 0);
             for (int j = 0; j < N; j++) {curPlan1[j] = planFirst[j]; curPlan[j] = planFirst[j];}
         } else if (resT > mTourTime[i]) {
             resT = mTourTime[i];
             k1 = 0;
             k2 = N;
-            fillIMAndYerpNum(view, planFirst, N, 1);
+            storeInterceptionInfo(view, planFirst, N, 1);
             for (int j = 0; j < N; j++) {curPlan2[j] = planFirst[j]; curPlan[j] = planFirst[j];}
         }
         for (int i = 0; i < N; i++) {planFirst[i] = i;} // Roll back to init
@@ -153,8 +153,8 @@ void Solver::solve(MyQGraphicsView* view)
     }
 
     //Block to fill IM1 & IM2 and some other interception stuff
-    fillIMAndYerpNum(view, curPlan1, k1, 0);
-    fillIMAndYerpNum(view, curPlan2, k2, 1);
+    storeInterceptionInfo(view, curPlan1, k1, 0);
+    storeInterceptionInfo(view, curPlan2, k2, 1);
     view->yerp[0]->plan.clear();
     view->yerp[1]->plan.clear();
     for (int i = 0; i < k1; i++) view->yerp[0]->plan.push_back(curPlan1[i]);
@@ -274,15 +274,21 @@ void Solver::fullReset()
     for (int i = 0; i < M; i++) {mx[i] = initmx[i]; my[i] = initmy[i];}
     for (int i = 0; i < N; i++) {x[i] = initx[i]; y[i] = inity[i]; vx[i] = initvx[i]; vy[i] = initvy[i];}
 }
-void Solver::fillIMAndYerpNum(MyQGraphicsView* view, int *plan, int rPSize, int yerpNum)
+void Solver::storeInterceptionInfo(MyQGraphicsView* view, int *plan, int rPSize, int yerpNum)
 {
     double T = 0.;
 
     for(int i = 0; i < rPSize; i++) {
         T += oneIntercept(plan[i], yerpNum);
-        view->prey[plan[i]]->setDieTime(QString::number(T, 'f', 2).toDouble());
-        view->prey[plan[i]]->setYerpNum(yerpNum);
+
+        Prey* p = view->prey[plan[i]];
+        p->setDieTime(QString::number(T, 'f', 2).toDouble());
+        p->setYerpNum(yerpNum);
     }
+
+    Yerp* y = view->yerp[yerpNum];
+    y->firstPrey = view->prey[plan[0]];
+    y->lastPrey = view->prey[plan[rPSize-1]];
 
     fullReset();
 }

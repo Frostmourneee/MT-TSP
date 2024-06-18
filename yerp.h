@@ -3,6 +3,7 @@
 
 #include <graphicsEntities.h>
 #include <QPainter>
+#include <prey.h>
 
 class Yerp : public GraphicsEntities
 {
@@ -11,6 +12,8 @@ public:
     {start = st;}
     QVector<int> plan;
     QVector<int> plan4AP; // For all Preys
+    Prey* lastPrey;
+    Prey* firstPrey;
     int getYerpNum() {return yerpNum;}
 
 private:
