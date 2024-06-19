@@ -29,6 +29,7 @@ public:
     void info();
     void setStatus(StatusScene s) {status = s;}
     void setVisibleText(bool b) {text->setVisible(b);}
+    void setSF(double fact) {mouseSF = fact; sceneSF = mouseSF >= 1 ? mouseSF : 1/(1+100*(1-mouseSF));}
     void clear();
     void backAction();
     void textCoords(double x, double y);
@@ -60,7 +61,8 @@ private:
     StatusScene status = StatusScene::settingPreyStart;
     GenRectSide side = GenRectSide::noSide;
     int unit{50}; // Pixels per 1 coord unit
-    double m_scale = 1000;
+    double mouseSF = 1;
+    double sceneSF = 1;
 };
 
 #endif // MYQGRAPCHICSVIEW_H

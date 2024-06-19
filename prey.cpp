@@ -39,10 +39,15 @@ void Prey::advance(int phase)
 
     int unit = dynamic_cast<MyQGraphicsView*>(scene()->parent())->getUnit();
     moveBy(vx*unit/100., -vy*unit/100.); // Timer shots 100 p/s, so movement velocity is V*unit pixels per second
+    curr += QPointF(vx/100., vy/100.);
 
     if (dynamic_cast<MyQGraphicsView*>(scene()->parent())->getStatus() == StatusScene::animationMode) return;
     QLineF e_s = QLineF(sStart, sEnd);
     QLineF cur_s = QLineF(sStart, pos());
 
-    if (e_s.length() < cur_s.length()) setPos(sStart);
+    if (e_s.length() < cur_s.length())
+    {
+        setPos(sStart);
+        curr = start;
+    }
 }

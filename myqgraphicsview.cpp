@@ -10,9 +10,7 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent) : QGraphicsView(parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    text = new QGraphicsTextItem("Move the cursor in the \n       working area");
-    text->setPos(70, 50);
-    text->setFont(QFont("Times", 20, QFont::Bold));
+    text = new QGraphicsTextItem();
     scene->addItem(text);
 
     arrow = new Arrow(0, 0, 0, 0);
@@ -294,10 +292,40 @@ void MyQGraphicsView::mouseReleaseEvent(QMouseEvent *e)
 }
 void MyQGraphicsView::wheelEvent(QWheelEvent *e)
 {
-    m_scale += e->angleDelta().y() / qreal(600);
-    m_scale = qMax(qreal(0.1), qMin(qreal(4), m_scale));
-    if (!prey.isEmpty()) prey[0]->setTransform(QTransform::fromScale(m_scale, m_scale), true);
-    qDebug() << m_scale;
+    if (status != StatusScene::animationMode) return; // Zoom seems to be useful only in animation mode
+
+    double aDelta = e->angleDelta().y();
+    if (mouseSF == 1)
+    {
+        mouseSF += aDelta > 0 ? aDelta / 1200. : aDelta / 120000.; // +-0.1 || +-0.0001
+    }
+    else mouseSF += mouseSF > 1 ? aDelta / 1200. : aDelta / 120000.;
+
+    mouseSF = clamp(mouseSF, 0.51, 50);
+    sceneSF = mouseSF >= 1 ? mouseSF : 1/(1+100*(1-mouseSF)); // Zooming in or out from 1 to 100 with step 0.1 (zoom in 1, 1.1, 1.2, ..., 100 times or zoom out 1, 1.1, 1.2, ... 100 times
+    qDebug() << "zoom" << (mouseSF>= 1 ? "in" : "out") << (mouseSF >= 1 ? mouseSF : 1+100*(1-mouseSF)) << "times";
+
+    for (Prey* p : prey)
+    {
+        QPointF radiusVec = p->getCurr();
+        QPointF newPos = sceneSF*radiusVec;
+        p->setPos(coordsToScene(newPos));
+    }
+
+    for (Yerp* y : yerp)
+    {
+        QPointF radiusVec = y->getCurr();
+        QPointF newPos = sceneSF*radiusVec;
+        y->setPos(coordsToScene(newPos));
+    }
+
+//    for (QGraphicsLineItem* l : coordGridLine)
+//    {
+//        QPointF radiusVec = sceneToCoords(l->pos());
+//        if (l == coordGridLine[0]) qDebug() << radiusVec;
+//        QPointF newPos = sceneSF*radiusVec;
+//        l->setPos(coordsToScene(newPos));
+//    }
 }
 void MyQGraphicsView::resizeEvent(QResizeEvent *e)
 {
@@ -308,7 +336,7 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
     scene->setSceneRect(0, 0, w, h);
 
     QRectF rect = genRect->rect();
-    double needRectW = rect.width() < w-20-rect.x() ? rect.width() : w-20-rect.x();
+    double needRectW = rect.width() < w-20-rect.x() ? rect.width() : w-20-rect.x(); // Stuff for checking whether genRect is smaller than scene or not
     double needRectH = rect.height() < h-20-rect.y() ? rect.height() : h-20-rect.y();
     QRectF newRect = QRectF(rect.x(), rect.y(), needRectW, needRectH).normalized();
     genRect->setRect(newRect);
@@ -327,31 +355,31 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
     }
     coordGridLine.clear();
 
-    for (int i = 1; i < 0.98*w/(2*unit); i++) // Thin absciss lines, need to be renewed because amount of them isn't constant
+    for (int i = 1; i < 0.98*w/(2*unit); i++) // Thin vertical lines, need to be renewed because amount of them isn't constant
     {
-        QGraphicsLineItem* coordL = new QGraphicsLineItem(i*unit, -0.98*h/2., i*unit, 0.98*h/2.);
-        coordL->setPos(w / 2., h / 2.);
+        QGraphicsLineItem* coordL = new QGraphicsLineItem(0, -0.98*h/2., 0, 0.98*h/2.);
+        coordL->setPos(i*unit + w / 2., h / 2.);
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
         coordGridLine.push_back(coordL);
         scene->addItem(coordL);
 
-        coordL = new QGraphicsLineItem(-i*unit, -0.98*h/2., -i*unit, 0.98*h/2.);
-        coordL->setPos(w / 2., h / 2.);
+        coordL = new QGraphicsLineItem(0, -0.98*h/2., 0, 0.98*h/2.);
+        coordL->setPos(-i*unit + w / 2., h / 2.);
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
         coordGridLine.push_back(coordL);
         scene->addItem(coordL);
     }
 
-    for (int i = 1; i < 0.98*h/(2*unit); i++) // Thin ordinate lines, need to be renewed because amount of them isn't constant
+    for (int i = 1; i < 0.98*h/(2*unit); i++) // Thin horizontal lines, need to be renewed because amount of them isn't constant
     {
-        QGraphicsLineItem* coordL = new QGraphicsLineItem(-0.98*w/2., i*unit, 0.98*w/2., i*unit);
-        coordL->setPos(w / 2., h / 2.);
+        QGraphicsLineItem* coordL = new QGraphicsLineItem(-0.98*w/2., 0, 0.98*w/2., 0);
+        coordL->setPos(w / 2., i*unit + h / 2.);
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
         coordGridLine.push_back(coordL);
         scene->addItem(coordL);
 
-        coordL = new QGraphicsLineItem(-0.98*w/2., -i*unit, 0.98*w/2., -i*unit);
-        coordL->setPos(w / 2., h / 2.);
+        coordL = new QGraphicsLineItem(-0.98*w/2., 0, 0.98*w/2., 0);
+        coordL->setPos(w / 2., -i*unit + h / 2.);
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
         coordGridLine.push_back(coordL);
         scene->addItem(coordL);
@@ -387,6 +415,7 @@ void MyQGraphicsView::createYerp(QPointF pMath)
     Yerp* yerpInst = new Yerp(yerp.size(), pMath); // Click born Yerp instance
     yerpInst->setPos(coordsToScene(pMath));
     yerpInst->setSStart(coordsToScene(pMath));
+    yerpInst->setCurr(pMath);
     scene->addItem(yerpInst);
     yerp.push_back(yerpInst);
 }
@@ -409,6 +438,7 @@ void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
     preyInst->setSStart(pScene);
     preyInst->setPos(pScene);
     preyInst->setStart(st);
+    preyInst->setCurr(st);
     preyInst->sEll = ellipse;
     prey.push_back(preyInst);
 
@@ -440,7 +470,7 @@ QPointF MyQGraphicsView::sceneToCoords(QPointF scenePoint) // Translate point fr
     int h = height();
 
     QPointF pToCoordLineX = scenePoint - QPointF(w/2, h/2); // Data will be stored with 2 decimals for convenience
-    return QPointF(round(pToCoordLineX.x()/unit * 100)/100, -1 * round(pToCoordLineX.y()/unit * 100)/100);
+    return QPointF(QString::number(pToCoordLineX.x()/unit, 'f', 2).toDouble(), -1 * QString::number(pToCoordLineX.y()/unit, 'f', 2).toDouble());
 }
 QPointF MyQGraphicsView::coordsToScene(QPointF coordPoint) // NOT LINEAR!!! Translate point from convinient "maths" coords to Scene coords
 {
@@ -566,7 +596,7 @@ void MyQGraphicsView::info()
     qDebug() << "(sStart, sEnd, start, end, vx, vy, alpha, V)" << '\n';
     for (Prey* p : prey)
     {
-        qDebug() << "(" << p->getSStart() << "," << p->getSEnd() << "," << p->getStart() << "," << p->getEnd() << "," << p->getVx() << "," << p->getVy() << "," << p->getAlpha() << p->getV() << ")" << '\n';
+        qDebug() << "(" << p->getSStart() << "," << p->getSEnd() << "," << p->getStart() << "," << p->getEnd() << "," << p->getVx() << "," << p->getVy() << "," << p->getAlpha() << p->getV() << ")" << p->pos() << '\n';
     }
     qDebug() << "(yerpNum, sStart, start)" << '\n';
     for (Yerp* y : yerp)

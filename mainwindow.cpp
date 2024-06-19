@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 
 //TODO Zoom
-//TODO добавить йерпам ласт цель и первую цель для удобства в коде
 //TODO подумать над плавностью смены сотых долей в координатах
 //TODO из-за симметрий быть может можно перебор уменьшить когда M = 2
 //TODO тесты
@@ -79,6 +78,7 @@ void MainWindow::on_actionClear_triggered()
 
     view->clear();
     view->genRect->show();
+    view->setSF(1);
     ui->rBConstruction->setChecked(true);
     ui->rBAnimation->setEnabled(false);
     ui->dSBTime->setValue(0);
@@ -396,19 +396,23 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     if (!checked) return;
 
     view->setStatus(StatusScene::settingPreyStart);
-    view->genRect->show();
+
     ui->rBAnimation->setEnabled(false);
     ui->actionStart->setEnabled(true);
     ui->actionRandom->setEnabled(true);
     ui->actionBack->setEnabled(true);
 
-    view->timer->start(10);
+    view->genRect->show();
+    view->setSF(1);
     ui->dSBTime->setValue(0);
     ui->sliderTime->setValue(0);
     ui->playButton->setIcon(QIcon("playIcon.png"));
     ui->playButton->setEnabled(false);
     ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
     ui->speedUpButton->setEnabled(false);
+
+
+    view->timer->start(10);
 
     for (Prey* p : view->prey)
     {
@@ -417,11 +421,13 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
         p->line->show();
         p->setPos(p->getSStart());
         p->setIsDied(false);
+        p->setCurr(p->getStart());
     }
 
     for (Yerp* y : view->yerp) {
         y->setVel(0, 0);
         y->setPos(view->coordsToScene(y->getStart()));
+        y->setCurr(y->getStart());
     }
 }
 
@@ -452,6 +458,7 @@ void MainWindow::solvingEnded()
         p->eEll->hide();
         p->line->hide();
         p->setPos(p->getSStart());
+        p->setCurr(p->getStart());
     }
 }
 
@@ -480,7 +487,11 @@ void MainWindow::on_dSBTime_valueChanged(double newT)
     } else sliderVsDSBTime = true;
 
     for (Prey* p : view->prey) {
-        if (newT == 0) p->setPos(p->getSStart()); // Initial time moment
+        if (newT == 0)
+        {
+            p->setPos(p->getSStart()); // Initial time moment
+            p->setCurr(p->getStart());
+        }
 
         if (newT - p->getDieTime() > 0) {p->setIsDied(true); p->update();}
         else if (newT - p->getDieTime() < 0) {p->setIsDied(false); p->update();}
@@ -488,13 +499,18 @@ void MainWindow::on_dSBTime_valueChanged(double newT)
             p->setIsDied(true);
             p->update();
 
-            p->setPos(view->coordsToScene(p->getStart()+newT*QPointF(p->getVx(), p->getVy())));
+            p->setPos(view->coordsToScene(p->getDiePoint()));
+            p->setCurr(p->getDiePoint());
         } // The die moment itself
     }
 
     for (Yerp* y : view->yerp) {
         if (y->plan.isEmpty()) continue; // Yerp has no Preys to kill
-        if (newT == 0) y->setPos(view->coordsToScene(y->getStart())); // Initial time moment
+        if (newT == 0)
+        {
+            y->setPos(view->coordsToScene(y->getStart())); // Initial time moment
+            y->setCurr(y->getStart());
+        }
 
         if (newT >= y->lastPrey->getDieTime()) { // Yerp killed every Prey devoted to it
             y->setVel(0, 0);
@@ -535,17 +551,20 @@ void MainWindow::on_dSBTime_valueChanged(double newT)
     for (Prey* p : view->prey) {
         if (p->getIsDied()) {
             p->setPos(view->coordsToScene(p->getDiePoint()));
+            p->setCurr(p->getDiePoint());
             continue;
         }
 
         newP = p->getStart() + newT*QPointF(p->getVx(), p->getVy());
         p->setPos(view->coordsToScene(newP));
+        p->setCurr(newP);
     }
 
     for (Yerp* y : view->yerp) {
         if (y->plan.isEmpty()) continue;
         if (newT >= y->lastPrey->getDieTime()) {
             y->setPos(view->coordsToScene(y->lastPrey->getDiePoint()));
+            y->setCurr(y->lastPrey->getDiePoint());
             continue;
         } // Yerp killed every Prey devoted to it
 
@@ -569,6 +588,7 @@ void MainWindow::on_dSBTime_valueChanged(double newT)
         }
 
         y->setPos(view->coordsToScene(newP));
+        y->setCurr(newP);
     }
     //===============//
 }
