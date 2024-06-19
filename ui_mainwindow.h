@@ -48,6 +48,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QPushButton *playButton;
     QPushButton *speedUpButton;
+    QPushButton *resetZoomButton;
     QDoubleSpinBox *dSBTime;
     QSlider *sliderTime;
     QMenuBar *menubar;
@@ -128,6 +129,17 @@ public:
 
         horizontalLayout->addWidget(speedUpButton);
 
+        resetZoomButton = new QPushButton(centralwidget);
+        resetZoomButton->setObjectName(QString::fromUtf8("resetZoomButton"));
+        resetZoomButton->setEnabled(false);
+        resetZoomButton->setMinimumSize(QSize(32, 32));
+        resetZoomButton->setMaximumSize(QSize(32, 32));
+        resetZoomButton->setIconSize(QSize(32, 32));
+        resetZoomButton->setAutoDefault(false);
+        resetZoomButton->setFlat(true);
+
+        horizontalLayout->addWidget(resetZoomButton);
+
         dSBTime = new QDoubleSpinBox(centralwidget);
         dSBTime->setObjectName(QString::fromUtf8("dSBTime"));
         dSBTime->setMinimumSize(QSize(80, 28));
@@ -177,6 +189,7 @@ public:
 
         playButton->setDefault(false);
         speedUpButton->setDefault(false);
+        resetZoomButton->setDefault(false);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -244,6 +257,10 @@ public:
         speedUpButton->setText(QString());
 #if QT_CONFIG(shortcut)
         speedUpButton->setShortcut(QCoreApplication::translate("MainWindow", "Up", nullptr));
+#endif // QT_CONFIG(shortcut)
+        resetZoomButton->setText(QString());
+#if QT_CONFIG(shortcut)
+        resetZoomButton->setShortcut(QCoreApplication::translate("MainWindow", "H", nullptr));
 #endif // QT_CONFIG(shortcut)
         menuOptions->setTitle(QCoreApplication::translate("MainWindow", "Actions", nullptr));
     } // retranslateUi

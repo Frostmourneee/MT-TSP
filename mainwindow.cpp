@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->progressBar->setStyleSheet("text-align: center");
     ui->playButton->setIcon(QIcon("playIcon.png"));
     ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
+    ui->resetZoomButton->setIcon(QIcon("resetIcon.png"));
 
     connect(view->timer, SIGNAL(timeout()), this, SLOT(sliderTick()));
 }
@@ -87,6 +88,8 @@ void MainWindow::on_actionClear_triggered()
     ui->playButton->setEnabled(false);
     ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
     ui->speedUpButton->setEnabled(false);
+    ui->resetZoomButton->setEnabled(false);
+    on_resetZoomButton_clicked();
 
     QPointF pMathCursorPos = view->sceneToCoords(view->mapFromGlobal(QCursor::pos()));
     double x = pMathCursorPos.x();
@@ -114,7 +117,7 @@ void MainWindow::on_actionRandom_triggered()
     double ymax = QString::number(genLeft.y(), 'f', 2).toDouble();
     double ymin = QString::number(genRight.y(), 'f', 2).toDouble();
     double maxVel1f = 7;
-    double minVel1f = 0;
+    double minVel1f = 5;
 
     if (xmax <= xmin || ymax <= ymin) {
         QMessageBox::critical(this, "MT-TSP", "Invalid generation bounds\n");
@@ -403,14 +406,14 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     ui->actionBack->setEnabled(true);
 
     view->genRect->show();
-    view->setSF(1);
     ui->dSBTime->setValue(0);
     ui->sliderTime->setValue(0);
     ui->playButton->setIcon(QIcon("playIcon.png"));
     ui->playButton->setEnabled(false);
     ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
     ui->speedUpButton->setEnabled(false);
-
+    ui->resetZoomButton->setEnabled(false);
+    on_resetZoomButton_clicked();
 
     view->timer->start(10);
 
@@ -450,6 +453,7 @@ void MainWindow::solvingEnded()
     ui->sliderTime->setValue(0);
     ui->playButton->setEnabled(true);
     ui->speedUpButton->setEnabled(true);
+    ui->resetZoomButton->setEnabled(true);
     view->timer->stop();
 
     for (Prey* p : view->prey)
@@ -635,6 +639,11 @@ void MainWindow::on_speedUpButton_clicked()
         }
     }
     view->timer->setInterval(tick);
+}
+void MainWindow::on_resetZoomButton_clicked()
+{
+    view->setSF(1);
+    view->zoomGraphics(1);
 }
 
 void MainWindow::changeProgressBar(long long vC, long long vAll)

@@ -276,6 +276,7 @@ void Solver::fullReset()
 }
 void Solver::storeInterceptionInfo(MyQGraphicsView* view, int *plan, int rPSize, int yerpNum)
 {
+    if (rPSize == 0) return;
     double T = 0.;
 
     for(int i = 0; i < rPSize; i++) {

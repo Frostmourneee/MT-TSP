@@ -37,6 +37,7 @@ public:
     void textCoords(double x, double y);
     void createYerp(QPointF);
     void createPreyOnFullInfo(QPointF, QPointF, double);
+    void zoomGraphics(double);
     QVector<Prey* > prey;
     QVector<Yerp* > yerp;
     QTimer* timer;
@@ -55,9 +56,13 @@ private:
     double clamp(double value, double min, double max) {return value > max ? max : value < min ? min : value;};
     bool onGenRect(QPointF);
     void textV(double v);
+    void resizeCoordlines();
     QGraphicsLineItem* coordLineX;
     QGraphicsLineItem* coordLineY;
-    QVector<GridLineItem* > coordGridLine;
+    QVector<GridLineItem* > coordLinesPosX;
+    QVector<GridLineItem* > coordLinesNegX;
+    QVector<GridLineItem* > coordLinesPosY;
+    QVector<GridLineItem* > coordLinesNegY;
     QGraphicsTextItem* text;
     Arrow* arrow;
     StatusScene status = StatusScene::settingPreyStart;

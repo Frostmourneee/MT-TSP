@@ -54,5 +54,6 @@ private slots:
     void on_playButton_clicked();
     void on_dSBTime_editingFinished() {setFocus();}
     void on_speedUpButton_clicked();
+    void on_resetZoomButton_clicked();
 };
 #endif // MAINWINDOW_H
