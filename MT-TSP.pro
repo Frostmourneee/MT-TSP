@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     arrow.cpp \
     graphicsEntities.cpp \
+    gridlineitem.cpp \
     main.cpp \
     mainwindow.cpp \
     myqgraphicsview.cpp \
@@ -28,6 +29,7 @@ SOURCES += \
 HEADERS += \
     arrow.h \
     graphicsEntities.h \
+    gridlineitem.h \
     mainwindow.h \
     myqgraphicsview.h \
     prey.h \

@@ -8,6 +8,7 @@
 #include <prey.h>
 #include <yerp.h>
 #include <math.h>
+#include <gridlineitem.h>
 #include <QGuiApplication>
 #include <QDebug>
 #include <QMessageBox>
@@ -25,7 +26,8 @@ public:
     QPointF sceneToCoords(QPointF);
     QPointF coordsToScene(QPointF);
     StatusScene getStatus() {return status;}
-    int getUnit() {return unit;}
+    double getBaseUnit() {return baseUnit;}
+    double getUnit() {return unit;}
     void info();
     void setStatus(StatusScene s) {status = s;}
     void setVisibleText(bool b) {text->setVisible(b);}
@@ -55,12 +57,13 @@ private:
     void textV(double v);
     QGraphicsLineItem* coordLineX;
     QGraphicsLineItem* coordLineY;
-    QVector<QGraphicsLineItem* > coordGridLine;
+    QVector<GridLineItem* > coordGridLine;
     QGraphicsTextItem* text;
     Arrow* arrow;
     StatusScene status = StatusScene::settingPreyStart;
     GenRectSide side = GenRectSide::noSide;
-    int unit{50}; // Pixels per 1 coord unit
+    const double baseUnit{50.}; // Pixels per 1 coord unit
+    double unit{baseUnit}; // Pixels per 1 coord unit
     double mouseSF = 1;
     double sceneSF = 1;
 };

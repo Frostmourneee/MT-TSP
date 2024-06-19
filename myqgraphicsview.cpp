@@ -38,7 +38,7 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
     if (e->button() != Qt::LeftButton && e->button() != Qt::RightButton) return;
 
     QPointF pScene = mapToScene(e->pos()); // Scene coords
-    QPointF pMath = sceneToCoords(pScene); // Convinient "maths" coords
+    QPointF pMath = sceneToCoords(pScene); // Convenient "maths" coords
 
     if (e->button() == Qt::RightButton)
     {
@@ -161,7 +161,7 @@ void MyQGraphicsView::mouseMoveEvent(QMouseEvent* e)
     if (e->buttons() != Qt::NoButton && e->buttons() != Qt::LeftButton) return; // We need only movement or movement with Qt::LeftButton
 
     QPointF pScene = mapToScene(e->pos()); // Scene coords
-    QPointF pMath = sceneToCoords(pScene); // Convinient "maths" coords
+    QPointF pMath = sceneToCoords(pScene); // Convenient "maths" coords
     if (onGenRect(pScene))
     {
         if (status == StatusScene::settingPreyStart) setCursor(QCursor(Qt::OpenHandCursor));
@@ -303,29 +303,29 @@ void MyQGraphicsView::wheelEvent(QWheelEvent *e)
 
     mouseSF = clamp(mouseSF, 0.51, 50);
     sceneSF = mouseSF >= 1 ? mouseSF : 1/(1+100*(1-mouseSF)); // Zooming in or out from 1 to 100 with step 0.1 (zoom in 1, 1.1, 1.2, ..., 100 times or zoom out 1, 1.1, 1.2, ... 100 times
-    qDebug() << "zoom" << (mouseSF>= 1 ? "in" : "out") << (mouseSF >= 1 ? mouseSF : 1+100*(1-mouseSF)) << "times";
+    unit = sceneSF*baseUnit;
+    qDebug() << "zoom" << (mouseSF>= 1 ? "in" : "out") << (mouseSF >= 1 ? mouseSF : 1+100*(1-mouseSF)) << "times" << unit << sceneSF;
 
     for (Prey* p : prey)
     {
         QPointF radiusVec = p->getCurr();
-        QPointF newPos = sceneSF*radiusVec;
-        p->setPos(coordsToScene(newPos));
+        //QPointF newPos = sceneSF*radiusVec;
+        p->setPos(coordsToScene(radiusVec));
     }
 
     for (Yerp* y : yerp)
     {
         QPointF radiusVec = y->getCurr();
-        QPointF newPos = sceneSF*radiusVec;
-        y->setPos(coordsToScene(newPos));
+        //QPointF newPos = sceneSF*radiusVec;
+        y->setPos(coordsToScene(radiusVec));
     }
 
-//    for (QGraphicsLineItem* l : coordGridLine)
-//    {
-//        QPointF radiusVec = sceneToCoords(l->pos());
-//        if (l == coordGridLine[0]) qDebug() << radiusVec;
-//        QPointF newPos = sceneSF*radiusVec;
-//        l->setPos(coordsToScene(newPos));
-//    }
+    for (GridLineItem* l : coordGridLine)
+    {
+        QPointF radiusVec = l->getPos();
+        //QPointF newPos = sceneSF*radiusVec;
+        l->setPos(coordsToScene(radiusVec));
+    }
 }
 void MyQGraphicsView::resizeEvent(QResizeEvent *e)
 {
@@ -355,31 +355,31 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
     }
     coordGridLine.clear();
 
-    for (int i = 1; i < 0.98*w/(2*unit); i++) // Thin vertical lines, need to be renewed because amount of them isn't constant
+    for (int i = 1; i < 0.98*w/(2*baseUnit); i++) // Thin vertical lines, need to be renewed because amount of them isn't constant
     {
-        QGraphicsLineItem* coordL = new QGraphicsLineItem(0, -0.98*h/2., 0, 0.98*h/2.);
-        coordL->setPos(i*unit + w / 2., h / 2.);
+        GridLineItem* coordL = new GridLineItem(0, -0.98*h/2., 0, 0.98*h/2., i, 0);
+        coordL->setPos(i*baseUnit + w / 2., h / 2.);
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
         coordGridLine.push_back(coordL);
         scene->addItem(coordL);
 
-        coordL = new QGraphicsLineItem(0, -0.98*h/2., 0, 0.98*h/2.);
-        coordL->setPos(-i*unit + w / 2., h / 2.);
+        coordL = new GridLineItem(0, -0.98*h/2., 0, 0.98*h/2., -i, 0);
+        coordL->setPos(-i*baseUnit + w / 2., h / 2.);
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
         coordGridLine.push_back(coordL);
         scene->addItem(coordL);
     }
 
-    for (int i = 1; i < 0.98*h/(2*unit); i++) // Thin horizontal lines, need to be renewed because amount of them isn't constant
+    for (int i = 1; i < 0.98*h/(2*baseUnit); i++) // Thin horizontal lines, need to be renewed because amount of them isn't constant
     {
-        QGraphicsLineItem* coordL = new QGraphicsLineItem(-0.98*w/2., 0, 0.98*w/2., 0);
-        coordL->setPos(w / 2., i*unit + h / 2.);
+        GridLineItem* coordL = new GridLineItem(-0.98*w/2., 0, 0.98*w/2., 0, 0, i);
+        coordL->setPos(w / 2., i*baseUnit + h / 2.);
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
         coordGridLine.push_back(coordL);
         scene->addItem(coordL);
 
-        coordL = new QGraphicsLineItem(-0.98*w/2., 0, 0.98*w/2., 0);
-        coordL->setPos(w / 2., -i*unit + h / 2.);
+        coordL = new GridLineItem(-0.98*w/2., 0, 0.98*w/2., 0, 0, -i);
+        coordL->setPos(w / 2., -i*baseUnit + h / 2.);
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
         coordGridLine.push_back(coordL);
         scene->addItem(coordL);
@@ -464,7 +464,7 @@ void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
     preyInst->setVel(v*cos(alpha*PI/180.), v*sin(alpha*PI/180.));
     preyInst->setV(v);
 }
-QPointF MyQGraphicsView::sceneToCoords(QPointF scenePoint) // Translate point from Scene coords to convinient "maths" coords
+QPointF MyQGraphicsView::sceneToCoords(QPointF scenePoint) // Translate point from Scene coords to Convenient "maths" coords
 {
     int w = width();
     int h = height();
@@ -472,7 +472,7 @@ QPointF MyQGraphicsView::sceneToCoords(QPointF scenePoint) // Translate point fr
     QPointF pToCoordLineX = scenePoint - QPointF(w/2, h/2); // Data will be stored with 2 decimals for convenience
     return QPointF(QString::number(pToCoordLineX.x()/unit, 'f', 2).toDouble(), -1 * QString::number(pToCoordLineX.y()/unit, 'f', 2).toDouble());
 }
-QPointF MyQGraphicsView::coordsToScene(QPointF coordPoint) // NOT LINEAR!!! Translate point from convinient "maths" coords to Scene coords
+QPointF MyQGraphicsView::coordsToScene(QPointF coordPoint) // NOT LINEAR!!! Translate point from Convenient "maths" coords to Scene coords
 {
     int w = width();
     int h = height();
