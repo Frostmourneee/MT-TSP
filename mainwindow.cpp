@@ -1,14 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-//TODO Zoom
+//TODO zoom в не анимации ибо это поможет точнее устанавливать координаты
 //TODO подумать над плавностью смены сотых долей в координатах
 //TODO из-за симметрий быть может можно перебор уменьшить когда M = 2
 //TODO тесты
 //TODO сортировка по иксам работает?
 //TODO нельзя задать план из двузначной цели
 //TODO позволить при большом N не искать оптимум, а просто летать
-//TODO при M = 2 в графе идеального плана для одного считает видимо лучший для облёта именно первым! Если из разных точек стартуют, то может вторым лучше
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,7 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     view = new MyQGraphicsView(this);
     ui->vLScene->insertWidget(0, view);
-    view->genRect->setRect(QRectF(20, 20, 1318, 773));
+    view->genRect->setRect(QRectF(20, 20, 1318, 773)); // Rect is bigger than it should be but in resizeEvent it will get the size it needs
+    view->setSCoordCenter(QPointF(299, 218));
     view->setFocus();
 
     thread = new QThread(this);
@@ -643,6 +643,9 @@ void MainWindow::on_speedUpButton_clicked()
 void MainWindow::on_resetZoomButton_clicked()
 {
     view->setSF(1);
+    view->setAnchor(QPointF(0, 0));
+    view->setSCoordCenter(QPointF(view->width()/2., view->height()/2.));
+
     view->zoomGraphics(1);
 }
 

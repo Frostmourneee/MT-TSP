@@ -32,6 +32,8 @@ public:
     void setStatus(StatusScene s) {status = s;}
     void setVisibleText(bool b) {text->setVisible(b);}
     void setSF(double fact) {mouseSF = fact; sceneSF = mouseSF >= 1 ? mouseSF : 1/(1+100*(1-mouseSF));}
+    void setAnchor(QPointF p) {anchor = p;}
+    void setSCoordCenter(QPointF p) {sCoordCenter = p;}
     void clear();
     void backAction();
     void textCoords(double x, double y);
@@ -59,14 +61,14 @@ private:
     void resizeCoordlines();
     QGraphicsLineItem* coordLineX;
     QGraphicsLineItem* coordLineY;
-    QVector<GridLineItem* > coordLinesPosX;
-    QVector<GridLineItem* > coordLinesNegX;
-    QVector<GridLineItem* > coordLinesPosY;
-    QVector<GridLineItem* > coordLinesNegY;
+    QVector<GridLineItem* > coordLinesX;
+    QVector<GridLineItem* > coordLinesY;
     QGraphicsTextItem* text;
     Arrow* arrow;
     StatusScene status = StatusScene::settingPreyStart;
     GenRectSide side = GenRectSide::noSide;
+    QPointF anchor = QPointF(0, 0); // Point of Math coordinates which won't move due to zoom transformsations
+    QPointF sCoordCenter; // Point of the center of Math coords in scene coords
     const double baseUnit{50.}; // Pixels per 1 coord unit
     double unit{baseUnit}; // Pixels per 1 coord unit
     double mouseSF = 1;

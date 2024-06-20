@@ -32,6 +32,8 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent) : QGraphicsView(parent)
     connect(timer, SIGNAL(timeout()), scene, SLOT(advance()));
     timer->start(10);
 
+
+
 }
 
 void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
@@ -295,6 +297,10 @@ void MyQGraphicsView::wheelEvent(QWheelEvent *e)
 {
     if (status != StatusScene::animationMode) return; // Zoom seems to be useful only in animation mode
 
+    QPointF sAnchor = mapToScene(e->pos());
+    anchor = sceneToCoords(sAnchor); // Should be before changing sceneSF because it affects sceneToCoords
+
+    //===============// Calculating new sceneSF
     double aDelta = e->angleDelta().y();
     if (mouseSF == 1)
     {
@@ -304,7 +310,10 @@ void MyQGraphicsView::wheelEvent(QWheelEvent *e)
 
     mouseSF = clamp(mouseSF, 0.51, 50);
     sceneSF = mouseSF >= 1 ? mouseSF : 1/(1+100*(1-mouseSF)); // Zooming in or out from 1 to 100 with step 0.1 (zoom in 1, 1.1, 1.2, ..., 100 times or zoom out 1, 1.1, 1.2, ... 100 times
+    sceneSF = aDelta > 0 ? 1.1 : 0.9;
+    //===============//
 
+    sCoordCenter = sAnchor + sceneSF*(sCoordCenter-sAnchor);
     zoomGraphics(sceneSF);
 }
 void MyQGraphicsView::resizeEvent(QResizeEvent *e)
@@ -314,19 +323,13 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
     int w = width();
     int h = height();
     scene->setSceneRect(0, 0, w, h);
+    sCoordCenter = QPointF(w/2., h/2.);
 
     QRectF rect = genRect->rect();
     double needRectW = rect.width() < w-20-rect.x() ? rect.width() : w-20-rect.x(); // Stuff for checking whether genRect is smaller than scene or not
     double needRectH = rect.height() < h-20-rect.y() ? rect.height() : h-20-rect.y();
     QRectF newRect = QRectF(rect.x(), rect.y(), needRectW, needRectH).normalized();
     genRect->setRect(newRect);
-
-    coordLineX->setLine(-w*0.49, 0, w*0.49, 0); // Main absciss line
-    coordLineY->setLine(0, -h*0.49, 0, h*0.49); // Main ordinate line
-    coordLineX->setPos(w / 2., h / 2.);
-    coordLineY->setPos(w / 2., h / 2.);
-    coordLineX->setPen(QPen(QBrush(Qt::black, Qt::SolidPattern), 3));
-    coordLineY->setPen(QPen(QBrush(Qt::black, Qt::SolidPattern), 3));
 
     resizeCoordlines();
 
@@ -412,7 +415,7 @@ void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
 
 void MyQGraphicsView::zoomGraphics(double scaleFactor)
 {
-    unit = scaleFactor*baseUnit;
+    scaleFactor == 1 ? unit = baseUnit : unit *= scaleFactor;
     for (Prey* p : prey)
     {
         QPointF radiusVec = p->getCurr();
@@ -435,83 +438,90 @@ void MyQGraphicsView::zoomGraphics(double scaleFactor)
 }
 void MyQGraphicsView::resizeCoordlines()
 {
-    for (GridLineItem* l : coordLinesPosX)
+    for (GridLineItem* l : coordLinesX)
     {
         scene->removeItem(l);
         delete l;
     }
-    for (GridLineItem* l : coordLinesNegX)
+    for (GridLineItem* l : coordLinesY)
     {
         scene->removeItem(l);
         delete l;
     }
-    for (GridLineItem* l : coordLinesPosY)
-    {
-        scene->removeItem(l);
-        delete l;
-    }
-    for (GridLineItem* l : coordLinesNegY)
-    {
-        scene->removeItem(l);
-        delete l;
-    }
-    coordLinesPosX.clear();
-    coordLinesNegX.clear();
-    coordLinesPosY.clear();
-    coordLinesNegY.clear();
+    coordLinesX.clear();
+    coordLinesY.clear();
 
     int w = width();
     int h = height();
-    for (int i = 1; i < 0.98*w/(2*unit); i++) // Thin vertical lines, need to be renewed because amount of them isn't constant
-    {
-        GridLineItem* coordL = new GridLineItem(0, -0.98*h/2., 0, 0.98*h/2., i, 0);
-        coordL->setPos(i*unit + w / 2., h / 2.);
-        coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
-        coordLinesPosX.push_back(coordL);
-        scene->addItem(coordL);
+    QPointF sRD = QPointF(0.98*w, 0.98*h); // Scene right down point
+    QPointF sLU = QPointF(0.02*w, 0.02*h); // Scene left up point
+    QPointF rD = sceneToCoords(sRD);
+    QPointF lU = sceneToCoords(sLU);
+    int xMax = rD.x() > 0 ? floor(rD.x()) : floor(rD.x()) + 1;
+    int xMin = lU.x() > 0 ? floor(lU.x()) : floor(lU.x()) + 1;
+    int yMin = rD.y() > 0 ? floor(rD.y()) : floor(rD.y()) + 1;
+    int yMax = lU.y() > 0 ? floor(lU.y()) : floor(lU.y()) + 1;
+    if (xMax == 0) xMax = -1;
+    if (xMin == 0) xMin = 1;
+    if (yMax == 0) yMax = -1;
+    if (yMin == 0) yMin = 1;
 
-        coordL = new GridLineItem(0, -0.98*h/2., 0, 0.98*h/2., -i, 0);
-        coordL->setPos(-i*unit + w / 2., h / 2.);
+    coordLineX->setLine((sLU-sCoordCenter).x(), 0, (sRD-sCoordCenter).x(), 0); // Main absciss line
+    coordLineY->setLine(0, (sLU-sCoordCenter).y(), 0, (sRD-sCoordCenter).y()); // Main ordinate line
+    coordLineX->setPos(coordsToScene(QPointF(0, 0)));
+    coordLineY->setPos(coordsToScene(QPointF(0, 0)));
+    coordLineX->setPen(QPen(QBrush(Qt::black, Qt::SolidPattern), 3));
+    coordLineY->setPen(QPen(QBrush(Qt::black, Qt::SolidPattern), 3));
+
+    int idxAbsciss = -1;
+    int idxOrdinate = -1;
+    for (int i = xMin; i < xMax+1; i++) // Thin vertical lines, need to be renewed because amount of them isn't constant
+    {
+        GridLineItem* coordL = new GridLineItem(0, (sLU-sCoordCenter).y(), 0, (sRD-sCoordCenter).y(), i, 0);
+        coordL->setPos(coordsToScene(QPointF(i, 0)));
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
-        coordLinesNegX.push_back(coordL);
+        coordLinesX.push_back(coordL);
         scene->addItem(coordL);
+        if (i == 0) idxAbsciss = coordLinesX.size()-1;
+    }
+    for (int i = yMin; i < yMax+1; i++) // Thin horizontal lines, need to be renewed because amount of them isn't constant
+    {
+        GridLineItem* coordL = new GridLineItem((sLU-sCoordCenter).x(), 0, (sRD-sCoordCenter).x(), 0, 0, i);
+        coordL->setPos(coordsToScene(QPointF(0, i)));
+        coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
+        coordLinesY.push_back(coordL);
+        scene->addItem(coordL);
+        if (i == 0) idxOrdinate = coordLinesY.size()-1;
     }
 
-    for (int i = 1; i < 0.98*h/(2*unit); i++) // Thin horizontal lines, need to be renewed because amount of them isn't constant
-    {
-        GridLineItem* coordL = new GridLineItem(-0.98*w/2., 0, 0.98*w/2., 0, 0, i);
-        coordL->setPos(w / 2., i*unit + h / 2.);
-        coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
-        coordLinesPosY.push_back(coordL);
-        scene->addItem(coordL);
+    int linesInBaseUnit = baseUnit / (coordsToScene(coordLinesX[1]->getPos()).x() - coordsToScene(coordLinesX[0]->getPos()).x());
+    if (linesInBaseUnit < 1) return; // No collapsing grid if distance among lines = 1 baseUnit (50 pixels) or less
 
-        coordL = new GridLineItem(-0.98*w/2., 0, 0.98*w/2., 0, 0, -i);
-        coordL->setPos(w / 2., -i*unit + h / 2.);
-        coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
-        coordLinesNegY.push_back(coordL);
-        scene->addItem(coordL);
+    if (idxAbsciss == -1) {for (int i = 0; i < coordLinesX.size(); i++) if (i % linesInBaseUnit != linesInBaseUnit-1) coordLinesX[i]->hide();}
+    else
+    {
+        for (int i = idxAbsciss+1; i < coordLinesX.size(); i++) if (i % linesInBaseUnit != idxAbsciss % linesInBaseUnit) coordLinesX[i]->hide();
+        for (int i = idxAbsciss-1; i > -1; i--) if (i % linesInBaseUnit != idxAbsciss % linesInBaseUnit) coordLinesX[i]->hide();
+    }
+    if (idxOrdinate == -1) {for (int i = 0; i < coordLinesY.size(); i++) if (i % linesInBaseUnit != linesInBaseUnit-1) coordLinesY[i]->hide();}
+    else
+    {
+        for (int i = idxOrdinate+1; i < coordLinesY.size(); i++) if (i % linesInBaseUnit != idxOrdinate % linesInBaseUnit) coordLinesY[i]->hide();
+        for (int i = idxOrdinate-1; i > -1; i--) if (i % linesInBaseUnit != idxOrdinate % linesInBaseUnit) coordLinesY[i]->hide();
     }
 
-    int linesInBaseUnit = baseUnit / (coordsToScene(coordLinesPosX[1]->getPos()).x() - coordsToScene(coordLinesPosX[0]->getPos()).x());
-    if (linesInBaseUnit < 1) return;
-    for (int i = 0; i < coordLinesPosX.size(); i++) if (i % linesInBaseUnit != linesInBaseUnit-1) {coordLinesPosX[i]->hide(); coordLinesNegX[i]->hide();}
-    for (int i = 0; i < coordLinesPosY.size(); i++) if (i % linesInBaseUnit != linesInBaseUnit-1) {coordLinesPosY[i]->hide(); coordLinesNegY[i]->hide();}
+    return;
 }
+
 QPointF MyQGraphicsView::sceneToCoords(QPointF scenePoint) // Translate point from Scene coords to Convenient "maths" coords
 {
-    int w = width();
-    int h = height();
-
-    QPointF pToCoordLineX = scenePoint - QPointF(w/2, h/2); // Data will be stored with 2 decimals for convenience
-    return QPointF(QString::number(pToCoordLineX.x()/unit, 'f', 2).toDouble(), -1 * QString::number(pToCoordLineX.y()/unit, 'f', 2).toDouble());
+    QPointF pToCoordLineX = scenePoint - sCoordCenter;
+    return QPointF(pToCoordLineX.x()/unit, -1 * pToCoordLineX.y()/unit);
 }
 QPointF MyQGraphicsView::coordsToScene(QPointF coordPoint) // NOT LINEAR!!! Translate point from Convenient "maths" coords to Scene coords
 {
-    int w = width();
-    int h = height();
-
-    QPointF pTocoordLineXInverse = unit*coordPoint - QPointF(0, 2*unit*coordPoint.y());
-    return pTocoordLineXInverse + QPointF(w/2, h/2);
+    QPointF pToCoordLineXInverse = unit*coordPoint - QPointF(0, 2*unit*coordPoint.y());
+    return sCoordCenter + pToCoordLineXInverse;
 }
 
 void MyQGraphicsView::textCoords(double x, double y)
