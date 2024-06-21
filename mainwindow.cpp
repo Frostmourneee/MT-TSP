@@ -1,9 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-//TODO zoom в не анимации ибо это поможет точнее устанавливать координаты
-//TODO подумать над плавностью смены сотых долей в координатах
-//TODO из-за симметрий быть может можно перебор уменьшить когда M = 2
+//TODO иконки на действия
+//TODO по хорошему нужно переписать создание прея, чтоб он создавался только в конце самом
+//TODO добавить транслейт при нажатии на стрелочки или wasd
 //TODO тесты
 //TODO сортировка по иксам работает?
 //TODO нельзя задать план из двузначной цели
@@ -73,6 +73,208 @@ void MainWindow::mouseMoveEvent(QMouseEvent * e) {
     view->setVisibleText(false);
 }
 
+void MainWindow::sliderTick()
+{
+    if (view->getStatus() != StatusScene::animationMode) return;
+
+    ui->sliderTime->setValue(ui->sliderTime->value() + ui->sliderTime->singleStep());
+}
+void MainWindow::on_sliderTime_valueChanged(int newV)
+{
+    if (view->getStatus() != StatusScene::animationMode) return;
+
+    if (sliderVsDSBTime) {
+        sliderVsDSBTime = false;
+        ui->dSBTime->setValue(newV / 100.0);
+    } else sliderVsDSBTime = true;
+}
+void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics in Animation mode
+{
+    if (view->getStatus() != StatusScene::animationMode) return;
+
+    if (sliderVsDSBTime) {
+        sliderVsDSBTime = false;
+        ui->sliderTime->setValue((int)(newT*100));
+    } else sliderVsDSBTime = true;
+
+    for (Prey* p : view->prey) {
+        if (newT == 0)
+        {
+            p->setPos(p->getSStart()); // Initial time moment
+            p->setCurr(p->getStart());
+        }
+
+        if (newT - p->getDieTime() > 0) {p->setIsDied(true); p->update();}
+        else if (newT - p->getDieTime() < 0) {p->setIsDied(false); p->update();}
+        else {
+            p->setIsDied(true);
+            p->update();
+
+            p->setPos(view->coordsToScene(p->getDiePoint()));
+            p->setCurr(p->getDiePoint());
+        } // The die moment itself
+    }
+
+    for (Yerp* y : view->yerp) {
+        if (y->plan.isEmpty()) continue; // Yerp has no Preys to kill
+        if (newT == 0)
+        {
+            y->setPos(view->coordsToScene(y->getStart())); // Initial time moment
+            y->setCurr(y->getStart());
+        }
+
+        if (newT >= y->lastPrey->getDieTime()) { // Yerp killed every Prey devoted to it
+            y->setVel(0, 0);
+            continue;
+        }
+
+        double alpha;
+        QPointF start, end;
+        if (newT < y->firstPrey->getDieTime()) {
+            start = y->getStart();
+            end = y->firstPrey->getDiePoint();
+        } else {
+            for (int i = 0; i < y->plan.size()-1; i++) {
+                Prey* prevPrey = view->prey[y->plan[i]];
+                Prey* nextPrey = view->prey[y->plan[i+1]];
+
+                if (prevPrey->getDieTime() <= newT && newT < nextPrey->getDieTime()) {
+                    start = prevPrey->getDiePoint();
+                    end = nextPrey->getDiePoint();
+                }
+            }
+        }
+
+        alpha = (fabs((end-start).x()) < 1.e-4 ? ((end-start).y() > 0 ? PI/2. : -PI/2.) : // Angle in radians
+                                                 atan2((end-start).y(), (end-start).x()));
+        y->setVel(cos(alpha), sin(alpha));
+    }
+
+    if (newT == ui->dSBTime->maximum()) { // Animation has ended
+        ui->playButton->setIcon(QIcon("playIcon.png"));
+        ui->sliderTime->setEnabled(true);
+        view->timer->stop();
+    } // Animation has ended
+
+    //===============// Placing positions via mouse click
+    if (view->timer->isActive()) return;
+    QPointF newP;
+    for (Prey* p : view->prey) {
+        if (p->getIsDied()) {
+            p->setPos(view->coordsToScene(p->getDiePoint()));
+            p->setCurr(p->getDiePoint());
+            continue;
+        }
+
+        newP = p->getStart() + newT*QPointF(p->getVx(), p->getVy());
+        p->setPos(view->coordsToScene(newP));
+        p->setCurr(newP);
+    }
+
+    for (Yerp* y : view->yerp) {
+        if (y->plan.isEmpty()) continue;
+        if (newT >= y->lastPrey->getDieTime()) {
+            y->setPos(view->coordsToScene(y->lastPrey->getDiePoint()));
+            y->setCurr(y->lastPrey->getDiePoint());
+            continue;
+        } // Yerp killed every Prey devoted to it
+
+        if (newT < y->firstPrey->getDieTime()) {
+            newP = y->getStart() + newT*QPointF(y->getVx(), y->getVy());
+        } else {
+            for (int i = 0; i < y->plan.size()-1; i++) {
+                Prey* prevPrey = view->prey[y->plan[i]];
+                Prey* nextPrey = view->prey[y->plan[i+1]];
+                double t_i0 = prevPrey->getDieTime();
+                double t_i1 = nextPrey->getDieTime();
+
+                if (t_i0 <= newT && newT < t_i1) {
+                    newP = prevPrey->getDiePoint() + (newT-t_i0)*QPointF(y->getVx(), y->getVy());
+                }
+            }
+
+            if (newT == y->lastPrey->getDieTime()) {
+                newP = y->lastPrey->getDiePoint();
+            } // Sync at last moment
+        }
+
+        y->setPos(view->coordsToScene(newP));
+        y->setCurr(newP);
+    }
+    //===============//
+}
+void MainWindow::on_playButton_clicked()
+{
+    if (view->getStatus() != StatusScene::animationMode) return;
+
+    if (view->timer->isActive()) {
+        view->timer->stop();
+        ui->playButton->setIcon(QIcon("playIcon.png"));
+        ui->sliderTime->setEnabled(true);
+    } else {
+        view->timer->start(10);
+        ui->playButton->setIcon(QIcon("pauseIcon.png"));
+        ui->sliderTime->setEnabled(false);
+        if (ui->dSBTime->value() == ui->dSBTime->maximum()) { // Pressed when the whole animation was played
+            ui->sliderTime->setValue(0);
+        }
+    }
+}
+void MainWindow::on_speedUpButton_clicked()
+{
+    QVector<int> tickVar;
+    tickVar.push_back(10); tickVar.push_back(5); tickVar.push_back(2); tickVar.push_back(1);
+
+    int tick = tickVar[(tickVar.indexOf(view->timer->interval())+1) % 4]; // 10 -> 5 -> 2 -> 1 -> 10
+
+    view->timer->setInterval(tick);
+}
+void MainWindow::on_resetZoomButton_clicked()
+{
+    view->setSF(1);
+    view->setAnchor(QPointF(0, 0));
+    view->setSCoordCenter(QPointF(view->width()/2., view->height()/2.));
+
+    view->zoomGraphics(1);
+}
+void MainWindow::on_rBConstruction_toggled(bool checked)
+{
+    if (!checked) return;
+
+    view->setStatus(StatusScene::settingPreyStart);
+
+    ui->rBAnimation->setEnabled(false);
+    ui->actionStart->setEnabled(true);
+    ui->actionRandom->setEnabled(true);
+    ui->actionBack->setEnabled(true);
+
+    view->genRect->show();
+    ui->dSBTime->setValue(0);
+    ui->sliderTime->setValue(0);
+    ui->playButton->setIcon(QIcon("playIcon.png"));
+    ui->playButton->setEnabled(false);
+    ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
+    ui->speedUpButton->setEnabled(false);
+    on_resetZoomButton_clicked();
+
+    view->timer->start(10);
+
+    for (Prey* p : view->prey)
+    {
+        p->sEll->show();
+        p->eEll->show();
+        p->line->show();
+        p->setPos(p->getSStart());
+        p->setIsDied(false);
+        p->setCurr(p->getStart());
+    }
+
+    for (Yerp* y : view->yerp) {
+        y->setVel(0, 0);
+        y->setPos(view->coordsToScene(y->getStart()));
+        y->setCurr(y->getStart());
+    }
+}
 void MainWindow::on_actionClear_triggered()
 {
     setFocus();
@@ -88,7 +290,6 @@ void MainWindow::on_actionClear_triggered()
     ui->playButton->setEnabled(false);
     ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
     ui->speedUpButton->setEnabled(false);
-    ui->resetZoomButton->setEnabled(false);
     on_resetZoomButton_clicked();
 
     QPointF pMathCursorPos = view->sceneToCoords(view->mapFromGlobal(QCursor::pos()));
@@ -394,45 +595,6 @@ QString MainWindow::yerpDataStrSave(double x, double y, int maxX, int maxY)
 
     return str;
 }
-void MainWindow::on_rBConstruction_toggled(bool checked)
-{
-    if (!checked) return;
-
-    view->setStatus(StatusScene::settingPreyStart);
-
-    ui->rBAnimation->setEnabled(false);
-    ui->actionStart->setEnabled(true);
-    ui->actionRandom->setEnabled(true);
-    ui->actionBack->setEnabled(true);
-
-    view->genRect->show();
-    ui->dSBTime->setValue(0);
-    ui->sliderTime->setValue(0);
-    ui->playButton->setIcon(QIcon("playIcon.png"));
-    ui->playButton->setEnabled(false);
-    ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
-    ui->speedUpButton->setEnabled(false);
-    ui->resetZoomButton->setEnabled(false);
-    on_resetZoomButton_clicked();
-
-    view->timer->start(10);
-
-    for (Prey* p : view->prey)
-    {
-        p->sEll->show();
-        p->eEll->show();
-        p->line->show();
-        p->setPos(p->getSStart());
-        p->setIsDied(false);
-        p->setCurr(p->getStart());
-    }
-
-    for (Yerp* y : view->yerp) {
-        y->setVel(0, 0);
-        y->setPos(view->coordsToScene(y->getStart()));
-        y->setCurr(y->getStart());
-    }
-}
 
 void MainWindow::solvingEnded()
 {
@@ -453,7 +615,6 @@ void MainWindow::solvingEnded()
     ui->sliderTime->setValue(0);
     ui->playButton->setEnabled(true);
     ui->speedUpButton->setEnabled(true);
-    ui->resetZoomButton->setEnabled(true);
     view->timer->stop();
 
     for (Prey* p : view->prey)
@@ -464,189 +625,6 @@ void MainWindow::solvingEnded()
         p->setPos(p->getSStart());
         p->setCurr(p->getStart());
     }
-}
-
-void MainWindow::sliderTick() // Timer calls every 10ms
-{
-    if (view->getStatus() != StatusScene::animationMode) return;
-
-    ui->sliderTime->setValue(ui->sliderTime->value() + ui->sliderTime->singleStep());
-}
-void MainWindow::on_sliderTime_valueChanged(int newV)
-{
-    if (view->getStatus() != StatusScene::animationMode) return;
-
-    if (sliderVsDSBTime) {
-        sliderVsDSBTime = false;
-        ui->dSBTime->setValue(newV / 100.0);
-    } else sliderVsDSBTime = true;
-}
-void MainWindow::on_dSBTime_valueChanged(double newT)
-{
-    if (view->getStatus() != StatusScene::animationMode) return;
-
-    if (sliderVsDSBTime) {
-        sliderVsDSBTime = false;
-        ui->sliderTime->setValue((int)(newT*100));
-    } else sliderVsDSBTime = true;
-
-    for (Prey* p : view->prey) {
-        if (newT == 0)
-        {
-            p->setPos(p->getSStart()); // Initial time moment
-            p->setCurr(p->getStart());
-        }
-
-        if (newT - p->getDieTime() > 0) {p->setIsDied(true); p->update();}
-        else if (newT - p->getDieTime() < 0) {p->setIsDied(false); p->update();}
-        else {
-            p->setIsDied(true);
-            p->update();
-
-            p->setPos(view->coordsToScene(p->getDiePoint()));
-            p->setCurr(p->getDiePoint());
-        } // The die moment itself
-    }
-
-    for (Yerp* y : view->yerp) {
-        if (y->plan.isEmpty()) continue; // Yerp has no Preys to kill
-        if (newT == 0)
-        {
-            y->setPos(view->coordsToScene(y->getStart())); // Initial time moment
-            y->setCurr(y->getStart());
-        }
-
-        if (newT >= y->lastPrey->getDieTime()) { // Yerp killed every Prey devoted to it
-            y->setVel(0, 0);
-            continue;
-        }
-
-        double alpha;
-        QPointF start, end;
-        if (newT < y->firstPrey->getDieTime()) {
-            start = y->getStart();
-            end = y->firstPrey->getDiePoint();
-        } else {
-            for (int i = 0; i < y->plan.size()-1; i++) {
-                Prey* prevPrey = view->prey[y->plan[i]];
-                Prey* nextPrey = view->prey[y->plan[i+1]];
-
-                if (prevPrey->getDieTime() <= newT && newT < nextPrey->getDieTime()) {
-                    start = prevPrey->getDiePoint();
-                    end = nextPrey->getDiePoint();
-                }
-            }
-        }
-
-        alpha = (fabs((end-start).x()) < 1.e-4 ? ((end-start).y() > 0 ? PI/2. : -PI/2.) : // Angle in radians
-                                                 atan2((end-start).y(), (end-start).x()));
-        y->setVel(cos(alpha), sin(alpha));
-    }
-
-    if (newT == ui->dSBTime->maximum()) { // Animation has ended
-        ui->playButton->setIcon(QIcon("playIcon.png"));
-        ui->sliderTime->setEnabled(true);
-        view->timer->stop();
-    } // Animation has ended
-
-    //===============// Placing positions via mouse click
-    if (view->timer->isActive()) return;
-    QPointF newP;
-    for (Prey* p : view->prey) {
-        if (p->getIsDied()) {
-            p->setPos(view->coordsToScene(p->getDiePoint()));
-            p->setCurr(p->getDiePoint());
-            continue;
-        }
-
-        newP = p->getStart() + newT*QPointF(p->getVx(), p->getVy());
-        p->setPos(view->coordsToScene(newP));
-        p->setCurr(newP);
-    }
-
-    for (Yerp* y : view->yerp) {
-        if (y->plan.isEmpty()) continue;
-        if (newT >= y->lastPrey->getDieTime()) {
-            y->setPos(view->coordsToScene(y->lastPrey->getDiePoint()));
-            y->setCurr(y->lastPrey->getDiePoint());
-            continue;
-        } // Yerp killed every Prey devoted to it
-
-        if (newT < y->firstPrey->getDieTime()) {
-            newP = y->getStart() + newT*QPointF(y->getVx(), y->getVy());
-        } else {
-            for (int i = 0; i < y->plan.size()-1; i++) {
-                Prey* prevPrey = view->prey[y->plan[i]];
-                Prey* nextPrey = view->prey[y->plan[i+1]];
-                double t_i0 = prevPrey->getDieTime();
-                double t_i1 = nextPrey->getDieTime();
-
-                if (t_i0 <= newT && newT < t_i1) {
-                    newP = prevPrey->getDiePoint() + (newT-t_i0)*QPointF(y->getVx(), y->getVy());
-                }
-            }
-
-            if (newT == y->lastPrey->getDieTime()) {
-                newP = y->lastPrey->getDiePoint();
-            } // Sync at last moment
-        }
-
-        y->setPos(view->coordsToScene(newP));
-        y->setCurr(newP);
-    }
-    //===============//
-}
-void MainWindow::on_playButton_clicked()
-{
-    if (view->getStatus() != StatusScene::animationMode) return;
-
-    if (view->timer->isActive()) {
-        view->timer->stop();
-        ui->playButton->setIcon(QIcon("playIcon.png"));
-        ui->sliderTime->setEnabled(true);
-    } else {
-        view->timer->start(10);
-        ui->playButton->setIcon(QIcon("pauseIcon.png"));
-        ui->sliderTime->setEnabled(false);
-        if (ui->dSBTime->value() == ui->dSBTime->maximum()) { // Pressed when the whole animation was played
-            ui->sliderTime->setValue(0);
-        }
-    }
-}
-void MainWindow::on_speedUpButton_clicked()
-{
-    int tick = view->timer->interval();
-    switch (tick) {
-        case 10:
-        {
-            tick = 5;
-            break;
-        }
-        case 5:
-        {
-            tick = 2;
-            break;
-        }
-        case 2:
-        {
-            tick = 1;
-            break;
-        }
-        case 1:
-        {
-            tick = 10;
-            break;
-        }
-    }
-    view->timer->setInterval(tick);
-}
-void MainWindow::on_resetZoomButton_clicked()
-{
-    view->setSF(1);
-    view->setAnchor(QPointF(0, 0));
-    view->setSCoordCenter(QPointF(view->width()/2., view->height()/2.));
-
-    view->zoomGraphics(1);
 }
 
 void MainWindow::changeProgressBar(long long vC, long long vAll)

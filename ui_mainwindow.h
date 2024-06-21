@@ -131,7 +131,7 @@ public:
 
         resetZoomButton = new QPushButton(centralwidget);
         resetZoomButton->setObjectName(QString::fromUtf8("resetZoomButton"));
-        resetZoomButton->setEnabled(false);
+        resetZoomButton->setEnabled(true);
         resetZoomButton->setMinimumSize(QSize(32, 32));
         resetZoomButton->setMaximumSize(QSize(32, 32));
         resetZoomButton->setIconSize(QSize(32, 32));

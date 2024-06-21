@@ -86,6 +86,7 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
             preyInst->setSStart(pScene);
             preyInst->setPos(pScene);
             preyInst->setStart(pMath);
+            preyInst->setCurr(pMath);
             preyInst->sEll = ellipse;
             prey.push_back(preyInst);
             scene->addItem(preyInst);
@@ -295,7 +296,7 @@ void MyQGraphicsView::mouseReleaseEvent(QMouseEvent *e)
 }
 void MyQGraphicsView::wheelEvent(QWheelEvent *e)
 {
-    if (status != StatusScene::animationMode) return; // Zoom seems to be useful only in animation mode
+    //if (status != StatusScene::animationMode && status != StatusScene::settingPreyStart)
 
     QPointF sAnchor = mapToScene(e->pos());
     anchor = sceneToCoords(sAnchor); // Should be before changing sceneSF because it affects sceneToCoords
@@ -416,15 +417,16 @@ void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
 void MyQGraphicsView::zoomGraphics(double scaleFactor)
 {
     scaleFactor == 1 ? unit = baseUnit : unit *= scaleFactor;
+
     for (Prey* p : prey)
     {
         QPointF radiusVec = p->getCurr();
         p->setPos(coordsToScene(radiusVec));
         p->setSStart(coordsToScene(p->getStart()));
         p->setSEnd(coordsToScene(p->getEnd()));
-        p->sEll->setPos(p->getSStart());
-        p->eEll->setPos(p->getSEnd());
-        p->line->setLine(QLineF(p->getSStart(), p->getSEnd()));
+        p->sEll->setPos(p->getSStart()); // Impossible to have prey but not to have sEll
+        if (p->eEll != NULL) p->eEll->setPos(p->getSEnd());
+        if (p->line != NULL) p->line->setLine(QLineF(p->getSStart(), p->getSEnd()));
     }
 
     for (Yerp* y : yerp)
@@ -432,6 +434,12 @@ void MyQGraphicsView::zoomGraphics(double scaleFactor)
         QPointF radiusVec = y->getCurr();
         y->setPos(coordsToScene(radiusVec));
         y->setSStart(coordsToScene(y->getStart()));
+    }
+
+    if (!prey.isEmpty())
+    {
+        Prey* tmpPrey = prey.last();
+        arrow->setLine(tmpPrey->getSStart(), status == StatusScene::settingPreyVelocity ? tmpPrey->getSEnd() : mapFromGlobal(QCursor::pos()));
     }
 
     resizeCoordlines();
@@ -475,7 +483,7 @@ void MyQGraphicsView::resizeCoordlines()
 
     int idxAbsciss = -1;
     int idxOrdinate = -1;
-    for (int i = xMin; i < xMax+1; i++) // Thin vertical lines, need to be renewed because amount of them isn't constant
+    for (int i = xMin; i < xMax+1 && xMin != xMax; i++) // Thin vertical lines, need to be renewed because amount of them isn't constant
     {
         GridLineItem* coordL = new GridLineItem(0, (sLU-sCoordCenter).y(), 0, (sRD-sCoordCenter).y(), i, 0);
         coordL->setPos(coordsToScene(QPointF(i, 0)));
@@ -484,7 +492,7 @@ void MyQGraphicsView::resizeCoordlines()
         scene->addItem(coordL);
         if (i == 0) idxAbsciss = coordLinesX.size()-1;
     }
-    for (int i = yMin; i < yMax+1; i++) // Thin horizontal lines, need to be renewed because amount of them isn't constant
+    for (int i = yMin; i < yMax+1 && yMin != yMax; i++) // Thin horizontal lines, need to be renewed because amount of them isn't constant
     {
         GridLineItem* coordL = new GridLineItem((sLU-sCoordCenter).x(), 0, (sRD-sCoordCenter).x(), 0, 0, i);
         coordL->setPos(coordsToScene(QPointF(0, i)));
@@ -494,6 +502,7 @@ void MyQGraphicsView::resizeCoordlines()
         if (i == 0) idxOrdinate = coordLinesY.size()-1;
     }
 
+    if (coordLinesX.size() < 2 && coordLinesY.size() < 2) return; //TODO странное место, подумать об ограничении на зум
     int linesInBaseUnit = baseUnit / (coordsToScene(coordLinesX[1]->getPos()).x() - coordsToScene(coordLinesX[0]->getPos()).x());
     if (linesInBaseUnit < 1) return; // No collapsing grid if distance among lines = 1 baseUnit (50 pixels) or less
 

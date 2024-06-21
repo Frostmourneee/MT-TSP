@@ -10,11 +10,11 @@ class Yerp : public GraphicsEntities
 public:
     Yerp(int num, QPointF st) : yerpNum{num}
     {start = st;}
+    int getYerpNum() {return yerpNum;}
     QVector<int> plan;
     QVector<int> plan4AP; // For all Preys
     Prey* lastPrey;
     Prey* firstPrey;
-    int getYerpNum() {return yerpNum;}
 
 private:
     QPen pen = QPen(Qt::red, 3);
