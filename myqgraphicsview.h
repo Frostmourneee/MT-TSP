@@ -40,6 +40,9 @@ public:
     void createYerp(QPointF);
     void createPreyOnFullInfo(QPointF, QPointF, double);
     void zoomGraphics(double);
+    void translateGraphics(Qt::Key);
+    void preyTransform(Prey*, QPointF);
+    void yerpTransform(Yerp*, QPointF);
     QVector<Prey* > prey;
     QVector<Yerp* > yerp;
     QTimer* timer;

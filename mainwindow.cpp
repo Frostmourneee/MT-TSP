@@ -2,8 +2,7 @@
 #include "ui_mainwindow.h"
 
 //TODO иконки на действия
-//TODO по хорошему нужно переписать создание прея, чтоб он создавался только в конце самом
-//TODO добавить транслейт при нажатии на стрелочки или wasd
+//TODO во время транслейта почему-то если нет основных координатных линий то появляется дребезжание
 //TODO тесты
 //TODO сортировка по иксам работает?
 //TODO нельзя задать план из двузначной цели
@@ -51,16 +50,41 @@ MainWindow::~MainWindow()
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
-    switch (e->key()) {
+    switch (e->key())
+    {
         case Qt::Key_I:
-        case 1064: {
+        case 1064:
+        {
             if (!e->modifiers().testFlag(Qt::ControlModifier)) return; // +Ctrl pressed
 
             view->info();
             break;
         }
-
-    case Qt::Key_T: // Test key
+        case Qt::Key_W:
+        case 1062:
+        {
+            view->translateGraphics(Qt::Key_W);
+            break;
+        }
+        case Qt::Key_A:
+        case 1060:
+        {
+            view->translateGraphics(Qt::Key_A);
+            break;
+        }
+        case Qt::Key_S:
+        case 1067:
+        {
+            view->translateGraphics(Qt::Key_S);
+            break;
+        }
+        case Qt::Key_D:
+        case 1042:
+        {
+            view->translateGraphics(Qt::Key_D);
+            break;
+        }
+        case Qt::Key_T: // Test key
         {
 
             break;

@@ -418,23 +418,8 @@ void MyQGraphicsView::zoomGraphics(double scaleFactor)
 {
     scaleFactor == 1 ? unit = baseUnit : unit *= scaleFactor;
 
-    for (Prey* p : prey)
-    {
-        QPointF radiusVec = p->getCurr();
-        p->setPos(coordsToScene(radiusVec));
-        p->setSStart(coordsToScene(p->getStart()));
-        p->setSEnd(coordsToScene(p->getEnd()));
-        p->sEll->setPos(p->getSStart()); // Impossible to have prey but not to have sEll
-        if (p->eEll != NULL) p->eEll->setPos(p->getSEnd());
-        if (p->line != NULL) p->line->setLine(QLineF(p->getSStart(), p->getSEnd()));
-    }
-
-    for (Yerp* y : yerp)
-    {
-        QPointF radiusVec = y->getCurr();
-        y->setPos(coordsToScene(radiusVec));
-        y->setSStart(coordsToScene(y->getStart()));
-    }
+    for (Prey* p : prey) preyTransform(p, p->getCurr());
+    for (Yerp* y : yerp) yerpTransform(y, y->getCurr());
 
     if (!prey.isEmpty())
     {
@@ -520,6 +505,68 @@ void MyQGraphicsView::resizeCoordlines()
     }
 
     return;
+}
+void MyQGraphicsView::translateGraphics(Qt::Key key)
+{
+    if (status != StatusScene::animationMode) return;
+
+    switch (key)
+    {
+        case Qt::Key_W:
+        {
+            sCoordCenter += QPointF(0, 5);
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+QPointF(0, 5)));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+QPointF(0, 5)));
+
+            resizeCoordlines();
+            break;
+        }
+        case Qt::Key_A:
+        {
+            sCoordCenter += QPointF(5, 0);
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+QPointF(5, 0)));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+QPointF(5, 0)));
+
+            resizeCoordlines();
+            break;
+        }
+        case Qt::Key_S:
+        {
+            sCoordCenter += QPointF(0, -5);
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+QPointF(0, -5)));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+QPointF(0, -5)));
+
+            resizeCoordlines();
+            break;
+        }
+        case Qt::Key_D:
+        {
+            sCoordCenter += QPointF(-5, 0);
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+QPointF(-5, 0)));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+QPointF(-5, 0)));
+
+            resizeCoordlines();
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+}
+void MyQGraphicsView::preyTransform(Prey* p, QPointF st)
+{
+    p->setPos(coordsToScene(st));
+    p->setSStart(coordsToScene(p->getStart()));
+    p->setSEnd(coordsToScene(p->getEnd()));
+    p->sEll->setPos(p->getSStart()); // Impossible to have prey but not to have sEll
+    if (p->eEll != NULL) p->eEll->setPos(p->getSEnd());
+    if (p->line != NULL) p->line->setLine(QLineF(p->getSStart(), p->getSEnd()));
+}
+void MyQGraphicsView::yerpTransform(Yerp* y, QPointF st)
+{
+    y->setPos(coordsToScene(st));
+    y->setSStart(coordsToScene(y->getStart()));
 }
 
 QPointF MyQGraphicsView::sceneToCoords(QPointF scenePoint) // Translate point from Scene coords to Convenient "maths" coords
