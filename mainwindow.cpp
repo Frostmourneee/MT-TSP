@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-//TODO иконки на действия
 //TODO тесты
 //TODO сортировка по иксам работает?
 //TODO нельзя задать план из двузначной цели
@@ -38,6 +37,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->playButton->setIcon(QIcon("playIcon.png"));
     ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
     ui->resetZoomButton->setIcon(QIcon("resetIcon.png"));
+    ui->actionClear->setIcon(QIcon("newConfigIcon.png"));
+    ui->actionLoad_from_file->setIcon(QIcon("openConfigIcon.png"));
+    ui->actionSave_as->setIcon(QIcon("saveAsIcon.png"));
+    ui->actionBack->setIcon(QIcon("backIcon.png"));
+    ui->actionStart->setIcon(QIcon("startIcon.png"));
+    ui->actionStart->setText("Start Calculation\tShift+Enter");
+    ui->actionRandom->setIcon(QIcon("randomIcon.png"));
+    ui->actionFullscreen->setIcon(QIcon("fullscreenIcon.png"));
+    ui->actionExit->setIcon(QIcon("exitIcon.png"));
 
     connect(view->timer, SIGNAL(timeout()), this, SLOT(sliderTick()));
 }

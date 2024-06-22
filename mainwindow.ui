@@ -221,22 +221,23 @@
     <property name="title">
      <string>Actions</string>
     </property>
+    <addaction name="actionClear"/>
+    <addaction name="actionLoad_from_file"/>
+    <addaction name="actionSave_as"/>
+    <addaction name="separator"/>
     <addaction name="actionRandom"/>
     <addaction name="actionStart"/>
     <addaction name="actionBack"/>
-    <addaction name="actionClear"/>
+    <addaction name="separator"/>
     <addaction name="actionFullscreen"/>
     <addaction name="actionExit"/>
-    <addaction name="separator"/>
-    <addaction name="actionSave_as"/>
-    <addaction name="actionLoad_from_file"/>
    </widget>
    <addaction name="menuOptions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionStart">
    <property name="text">
-    <string>Start calculation</string>
+    <string>Start Calculation</string>
    </property>
    <property name="toolTip">
     <string>Start optimal plans calculation process</string>
@@ -247,7 +248,7 @@
   </action>
   <action name="actionSave_as">
    <property name="text">
-    <string>Save as</string>
+    <string>Save As</string>
    </property>
    <property name="toolTip">
     <string>Choose file to save data about preys and yerps</string>
@@ -258,13 +259,13 @@
   </action>
   <action name="actionLoad_from_file">
    <property name="text">
-    <string>Load from file</string>
+    <string>Open Configuration...</string>
    </property>
    <property name="toolTip">
     <string>Choose file to load data about preys and yerps</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+L</string>
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionExit">
@@ -285,7 +286,7 @@
   </action>
   <action name="actionRandom">
    <property name="text">
-    <string>Generate randomly</string>
+    <string>Random Generation</string>
    </property>
    <property name="toolTip">
     <string>Generate preys and yerps randomly</string>
@@ -296,7 +297,7 @@
   </action>
   <action name="actionBack">
    <property name="text">
-    <string>Back</string>
+    <string>Undo</string>
    </property>
    <property name="toolTip">
     <string>Rollback change</string>
@@ -307,7 +308,7 @@
   </action>
   <action name="actionClear">
    <property name="text">
-    <string>Clear</string>
+    <string>New Configuration...</string>
    </property>
    <property name="toolTip">
     <string>Clear the scene, restarts everything</string>

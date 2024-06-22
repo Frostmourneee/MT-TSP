@@ -175,15 +175,16 @@ public:
         MainWindow->setStatusBar(statusbar);
 
         menubar->addAction(menuOptions->menuAction());
+        menuOptions->addAction(actionClear);
+        menuOptions->addAction(actionLoad_from_file);
+        menuOptions->addAction(actionSave_as);
+        menuOptions->addSeparator();
         menuOptions->addAction(actionRandom);
         menuOptions->addAction(actionStart);
         menuOptions->addAction(actionBack);
-        menuOptions->addAction(actionClear);
+        menuOptions->addSeparator();
         menuOptions->addAction(actionFullscreen);
         menuOptions->addAction(actionExit);
-        menuOptions->addSeparator();
-        menuOptions->addAction(actionSave_as);
-        menuOptions->addAction(actionLoad_from_file);
 
         retranslateUi(MainWindow);
 
@@ -198,26 +199,26 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MT-TSP", nullptr));
-        actionStart->setText(QCoreApplication::translate("MainWindow", "Start calculation", nullptr));
+        actionStart->setText(QCoreApplication::translate("MainWindow", "Start Calculation", nullptr));
 #if QT_CONFIG(tooltip)
         actionStart->setToolTip(QCoreApplication::translate("MainWindow", "Start optimal plans calculation process", nullptr));
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(shortcut)
         actionStart->setShortcut(QCoreApplication::translate("MainWindow", "Shift+Return", nullptr));
 #endif // QT_CONFIG(shortcut)
-        actionSave_as->setText(QCoreApplication::translate("MainWindow", "Save as", nullptr));
+        actionSave_as->setText(QCoreApplication::translate("MainWindow", "Save As", nullptr));
 #if QT_CONFIG(tooltip)
         actionSave_as->setToolTip(QCoreApplication::translate("MainWindow", "Choose file to save data about preys and yerps", nullptr));
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(shortcut)
         actionSave_as->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+S", nullptr));
 #endif // QT_CONFIG(shortcut)
-        actionLoad_from_file->setText(QCoreApplication::translate("MainWindow", "Load from file", nullptr));
+        actionLoad_from_file->setText(QCoreApplication::translate("MainWindow", "Open Configuration...", nullptr));
 #if QT_CONFIG(tooltip)
         actionLoad_from_file->setToolTip(QCoreApplication::translate("MainWindow", "Choose file to load data about preys and yerps", nullptr));
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(shortcut)
-        actionLoad_from_file->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+L", nullptr));
+        actionLoad_from_file->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+O", nullptr));
 #endif // QT_CONFIG(shortcut)
         actionExit->setText(QCoreApplication::translate("MainWindow", "Exit", nullptr));
 #if QT_CONFIG(shortcut)
@@ -227,21 +228,21 @@ public:
 #if QT_CONFIG(shortcut)
         actionFullscreen->setShortcut(QCoreApplication::translate("MainWindow", "F11", nullptr));
 #endif // QT_CONFIG(shortcut)
-        actionRandom->setText(QCoreApplication::translate("MainWindow", "Generate randomly", nullptr));
+        actionRandom->setText(QCoreApplication::translate("MainWindow", "Random Generation", nullptr));
 #if QT_CONFIG(tooltip)
         actionRandom->setToolTip(QCoreApplication::translate("MainWindow", "Generate preys and yerps randomly", nullptr));
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(shortcut)
         actionRandom->setShortcut(QCoreApplication::translate("MainWindow", "G", nullptr));
 #endif // QT_CONFIG(shortcut)
-        actionBack->setText(QCoreApplication::translate("MainWindow", "Back", nullptr));
+        actionBack->setText(QCoreApplication::translate("MainWindow", "Undo", nullptr));
 #if QT_CONFIG(tooltip)
         actionBack->setToolTip(QCoreApplication::translate("MainWindow", "Rollback change", nullptr));
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(shortcut)
         actionBack->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+Z", nullptr));
 #endif // QT_CONFIG(shortcut)
-        actionClear->setText(QCoreApplication::translate("MainWindow", "Clear", nullptr));
+        actionClear->setText(QCoreApplication::translate("MainWindow", "New Configuration...", nullptr));
 #if QT_CONFIG(tooltip)
         actionClear->setToolTip(QCoreApplication::translate("MainWindow", "Clear the scene, restarts everything", nullptr));
 #endif // QT_CONFIG(tooltip)
