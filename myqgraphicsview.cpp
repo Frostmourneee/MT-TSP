@@ -296,8 +296,6 @@ void MyQGraphicsView::mouseReleaseEvent(QMouseEvent *e)
 }
 void MyQGraphicsView::wheelEvent(QWheelEvent *e)
 {
-    //if (status != StatusScene::animationMode && status != StatusScene::settingPreyStart)
-
     QPointF sAnchor = mapToScene(e->pos());
     anchor = sceneToCoords(sAnchor); // Should be before changing sceneSF because it affects sceneToCoords
 
@@ -314,6 +312,7 @@ void MyQGraphicsView::wheelEvent(QWheelEvent *e)
     sceneSF = aDelta > 0 ? 1.1 : 0.9;
     //===============//
 
+    if (unit*sceneSF < 0.48 || unit*sceneSF > 230) return; // Zoom in up to x4 and zoom out up to x100
     sCoordCenter = sAnchor + sceneSF*(sCoordCenter-sAnchor);
     zoomGraphics(sceneSF);
 }
@@ -416,7 +415,9 @@ void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
 
 void MyQGraphicsView::zoomGraphics(double scaleFactor)
 {
-    scaleFactor == 1 ? unit = baseUnit : unit *= scaleFactor;
+    double prevUnit = unit;
+    unit *= scaleFactor;
+    if ((prevUnit-baseUnit)*(unit-baseUnit) < 0 || scaleFactor == 1) unit = baseUnit; // sF == 1 means indicates call to reset zoom at all
 
     for (Prey* p : prey) preyTransform(p, p->getCurr());
     for (Yerp* y : yerp) yerpTransform(y, y->getCurr());
@@ -450,14 +451,6 @@ void MyQGraphicsView::resizeCoordlines()
     QPointF sLU = QPointF(0.02*w, 0.02*h); // Scene left up point
     QPointF rD = sceneToCoords(sRD);
     QPointF lU = sceneToCoords(sLU);
-    int xMax = rD.x() > 0 ? floor(rD.x()) : floor(rD.x()) + 1;
-    int xMin = lU.x() > 0 ? floor(lU.x()) : floor(lU.x()) + 1;
-    int yMin = rD.y() > 0 ? floor(rD.y()) : floor(rD.y()) + 1;
-    int yMax = lU.y() > 0 ? floor(lU.y()) : floor(lU.y()) + 1;
-    if (xMax == 0) xMax = -1;
-    if (xMin == 0) xMin = 1;
-    if (yMax == 0) yMax = -1;
-    if (yMin == 0) yMin = 1;
 
     coordLineX->setLine((sLU-sCoordCenter).x(), 0, (sRD-sCoordCenter).x(), 0); // Main absciss line
     coordLineY->setLine(0, (sLU-sCoordCenter).y(), 0, (sRD-sCoordCenter).y()); // Main ordinate line
@@ -466,44 +459,42 @@ void MyQGraphicsView::resizeCoordlines()
     coordLineX->setPen(QPen(QBrush(Qt::black, Qt::SolidPattern), 3));
     coordLineY->setPen(QPen(QBrush(Qt::black, Qt::SolidPattern), 3));
 
-    int idxAbsciss = -1;
-    int idxOrdinate = -1;
-    for (int i = xMin; i < xMax+1 && xMin != xMax; i++) // Thin vertical lines, need to be renewed because amount of them isn't constant
+    double ratio = baseUnit / unit;
+    double basicCoordLineUnit = ratio > 1 ? (int)ratio : 1./((int)(1/ratio));
+
+    if (basicCoordLineUnit <= 1./4) basicCoordLineUnit = 1./4;
+    else if (basicCoordLineUnit <= 1./2) basicCoordLineUnit = 1./2;
+    else if (basicCoordLineUnit <= 1) basicCoordLineUnit = 1;
+    else if (basicCoordLineUnit <= 2) basicCoordLineUnit = 2;
+    else if (basicCoordLineUnit <= 5) basicCoordLineUnit = 5;
+    else if (basicCoordLineUnit <= 10) basicCoordLineUnit = 10;
+    else if (basicCoordLineUnit <= 20) basicCoordLineUnit = 20;
+    else if (basicCoordLineUnit <= 50) basicCoordLineUnit = 50;
+    else basicCoordLineUnit = 100;
+
+    double distV = fabs(lU.x());
+    double distH = fabs(rD.y());
+    double leftVLineCoord = (lU.x() > 0 ? 1 : -1)*basicCoordLineUnit*(((int)(distV/basicCoordLineUnit))+(lU.x() > 0 ? 1 : 0));
+    double botHLineCoord = (rD.y() > 0 ? 1 : -1)*basicCoordLineUnit*(((int)(distH/basicCoordLineUnit))+(rD.y() > 0 ? 1 : 0));
+
+    for (double xCoord = leftVLineCoord; xCoord < rD.x(); xCoord += basicCoordLineUnit) // Thin vertical lines, need to be renewed because amount of them isn't constant
     {
-        GridLineItem* coordL = new GridLineItem(0, (sLU-sCoordCenter).y(), 0, (sRD-sCoordCenter).y(), i, 0);
-        coordL->setPos(coordsToScene(QPointF(i, 0)));
+        GridLineItem* coordL = new GridLineItem(0, (sLU-sCoordCenter).y(), 0, (sRD-sCoordCenter).y(), xCoord, 0);
+        coordL->setPos(coordsToScene(QPointF(xCoord, 0)));
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
         coordVerticalLines.push_back(coordL);
         scene->addItem(coordL);
-        if (i == 0) idxOrdinate = coordVerticalLines.size()-1;
+        if (fabs(xCoord) < 1.e-4) coordL->hide(); // Ordinate is on scene, so no need to draw dott thin line on it
     }
-    for (int i = yMin; i < yMax+1 && yMin != yMax; i++) // Thin horizontal lines, need to be renewed because amount of them isn't constant
+    for (double yCoord = botHLineCoord; yCoord < lU.y(); yCoord += basicCoordLineUnit) // Thin horizontal lines, need to be renewed because amount of them isn't constant
     {
-        GridLineItem* coordL = new GridLineItem((sLU-sCoordCenter).x(), 0, (sRD-sCoordCenter).x(), 0, 0, i);
-        coordL->setPos(coordsToScene(QPointF(0, i)));
+        GridLineItem* coordL = new GridLineItem((sLU-sCoordCenter).x(), 0, (sRD-sCoordCenter).x(), 0, 0, yCoord);
+        coordL->setPos(coordsToScene(QPointF(0, yCoord)));
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
         coordHorizontalLines.push_back(coordL);
         scene->addItem(coordL);
-        if (i == 0) idxAbsciss = coordHorizontalLines.size()-1;
+        if (fabs(yCoord) < 1.e-4) coordL->hide(); // Absciss is on scene, so no need to draw dott thin line on it
     }
-
-    if (coordVerticalLines.size() < 2 && coordHorizontalLines.size() < 2) return; //TODO странное место, подумать об ограничении на зум
-    int linesInBaseUnit = baseUnit / (coordsToScene(coordVerticalLines[1]->getPos()).x() - coordsToScene(coordVerticalLines[0]->getPos()).x());
-    if (linesInBaseUnit < 1) return; // No collapsing grid if distance among lines = 1 baseUnit (50 pixels) or less
-
-    if (idxOrdinate == -1) {for (int i = 0; i < coordVerticalLines.size(); i++) if (i % linesInBaseUnit != linesInBaseUnit-1) coordVerticalLines[i]->hide();}
-    else
-    {
-        for (int i = idxOrdinate+1; i < coordVerticalLines.size(); i++) if (i % linesInBaseUnit != idxOrdinate % linesInBaseUnit) coordVerticalLines[i]->hide();
-        for (int i = idxOrdinate-1; i > -1; i--) if (i % linesInBaseUnit != idxOrdinate % linesInBaseUnit) coordVerticalLines[i]->hide();
-    }
-    if (idxAbsciss == -1) {for (int i = 0; i < coordHorizontalLines.size(); i++) if (i % linesInBaseUnit != linesInBaseUnit-1) coordHorizontalLines[i]->hide();}
-    else
-    {
-        for (int i = idxAbsciss+1; i < coordHorizontalLines.size(); i++) if (i % linesInBaseUnit != idxAbsciss % linesInBaseUnit) coordHorizontalLines[i]->hide();
-        for (int i = idxAbsciss-1; i > -1; i--) if (i % linesInBaseUnit != idxAbsciss % linesInBaseUnit) coordHorizontalLines[i]->hide();
-    }
-    qDebug() << idxAbsciss << coordHorizontalLines.size() << yMin << yMax << coordHorizontalLines[0]->getPos();
 
     return;
 }
