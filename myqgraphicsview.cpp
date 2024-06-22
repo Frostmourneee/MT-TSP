@@ -498,44 +498,89 @@ void MyQGraphicsView::resizeCoordlines()
 
     return;
 }
-void MyQGraphicsView::translateGraphics(Qt::Key key)
+void MyQGraphicsView::translateGraphics(TranslateDir dir)
 {
     if (status != StatusScene::animationMode) return;
 
-    switch (key)
+    int translateVelocity = 5;
+    switch (dir)
     {
-        case Qt::Key_W:
+        case TranslateDir::U:
         {
-            sCoordCenter += QPointF(0, 1);
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+QPointF(0, 1)));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+QPointF(0, 1)));
+            QPointF pDir = translateVelocity*QPointF(0, 1);
+            sCoordCenter += pDir;
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
 
             resizeCoordlines();
             break;
         }
-        case Qt::Key_A:
+        case TranslateDir::UR:
         {
-            sCoordCenter += QPointF(5, 0);
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+QPointF(5, 0)));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+QPointF(5, 0)));
+            QPointF pDir = translateVelocity*QPointF(-sqrt(2)/2, sqrt(2)/2);
+            sCoordCenter += pDir;
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
 
             resizeCoordlines();
             break;
         }
-        case Qt::Key_S:
+        case TranslateDir::UL:
         {
-            sCoordCenter += QPointF(0, -5);
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+QPointF(0, -5)));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+QPointF(0, -5)));
+            QPointF pDir = translateVelocity*QPointF(sqrt(2)/2, sqrt(2)/2);
+            sCoordCenter += pDir;
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
 
             resizeCoordlines();
             break;
         }
-        case Qt::Key_D:
+        case TranslateDir::L:
         {
-            sCoordCenter += QPointF(-5, 0);
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+QPointF(-5, 0)));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+QPointF(-5, 0)));
+            QPointF pDir = translateVelocity*QPointF(1, 0);
+            sCoordCenter += pDir;
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
+
+            resizeCoordlines();
+            break;
+        }
+        case TranslateDir::D:
+        {
+            QPointF pDir = translateVelocity*QPointF(0, -1);
+            sCoordCenter += pDir;
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
+
+            resizeCoordlines();
+            break;
+        }
+        case TranslateDir::DR:
+        {
+            QPointF pDir = translateVelocity*QPointF(-sqrt(2)/2, -sqrt(2)/2);
+            sCoordCenter += pDir;
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
+
+            resizeCoordlines();
+            break;
+        }
+        case TranslateDir::DL:
+        {
+            QPointF pDir = translateVelocity*QPointF(sqrt(2)/2, -sqrt(2)/2);
+            sCoordCenter += pDir;
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
+
+            resizeCoordlines();
+            break;
+        }
+        case TranslateDir::R:
+        {
+            QPointF pDir = translateVelocity*QPointF(-1, 0);
+            sCoordCenter += pDir;
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
 
             resizeCoordlines();
             break;

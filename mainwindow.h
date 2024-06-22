@@ -30,6 +30,11 @@ private:
     Solver* solver;
     bool userHasntSeenOnlyLatinLettersWarning = true;
     bool sliderVsDSBTime = true; // Technical bool which needs to prevent the recursion in changing values of sliderTime and dSBTime
+    bool isWPressed = false;
+    bool isAPressed = false;
+    bool isSPressed = false;
+    bool isDPressed = false;
+
 
 signals:
     void solve(MyQGraphicsView* view);
@@ -39,6 +44,7 @@ private slots:
     void sliderTick();
     void changeProgressBar(long long vC, long long vAll);
     void keyPressEvent(QKeyEvent *) override;
+    void keyReleaseEvent(QKeyEvent *) override;
     void mouseMoveEvent(QMouseEvent *) override;
     void on_actionStart_triggered();
     void on_actionSave_as_triggered();

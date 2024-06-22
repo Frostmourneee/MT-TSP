@@ -18,6 +18,7 @@
 
 enum class GenRectSide {noSide, topSide, rightSide, botSide, leftSide};
 enum class StatusScene {settingPreyStart, settingPreyEnd, settingPreyVelocity, disabled, draggingGenRect, animationMode};
+enum class TranslateDir {U, UR, R, DR, D, DL, L, UL};
 class MyQGraphicsView : public QGraphicsView
 {
 
@@ -43,7 +44,7 @@ public:
     Despite of it, by mouse Prey is created only with its start position, so there is no full info about Prey at the creation moment.*/
     void createPreyOnFullInfo(QPointF, QPointF, double);
     void zoomGraphics(double);
-    void translateGraphics(Qt::Key);
+    void translateGraphics(TranslateDir);
     void preyTransform(Prey*, QPointF);
     void yerpTransform(Yerp*, QPointF);
     QVector<Prey* > prey;

@@ -3,7 +3,6 @@
 
 //TODO иконки на действия
 //TODO тесты
-//TODO ловить одновременное нажатие на wasd
 //TODO сортировка по иксам работает?
 //TODO нельзя задать план из двузначной цели
 //TODO позволить при большом N не искать оптимум, а просто летать
@@ -63,30 +62,72 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         case Qt::Key_W:
         case 1062:
         {
-            view->translateGraphics(Qt::Key_W);
+            isWPressed = true;
+            if (isWPressed == true && isAPressed == false && isSPressed == false && isDPressed == false) view->translateGraphics(TranslateDir::U);
+            if (isWPressed == true && isAPressed == true && isSPressed == false && isDPressed == false) view->translateGraphics(TranslateDir::UL);
+            if (isWPressed == true && isAPressed == false && isSPressed == false && isDPressed == true) view->translateGraphics(TranslateDir::UR);
             break;
         }
         case Qt::Key_A:
         case 1060:
         {
-            view->translateGraphics(Qt::Key_A);
+            isAPressed = true;
+            if (isWPressed == false && isAPressed == true && isSPressed == false && isDPressed == false) view->translateGraphics(TranslateDir::L);
+            if (isWPressed == true && isAPressed == true && isSPressed == false && isDPressed == false) view->translateGraphics(TranslateDir::UL);
+            if (isWPressed == false && isAPressed == true && isSPressed == true && isDPressed == false) view->translateGraphics(TranslateDir::DL);
             break;
         }
         case Qt::Key_S:
         case 1067:
         {
-            view->translateGraphics(Qt::Key_S);
+            isSPressed = true;
+            if (isWPressed == false && isAPressed == false && isSPressed == true && isDPressed == false) view->translateGraphics(TranslateDir::D);
+            if (isWPressed == false && isAPressed == true && isSPressed == true && isDPressed == false) view->translateGraphics(TranslateDir::DL);
+            if (isWPressed == false && isAPressed == false && isSPressed == true && isDPressed == true) view->translateGraphics(TranslateDir::DR);
             break;
         }
         case Qt::Key_D:
         case 1042:
         {
-            view->translateGraphics(Qt::Key_D);
+            isDPressed = true;
+            if (isWPressed == false && isAPressed == false && isSPressed == false && isDPressed == true) view->translateGraphics(TranslateDir::R);
+            if (isWPressed == true && isAPressed == false && isSPressed == false && isDPressed == true) view->translateGraphics(TranslateDir::UR);
+            if (isWPressed == false && isAPressed == false && isSPressed == true && isDPressed == true) view->translateGraphics(TranslateDir::DR);
             break;
         }
         case Qt::Key_T: // Test key
         {
 
+            break;
+        }
+    }
+}
+void MainWindow::keyReleaseEvent(QKeyEvent *e)
+{
+    switch (e->key())
+    {
+        case Qt::Key_W:
+        case 1062:
+        {
+            isWPressed = false;
+            break;
+        }
+        case Qt::Key_A:
+        case 1060:
+        {
+            isAPressed = false;
+            break;
+        }
+        case Qt::Key_S:
+        case 1067:
+        {
+            isSPressed = false;
+            break;
+        }
+        case Qt::Key_D:
+        case 1042:
+        {
+            isDPressed = false;
             break;
         }
     }
