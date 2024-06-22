@@ -38,6 +38,9 @@ public:
     void backAction();
     void textCoords(double x, double y);
     void createYerp(QPointF);
+    /*Prey can be created by loading from file, by random generation or manually via mouse.
+    In first two cases Prey is created with all its parameters (start, end, alpha, etc...) known.
+    Despite of it, by mouse Prey is created only with its start position, so there is no full info about Prey at the creation moment.*/
     void createPreyOnFullInfo(QPointF, QPointF, double);
     void zoomGraphics(double);
     void translateGraphics(Qt::Key);
@@ -64,8 +67,8 @@ private:
     void resizeCoordlines();
     QGraphicsLineItem* coordLineX;
     QGraphicsLineItem* coordLineY;
-    QVector<GridLineItem* > coordLinesX;
-    QVector<GridLineItem* > coordLinesY;
+    QVector<GridLineItem* > coordVerticalLines;
+    QVector<GridLineItem* > coordHorizontalLines;
     QGraphicsTextItem* text;
     Arrow* arrow;
     StatusScene status = StatusScene::settingPreyStart;

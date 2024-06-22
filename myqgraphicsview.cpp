@@ -431,18 +431,18 @@ void MyQGraphicsView::zoomGraphics(double scaleFactor)
 }
 void MyQGraphicsView::resizeCoordlines()
 {
-    for (GridLineItem* l : coordLinesX)
+    for (GridLineItem* l : coordVerticalLines)
     {
         scene->removeItem(l);
         delete l;
     }
-    for (GridLineItem* l : coordLinesY)
+    for (GridLineItem* l : coordHorizontalLines)
     {
         scene->removeItem(l);
         delete l;
     }
-    coordLinesX.clear();
-    coordLinesY.clear();
+    coordVerticalLines.clear();
+    coordHorizontalLines.clear();
 
     int w = width();
     int h = height();
@@ -473,36 +473,37 @@ void MyQGraphicsView::resizeCoordlines()
         GridLineItem* coordL = new GridLineItem(0, (sLU-sCoordCenter).y(), 0, (sRD-sCoordCenter).y(), i, 0);
         coordL->setPos(coordsToScene(QPointF(i, 0)));
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
-        coordLinesX.push_back(coordL);
+        coordVerticalLines.push_back(coordL);
         scene->addItem(coordL);
-        if (i == 0) idxAbsciss = coordLinesX.size()-1;
+        if (i == 0) idxOrdinate = coordVerticalLines.size()-1;
     }
     for (int i = yMin; i < yMax+1 && yMin != yMax; i++) // Thin horizontal lines, need to be renewed because amount of them isn't constant
     {
         GridLineItem* coordL = new GridLineItem((sLU-sCoordCenter).x(), 0, (sRD-sCoordCenter).x(), 0, 0, i);
         coordL->setPos(coordsToScene(QPointF(0, i)));
         coordL->setPen(QPen(QColor(0, 0, 0, 130), 1, Qt::DotLine));
-        coordLinesY.push_back(coordL);
+        coordHorizontalLines.push_back(coordL);
         scene->addItem(coordL);
-        if (i == 0) idxOrdinate = coordLinesY.size()-1;
+        if (i == 0) idxAbsciss = coordHorizontalLines.size()-1;
     }
 
-    if (coordLinesX.size() < 2 && coordLinesY.size() < 2) return; //TODO странное место, подумать об ограничении на зум
-    int linesInBaseUnit = baseUnit / (coordsToScene(coordLinesX[1]->getPos()).x() - coordsToScene(coordLinesX[0]->getPos()).x());
+    if (coordVerticalLines.size() < 2 && coordHorizontalLines.size() < 2) return; //TODO странное место, подумать об ограничении на зум
+    int linesInBaseUnit = baseUnit / (coordsToScene(coordVerticalLines[1]->getPos()).x() - coordsToScene(coordVerticalLines[0]->getPos()).x());
     if (linesInBaseUnit < 1) return; // No collapsing grid if distance among lines = 1 baseUnit (50 pixels) or less
 
-    if (idxAbsciss == -1) {for (int i = 0; i < coordLinesX.size(); i++) if (i % linesInBaseUnit != linesInBaseUnit-1) coordLinesX[i]->hide();}
+    if (idxOrdinate == -1) {for (int i = 0; i < coordVerticalLines.size(); i++) if (i % linesInBaseUnit != linesInBaseUnit-1) coordVerticalLines[i]->hide();}
     else
     {
-        for (int i = idxAbsciss+1; i < coordLinesX.size(); i++) if (i % linesInBaseUnit != idxAbsciss % linesInBaseUnit) coordLinesX[i]->hide();
-        for (int i = idxAbsciss-1; i > -1; i--) if (i % linesInBaseUnit != idxAbsciss % linesInBaseUnit) coordLinesX[i]->hide();
+        for (int i = idxOrdinate+1; i < coordVerticalLines.size(); i++) if (i % linesInBaseUnit != idxOrdinate % linesInBaseUnit) coordVerticalLines[i]->hide();
+        for (int i = idxOrdinate-1; i > -1; i--) if (i % linesInBaseUnit != idxOrdinate % linesInBaseUnit) coordVerticalLines[i]->hide();
     }
-    if (idxOrdinate == -1) {for (int i = 0; i < coordLinesY.size(); i++) if (i % linesInBaseUnit != linesInBaseUnit-1) coordLinesY[i]->hide();}
+    if (idxAbsciss == -1) {for (int i = 0; i < coordHorizontalLines.size(); i++) if (i % linesInBaseUnit != linesInBaseUnit-1) coordHorizontalLines[i]->hide();}
     else
     {
-        for (int i = idxOrdinate+1; i < coordLinesY.size(); i++) if (i % linesInBaseUnit != idxOrdinate % linesInBaseUnit) coordLinesY[i]->hide();
-        for (int i = idxOrdinate-1; i > -1; i--) if (i % linesInBaseUnit != idxOrdinate % linesInBaseUnit) coordLinesY[i]->hide();
+        for (int i = idxAbsciss+1; i < coordHorizontalLines.size(); i++) if (i % linesInBaseUnit != idxAbsciss % linesInBaseUnit) coordHorizontalLines[i]->hide();
+        for (int i = idxAbsciss-1; i > -1; i--) if (i % linesInBaseUnit != idxAbsciss % linesInBaseUnit) coordHorizontalLines[i]->hide();
     }
+    qDebug() << idxAbsciss << coordHorizontalLines.size() << yMin << yMax << coordHorizontalLines[0]->getPos();
 
     return;
 }
@@ -514,9 +515,9 @@ void MyQGraphicsView::translateGraphics(Qt::Key key)
     {
         case Qt::Key_W:
         {
-            sCoordCenter += QPointF(0, 5);
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+QPointF(0, 5)));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+QPointF(0, 5)));
+            sCoordCenter += QPointF(0, 1);
+            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+QPointF(0, 1)));
+            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+QPointF(0, 1)));
 
             resizeCoordlines();
             break;
