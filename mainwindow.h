@@ -24,6 +24,7 @@ private:
     int signs(double);
     bool isDataReadyToStartProcess();
     void saveDataToFile(FILE*);
+    void setBestPlanToLineEditUsePlan();
     Ui::MainWindow *ui;
     QThread* thread;
     MyQGraphicsView* view;
@@ -37,10 +38,12 @@ private:
 
 
 signals:
-    void solve(MyQGraphicsView* view);
+    void solve(MyQGraphicsView*);
+    void usePlan(MyQGraphicsView*);
 
 private slots:
     void solvingEnded();
+    void usePlanEnded();
     void sliderTick();
     void changeProgressBar(long long vC, long long vAll);
     void preyWasCreatedOrDestroyed();

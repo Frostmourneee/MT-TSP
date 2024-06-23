@@ -29,7 +29,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     solver = new Solver();
     connect(this, SIGNAL(solve(MyQGraphicsView*)), solver, SLOT(solve(MyQGraphicsView*)));
+    connect(this, SIGNAL(usePlan(MyQGraphicsView*)), solver, SLOT(usePlan(MyQGraphicsView*)));
     connect(solver, SIGNAL(solvingEnded()), this, SLOT(solvingEnded()));
+    connect(solver, SIGNAL(usePlanEnded()), this, SLOT(usePlanEnded()));
     connect(solver, SIGNAL(changeProgressBar(long long, long long)), this, SLOT(changeProgressBar(long long, long long)));
     solver->moveToThread(thread);
 
@@ -64,6 +66,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(view, SIGNAL(yerpWasCreatedOrDestroyed()), this, SLOT(yerpWasCreatedOrDestroyed()));
 
     ui->controlPanel->setStyleSheet("background-color: rgb(240, 240, 240);");
+
+    connect(ui->lineEditUsePlan, SIGNAL(returnPressed()), this, SLOT(setFocus()));
 }
 
 MainWindow::~MainWindow()
@@ -177,6 +181,21 @@ void MainWindow::sliderTick()
 
     ui->sliderTime->setValue(ui->sliderTime->value() + ui->sliderTime->singleStep());
 }
+void MainWindow::setBestPlanToLineEditUsePlan()
+{
+    QString toLineEdit = ""; // Stuff to produce plan to the lineEditUsePlan
+    for (Yerp* y : view->yerp)
+    {
+        for (int num : y->bestPlan)
+        {
+            toLineEdit += QString::number(num)+"-";
+        }
+        if (!toLineEdit.isEmpty() && toLineEdit[toLineEdit.size()-1] == "-") toLineEdit.chop(1);
+        toLineEdit += "; ";
+    }
+    toLineEdit.chop(1);
+    ui->lineEditUsePlan->setText(toLineEdit);
+}
 void MainWindow::on_sliderTime_valueChanged(int newV)
 {
     if (view->getStatus() != StatusScene::animationMode) return;
@@ -214,7 +233,11 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
     }
 
     for (Yerp* y : view->yerp) {
-        if (y->plan.isEmpty()) continue; // Yerp has no Preys to kill
+        if (y->curPlan.isEmpty()) // Yerp has no Preys to kill
+        {
+            y->setVel(0, 0);
+            continue;
+        }
         if (newT == 0)
         {
             y->setPos(view->coordsToScene(y->getStart())); // Initial time moment
@@ -232,9 +255,9 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
             start = y->getStart();
             end = y->firstPrey->getDiePoint();
         } else {
-            for (int i = 0; i < y->plan.size()-1; i++) {
-                Prey* prevPrey = view->prey[y->plan[i]];
-                Prey* nextPrey = view->prey[y->plan[i+1]];
+            for (int i = 0; i < y->curPlan.size()-1; i++) {
+                Prey* prevPrey = view->prey[y->curPlan[i]];
+                Prey* nextPrey = view->prey[y->curPlan[i+1]];
 
                 if (prevPrey->getDieTime() <= newT && newT < nextPrey->getDieTime()) {
                     start = prevPrey->getDiePoint();
@@ -271,7 +294,11 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
     }
 
     for (Yerp* y : view->yerp) {
-        if (y->plan.isEmpty()) continue;
+        if (y->curPlan.isEmpty()) // Yerp has no Preys to kill
+        {
+            y->setVel(0, 0);
+            continue;
+        }
         if (newT >= y->lastPrey->getDieTime()) {
             y->setPos(view->coordsToScene(y->lastPrey->getDiePoint()));
             y->setCurr(y->lastPrey->getDiePoint());
@@ -281,9 +308,9 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
         if (newT < y->firstPrey->getDieTime()) {
             newP = y->getStart() + newT*QPointF(y->getVx(), y->getVy());
         } else {
-            for (int i = 0; i < y->plan.size()-1; i++) {
-                Prey* prevPrey = view->prey[y->plan[i]];
-                Prey* nextPrey = view->prey[y->plan[i+1]];
+            for (int i = 0; i < y->curPlan.size()-1; i++) {
+                Prey* prevPrey = view->prey[y->curPlan[i]];
+                Prey* nextPrey = view->prey[y->curPlan[i+1]];
                 double t_i0 = prevPrey->getDieTime();
                 double t_i1 = nextPrey->getDieTime();
 
@@ -305,7 +332,6 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
 void MainWindow::on_playButton_clicked()
 {
     if (view->getStatus() != StatusScene::animationMode) return;
-
     if (view->timer->isActive()) {
         view->timer->stop();
         ui->playButton->setIcon(QIcon("playIcon.png"));
@@ -368,7 +394,67 @@ void MainWindow::on_actionShow_triggered()
 }
 void MainWindow::on_buttonUsePlan_clicked()
 {
+    QVector<int> plan4FirstYerp;
+    QVector<int> plan4SecondYerp;
+    for (QString i : ui->lineEditUsePlan->text().split(";")[0].split("-"))
+        if (i != "" && QString::number(i.toInt()) == i) plan4FirstYerp.push_back(i.toInt());
 
+    if (ui->lineEditUsePlan->text().split(";").size() > 1)
+        for (QString i : ui->lineEditUsePlan->text().split(";")[1].split("-"))
+            if (i != "" && i != " " && (QString::number(i.toInt()) == i || QString::number(i.toInt()) == i.remove(0, 1)))
+                plan4SecondYerp.push_back(i.toInt());
+
+    QPalette palette;
+    if (plan4FirstYerp.size()+plan4SecondYerp.size() != view->prey.size()) {
+        palette.setColor(QPalette::Text,Qt::red);
+        ui->lineEditUsePlan->setPalette(palette);
+        return;
+    } // Not all Preys on lineEdit were used or additional (non-existing) Preys were used
+
+    for (int i : plan4FirstYerp) if (i < 0 || i > view->prey.size()-1) {
+        palette.setColor(QPalette::Text,Qt::red);
+        ui->lineEditUsePlan->setPalette(palette);
+        return;
+    } // Found incorrect Prey in plan4FirstYerp
+    for (int i : plan4SecondYerp) if (i < 0 || i > view->prey.size()-1) {
+        palette.setColor(QPalette::Text,Qt::red);
+        ui->lineEditUsePlan->setPalette(palette);
+        return;
+    } // Found incorrect Prey in plan4SecondYerp
+
+    QVector<int> tmp;
+    for (int i : plan4FirstYerp) tmp.push_back(i);
+    for (int i : plan4SecondYerp) tmp.push_back(i);
+    for (int i = 0; i < tmp.size() - 1; i++) {
+        for (int j = i+1; j < tmp.size(); j++) if (tmp[j] == tmp[i]) {
+            palette.setColor(QPalette::Text,Qt::red);
+            ui->lineEditUsePlan->setPalette(palette);
+            return;
+        }
+    } // Found Same Preys
+
+    palette.setColor(QPalette::Text, Qt::black);
+    ui->lineEditUsePlan->setPalette(palette); // lineEdit filled correctly
+
+    ui->dSBTime->setValue(0); // To put everything to its start
+
+    Yerp* y1 = view->yerp[0];
+    if (view->yerp.size() == 1)
+    {
+        y1->curPlan.clear();
+        for (int i : plan4FirstYerp) y1->curPlan.push_back(i);
+    }
+    else if (view->yerp.size() == 2)
+    {
+        Yerp* y2 = view->yerp[1];
+        y1->curPlan.clear();
+        y2->curPlan.clear();
+        for (int i : plan4FirstYerp) y1->curPlan.push_back(i);
+        for (int i : plan4SecondYerp) y2->curPlan.push_back(i);
+    }
+
+    thread->start();
+    emit usePlan(view);
 }
 void MainWindow::on_actionUsePlan_triggered()
 {
@@ -376,7 +462,25 @@ void MainWindow::on_actionUsePlan_triggered()
 }
 void MainWindow::on_buttonBestPlan_clicked()
 {
+    setBestPlanToLineEditUsePlan();
 
+    Yerp* y1 = view->yerp[0];
+    if (view->yerp.size() == 1)
+    {
+        y1->curPlan.clear();
+        for (int i : y1->bestPlan) y1->curPlan.push_back(i);
+    }
+    else if (view->yerp.size() == 2)
+    {
+        Yerp* y2 = view->yerp[1];
+        y1->curPlan.clear();
+        y2->curPlan.clear();
+        for (int i : y1->bestPlan) y1->curPlan.push_back(i);
+        for (int i : y2->bestPlan) y2->curPlan.push_back(i);
+    }
+
+    thread->start();
+    emit usePlan(view);
 }
 void MainWindow::on_actionUseBestPlan_triggered()
 {
@@ -394,6 +498,7 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     ui->actionBack->setEnabled(true);
 
     view->genRect->show();
+    ui->labelT->setText("");
     ui->dSBTime->setValue(0);
     ui->sliderTime->setValue(0);
     ui->lineEditUsePlan->clear();
@@ -440,6 +545,7 @@ void MainWindow::on_actionClear_triggered()
     view->clear();
     ui->labelPreysNum->setText("0");
     ui->labelYerpsNum->setText("0");
+    ui->labelT->setText("");
     ui->lineEditUsePlan->clear();
     ui->lineEditUsePlan->setEnabled(false);
     ui->lineEditUsePlan->setStyleSheet("background-color: rgb(240, 240, 240);");
@@ -786,8 +892,9 @@ void MainWindow::solvingEnded()
     ui->progressBar->setValue(0);
     ui->dSBTime->setMaximum(solver->getResT());
     ui->dSBTime->setValue(0);
-    ui->sliderTime->setMaximum(100*solver->getResT()-(int)(solver->getResT()*100) < 0.5 ? (int)(solver->getResT()*100):(int)(solver->getResT()*100)+1);
+    ui->sliderTime->setMaximum(100*solver->getResT()-(int)(solver->getResT()*100) < 0.5 ? (int)(solver->getResT()*100) : (int)(solver->getResT()*100)+1);
     ui->sliderTime->setValue(0);
+    ui->labelT->setText(QString::number(solver->getResT(), 'f', 2));
     ui->optimalZoomButton->setEnabled(true);
     ui->actionOptimalZoom->setEnabled(true);
     ui->playButton->setEnabled(true);
@@ -810,6 +917,16 @@ void MainWindow::solvingEnded()
         p->setPos(p->getSStart());
         p->setCurr(p->getStart());
     }
+
+    setBestPlanToLineEditUsePlan();
+}
+void MainWindow::usePlanEnded()
+{
+    double resT = qMax(view->yerp[0]->lastPrey->getDieTime(), view->yerp.size() == 2 ? view->yerp[1]->lastPrey->getDieTime() : view->yerp[0]->lastPrey->getDieTime());
+    ui->labelT->setText(QString::number(resT, 'f', 2));
+    ui->dSBTime->setMaximum(resT);
+    ui->sliderTime->setMaximum(100*resT-(int)(resT*100) < 0.5 ? (int)(resT*100) : (int)(resT*100)+1);
+    thread->exit(0);
 }
 
 void MainWindow::changeProgressBar(long long vC, long long vAll)

@@ -33,21 +33,6 @@ QT_BEGIN_NAMESPACE
 class Ui_MainWindow
 {
 public:
-    QAction *actionStart1;
-    QAction *actionSave_as1;
-    QAction *actionLoad_from_file1;
-    QAction *actionExit1;
-    QAction *actionFullscreen1;
-    QAction *actionRandom1;
-    QAction *actionBack1;
-    QAction *actionClear_2;
-    QAction *actionPlay1;
-    QAction *actionSpeedUp1;
-    QAction *actionDefaultZoom1;
-    QAction *actionOptimalZoom1;
-    QAction *actionShow1;
-    QAction *actionUsePlan1;
-    QAction *actionUseBestPlan1;
     QAction *actionClear;
     QAction *actionLoad_from_file;
     QAction *actionSave_as;
@@ -73,16 +58,20 @@ public:
     QLabel *labelPreysNum;
     QLabel *labelPreys;
     QLabel *labelYerpsNum;
-    QWidget *widget;
+    QWidget *layoutWidget;
     QVBoxLayout *verticalLayout;
     QRadioButton *rBConstruction;
     QRadioButton *rBAnimation;
-    QWidget *widget1;
+    QWidget *layoutWidget1;
     QHBoxLayout *layoutUsePlan;
     QLabel *labelUsePlan;
     QLineEdit *lineEditUsePlan;
     QPushButton *buttonUsePlan;
     QPushButton *buttonBestPlan;
+    QWidget *widget;
+    QHBoxLayout *layoutResT;
+    QLabel *labelResT;
+    QLabel *labelT;
     QWidget *randomGen;
     QVBoxLayout *vLScene;
     QProgressBar *progressBar;
@@ -106,42 +95,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(694, 315);
-        actionStart1 = new QAction(MainWindow);
-        actionStart1->setObjectName(QString::fromUtf8("actionStart1"));
-        actionSave_as1 = new QAction(MainWindow);
-        actionSave_as1->setObjectName(QString::fromUtf8("actionSave_as1"));
-        actionLoad_from_file1 = new QAction(MainWindow);
-        actionLoad_from_file1->setObjectName(QString::fromUtf8("actionLoad_from_file1"));
-        actionExit1 = new QAction(MainWindow);
-        actionExit1->setObjectName(QString::fromUtf8("actionExit1"));
-        actionFullscreen1 = new QAction(MainWindow);
-        actionFullscreen1->setObjectName(QString::fromUtf8("actionFullscreen1"));
-        actionRandom1 = new QAction(MainWindow);
-        actionRandom1->setObjectName(QString::fromUtf8("actionRandom1"));
-        actionBack1 = new QAction(MainWindow);
-        actionBack1->setObjectName(QString::fromUtf8("actionBack1"));
-        actionClear_2 = new QAction(MainWindow);
-        actionClear_2->setObjectName(QString::fromUtf8("actionClear_2"));
-        actionPlay1 = new QAction(MainWindow);
-        actionPlay1->setObjectName(QString::fromUtf8("actionPlay1"));
-        actionPlay1->setEnabled(false);
-        actionSpeedUp1 = new QAction(MainWindow);
-        actionSpeedUp1->setObjectName(QString::fromUtf8("actionSpeedUp1"));
-        actionSpeedUp1->setEnabled(false);
-        actionDefaultZoom1 = new QAction(MainWindow);
-        actionDefaultZoom1->setObjectName(QString::fromUtf8("actionDefaultZoom1"));
-        actionOptimalZoom1 = new QAction(MainWindow);
-        actionOptimalZoom1->setObjectName(QString::fromUtf8("actionOptimalZoom1"));
-        actionOptimalZoom1->setEnabled(false);
-        actionShow1 = new QAction(MainWindow);
-        actionShow1->setObjectName(QString::fromUtf8("actionShow1"));
-        actionUsePlan1 = new QAction(MainWindow);
-        actionUsePlan1->setObjectName(QString::fromUtf8("actionUsePlan1"));
-        actionUsePlan1->setEnabled(false);
-        actionUseBestPlan1 = new QAction(MainWindow);
-        actionUseBestPlan1->setObjectName(QString::fromUtf8("actionUseBestPlan1"));
-        actionUseBestPlan1->setEnabled(false);
+        MainWindow->resize(719, 315);
         actionClear = new QAction(MainWindow);
         actionClear->setObjectName(QString::fromUtf8("actionClear"));
         actionLoad_from_file = new QAction(MainWindow);
@@ -237,31 +191,31 @@ public:
 
         layoutEntities->addWidget(labelYerpsNum);
 
-        widget = new QWidget(info);
-        widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setGeometry(QRect(10, 110, 361, 52));
-        verticalLayout = new QVBoxLayout(widget);
+        layoutWidget = new QWidget(info);
+        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
+        layoutWidget->setGeometry(QRect(10, 110, 361, 52));
+        verticalLayout = new QVBoxLayout(layoutWidget);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
-        rBConstruction = new QRadioButton(widget);
+        rBConstruction = new QRadioButton(layoutWidget);
         rBConstruction->setObjectName(QString::fromUtf8("rBConstruction"));
         rBConstruction->setChecked(true);
 
         verticalLayout->addWidget(rBConstruction);
 
-        rBAnimation = new QRadioButton(widget);
+        rBAnimation = new QRadioButton(layoutWidget);
         rBAnimation->setObjectName(QString::fromUtf8("rBAnimation"));
         rBAnimation->setEnabled(false);
 
         verticalLayout->addWidget(rBAnimation);
 
-        widget1 = new QWidget(info);
-        widget1->setObjectName(QString::fromUtf8("widget1"));
-        widget1->setGeometry(QRect(11, 61, 361, 34));
-        layoutUsePlan = new QHBoxLayout(widget1);
+        layoutWidget1 = new QWidget(info);
+        layoutWidget1->setObjectName(QString::fromUtf8("layoutWidget1"));
+        layoutWidget1->setGeometry(QRect(11, 61, 361, 34));
+        layoutUsePlan = new QHBoxLayout(layoutWidget1);
         layoutUsePlan->setObjectName(QString::fromUtf8("layoutUsePlan"));
         layoutUsePlan->setContentsMargins(0, 0, 0, 0);
-        labelUsePlan = new QLabel(widget1);
+        labelUsePlan = new QLabel(layoutWidget1);
         labelUsePlan->setObjectName(QString::fromUtf8("labelUsePlan"));
         labelUsePlan->setMinimumSize(QSize(88, 0));
         labelUsePlan->setMaximumSize(QSize(88, 16777215));
@@ -269,7 +223,7 @@ public:
 
         layoutUsePlan->addWidget(labelUsePlan);
 
-        lineEditUsePlan = new QLineEdit(widget1);
+        lineEditUsePlan = new QLineEdit(layoutWidget1);
         lineEditUsePlan->setObjectName(QString::fromUtf8("lineEditUsePlan"));
         lineEditUsePlan->setEnabled(false);
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -277,10 +231,16 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(lineEditUsePlan->sizePolicy().hasHeightForWidth());
         lineEditUsePlan->setSizePolicy(sizePolicy1);
+        QFont font2;
+        font2.setPointSize(10);
+        font2.setBold(true);
+        font2.setWeight(75);
+        lineEditUsePlan->setFont(font2);
+        lineEditUsePlan->setAlignment(Qt::AlignCenter);
 
         layoutUsePlan->addWidget(lineEditUsePlan);
 
-        buttonUsePlan = new QPushButton(widget1);
+        buttonUsePlan = new QPushButton(layoutWidget1);
         buttonUsePlan->setObjectName(QString::fromUtf8("buttonUsePlan"));
         buttonUsePlan->setEnabled(false);
         buttonUsePlan->setMinimumSize(QSize(32, 32));
@@ -291,7 +251,7 @@ public:
 
         layoutUsePlan->addWidget(buttonUsePlan);
 
-        buttonBestPlan = new QPushButton(widget1);
+        buttonBestPlan = new QPushButton(layoutWidget1);
         buttonBestPlan->setObjectName(QString::fromUtf8("buttonBestPlan"));
         buttonBestPlan->setEnabled(false);
         buttonBestPlan->setMinimumSize(QSize(32, 32));
@@ -301,6 +261,24 @@ public:
         buttonBestPlan->setFlat(true);
 
         layoutUsePlan->addWidget(buttonBestPlan);
+
+        widget = new QWidget(info);
+        widget->setObjectName(QString::fromUtf8("widget"));
+        widget->setGeometry(QRect(10, 180, 221, 21));
+        layoutResT = new QHBoxLayout(widget);
+        layoutResT->setObjectName(QString::fromUtf8("layoutResT"));
+        layoutResT->setContentsMargins(0, 0, 0, 0);
+        labelResT = new QLabel(widget);
+        labelResT->setObjectName(QString::fromUtf8("labelResT"));
+
+        layoutResT->addWidget(labelResT);
+
+        labelT = new QLabel(widget);
+        labelT->setObjectName(QString::fromUtf8("labelT"));
+        labelT->setFont(font1);
+        labelT->setAlignment(Qt::AlignCenter);
+
+        layoutResT->addWidget(labelT);
 
         controlPanel->addTab(info, QString());
         randomGen = new QWidget();
@@ -402,7 +380,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 694, 21));
+        menubar->setGeometry(QRect(0, 0, 719, 21));
         menuFile = new QMenu(menubar);
         menuFile->setObjectName(QString::fromUtf8("menuFile"));
         menuView = new QMenu(menubar);
@@ -457,39 +435,6 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MT-TSP", nullptr));
-        actionStart1->setText(QCoreApplication::translate("MainWindow", "Start Calculation", nullptr));
-#if QT_CONFIG(tooltip)
-        actionStart1->setToolTip(QCoreApplication::translate("MainWindow", "Start optimal plans calculation process", nullptr));
-#endif // QT_CONFIG(tooltip)
-        actionSave_as1->setText(QCoreApplication::translate("MainWindow", "Save As", nullptr));
-#if QT_CONFIG(tooltip)
-        actionSave_as1->setToolTip(QCoreApplication::translate("MainWindow", "Choose file to save data about preys and yerps", nullptr));
-#endif // QT_CONFIG(tooltip)
-        actionLoad_from_file1->setText(QCoreApplication::translate("MainWindow", "Load Configuration...", nullptr));
-#if QT_CONFIG(tooltip)
-        actionLoad_from_file1->setToolTip(QCoreApplication::translate("MainWindow", "Choose file to load data about preys and yerps", nullptr));
-#endif // QT_CONFIG(tooltip)
-        actionExit1->setText(QCoreApplication::translate("MainWindow", "Exit", nullptr));
-        actionFullscreen1->setText(QCoreApplication::translate("MainWindow", "Fullscreen", nullptr));
-        actionRandom1->setText(QCoreApplication::translate("MainWindow", "Random Generation", nullptr));
-#if QT_CONFIG(tooltip)
-        actionRandom1->setToolTip(QCoreApplication::translate("MainWindow", "Generate preys and yerps randomly", nullptr));
-#endif // QT_CONFIG(tooltip)
-        actionBack1->setText(QCoreApplication::translate("MainWindow", "Undo", nullptr));
-#if QT_CONFIG(tooltip)
-        actionBack1->setToolTip(QCoreApplication::translate("MainWindow", "Rollback change", nullptr));
-#endif // QT_CONFIG(tooltip)
-        actionClear_2->setText(QCoreApplication::translate("MainWindow", "New Configuration...", nullptr));
-#if QT_CONFIG(tooltip)
-        actionClear_2->setToolTip(QCoreApplication::translate("MainWindow", "Clear the scene, restarts everything", nullptr));
-#endif // QT_CONFIG(tooltip)
-        actionPlay1->setText(QCoreApplication::translate("MainWindow", "Play", nullptr));
-        actionSpeedUp1->setText(QCoreApplication::translate("MainWindow", "Speed up x1, x2, x5, x10", nullptr));
-        actionDefaultZoom1->setText(QCoreApplication::translate("MainWindow", "Default Scene View", nullptr));
-        actionOptimalZoom1->setText(QCoreApplication::translate("MainWindow", "Change View to Optimal", nullptr));
-        actionShow1->setText(QCoreApplication::translate("MainWindow", "Show", nullptr));
-        actionUsePlan1->setText(QCoreApplication::translate("MainWindow", "Use Plan", nullptr));
-        actionUseBestPlan1->setText(QCoreApplication::translate("MainWindow", "Use Best Plan", nullptr));
         actionClear->setText(QCoreApplication::translate("MainWindow", "New Configuration...", nullptr));
 #if QT_CONFIG(shortcut)
         actionClear->setShortcut(QCoreApplication::translate("MainWindow", "R", nullptr));
@@ -559,6 +504,8 @@ public:
         labelUsePlan->setText(QCoreApplication::translate("MainWindow", "Use plan:", nullptr));
         buttonUsePlan->setText(QString());
         buttonBestPlan->setText(QString());
+        labelResT->setText(QCoreApplication::translate("MainWindow", "Result Time:", nullptr));
+        labelT->setText(QString());
         controlPanel->setTabText(controlPanel->indexOf(info), QCoreApplication::translate("MainWindow", "General Info", nullptr));
         controlPanel->setTabText(controlPanel->indexOf(randomGen), QCoreApplication::translate("MainWindow", "Generation options", nullptr));
         playButton->setText(QString());

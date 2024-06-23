@@ -51,14 +51,16 @@ void Solver::solve(MyQGraphicsView* view)
     k1 = 0;
     k2 = 0;
 
+    Yerp* y1 = view->yerp[0];
     if (M == 1) {
         for (int i = 0; i < N; i++) curPlan[i] = i;
         resT = timeOneYerp(resT, curPlan, N, 0, false);
         storeInterceptionInfo(view, curPlan, N, 0); // Filling IMs and yerpNums
 
-        view->yerp[0]->plan.clear();
-        view->yerp[0]->plan4AP.clear();
-        for (int i = 0; i < N; i++) {view->yerp[0]->plan.push_back(curPlan[i]); view->yerp[0]->plan4AP.push_back(curPlan[i]);}
+        y1->bestPlan.clear();
+        y1->plan4AP.clear();
+        y1->curPlan.clear();
+        for (int i = 0; i < N; i++) {y1->bestPlan.push_back(curPlan[i]); y1->plan4AP.push_back(curPlan[i]); y1->curPlan.push_back(curPlan[i]);}
 
         free(x);
         free(y);
@@ -83,12 +85,13 @@ void Solver::solve(MyQGraphicsView* view)
         return;
     } // else M == 2
 
+    Yerp* y2 = view->yerp[1];
     double mTourTime[M];
     int planFirst[N];
     for (int i = 0; i < N; i++) planFirst[i] = i;
 
-    view->yerp[0]->plan4AP.clear();
-    view->yerp[1]->plan4AP.clear();
+    y1->plan4AP.clear();
+    y2->plan4AP.clear();
     for (int i = 0; i < M; i++) { // Worth only if initial Yerps positions are not the same
         mTourTime[i] = timeOneYerp(resT, planFirst, N, i, true);
         for (int j = 0; j < N; j++) view->yerp[i]->plan4AP.push_back(planFirst[j]);
@@ -155,10 +158,12 @@ void Solver::solve(MyQGraphicsView* view)
     //Block to fill IM1 & IM2 and some other interception stuff
     storeInterceptionInfo(view, curPlan1, k1, 0);
     storeInterceptionInfo(view, curPlan2, k2, 1);
-    view->yerp[0]->plan.clear();
-    view->yerp[1]->plan.clear();
-    for (int i = 0; i < k1; i++) view->yerp[0]->plan.push_back(curPlan1[i]);
-    for (int i = 0; i < k2; i++) view->yerp[1]->plan.push_back(curPlan2[i]);
+    y1->bestPlan.clear();
+    y2->bestPlan.clear();
+    y1->curPlan.clear();
+    y2->curPlan.clear();
+    for (int i = 0; i < k1; i++) {y1->bestPlan.push_back(curPlan1[i]); y1->curPlan.push_back(curPlan1[i]);}
+    for (int i = 0; i < k2; i++) {y2->bestPlan.push_back(curPlan2[i]); y2->curPlan.push_back(curPlan2[i]);}
 
     free(x);
     free(y);
@@ -180,6 +185,69 @@ void Solver::solve(MyQGraphicsView* view)
 
     clock_t clockEnd = clock();
     qDebug("Time spent: %lf\n", (double)(clockEnd-clockBegin)/CLOCKS_PER_SEC);
+}
+void Solver::usePlan(MyQGraphicsView *view)
+{
+    M = view->yerp.size();
+    N = view->prey.size();
+
+    mx = (double*)malloc(M*sizeof(double));
+    my = (double*)malloc(M*sizeof(double));
+    initmx = (double*)malloc(M*sizeof(double));
+    initmy = (double*)malloc(M*sizeof(double));
+    for (int i = 0; i < M; i++) // Fill Yerp info
+    {
+        mx[i] = view->yerp[i]->getStart().x();
+        my[i] = view->yerp[i]->getStart().y();
+        initmx[i] = mx[i];
+        initmy[i] = my[i];
+    }
+
+    x = (double*)malloc(N*sizeof(double));
+    y = (double*)malloc(N*sizeof(double));
+    vx = (double*)malloc(N*sizeof(double));
+    vy = (double*)malloc(N*sizeof(double));
+    initx = (double*)malloc(N*sizeof(double));
+    inity = (double*)malloc(N*sizeof(double));
+    initvx = (double*)malloc(N*sizeof(double));
+    initvy = (double*)malloc(N*sizeof(double));
+    for (int i = 0; i < N; i++) // Fill Prey info
+    {
+        x[i] = view->prey[i]->getStart().x();
+        y[i] = view->prey[i]->getStart().y();
+        vx[i] = view->prey[i]->getVx();
+        vy[i] = view->prey[i]->getVy();
+
+        initx[i] = x[i];
+        inity[i] = y[i];
+        initvx[i] = vx[i];
+        initvy[i] = vy[i];
+    }
+
+    int k1 = view->yerp[0]->curPlan.size();
+    int k2 = 0;
+    if (M == 2) k2 = view->yerp[1]->curPlan.size();
+    int p1[k1];
+    int p2[k2];
+    for (int i = 0; i < k1; i++) p1[i] = view->yerp[0]->curPlan[i];
+    for (int i = 0; i < k2; i++) p2[i] = view->yerp[1]->curPlan[i];
+
+    storeInterceptionInfo(view, p1, k1, 0);
+    if (M == 2) storeInterceptionInfo(view, p2, k2, 1);
+
+    free(x);
+    free(y);
+    free(vx);
+    free(vy);
+    free(mx);
+    free(my);
+    free(initmx);
+    free(initmy);
+    free(initx);
+    free(inity);
+    free(initvx);
+    free(initvy);
+    emit usePlanEnded();
 }
 
 double Solver::timeOneYerp(double bestT, int *realPlan, int rPSize, int yerpNum, bool shouldIgnoreOptimization)

@@ -11,8 +11,9 @@ public:
     Yerp(int num, QPointF st) : yerpNum{num}
     {start = st;}
     int getYerpNum() {return yerpNum;}
-    QVector<int> plan;
+    QVector<int> bestPlan;
     QVector<int> plan4AP; // For all Preys
+    QVector<int> curPlan; // For lineEditUsePlan
     Prey* lastPrey;
     Prey* firstPrey;
 

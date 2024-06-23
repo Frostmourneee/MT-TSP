@@ -13,6 +13,7 @@ public:
 
 signals:
     void solvingEnded();
+    void usePlanEnded();
     void changeProgressBar(long long vC, long long vAll); // Vars calculated and vars at all
 
 private:
@@ -51,7 +52,8 @@ private:
     long long vAll; // For progressBar, vars at all
 
 private slots:
-    void solve(MyQGraphicsView* view);
+    void solve(MyQGraphicsView*);
+    void usePlan(MyQGraphicsView*);
 };
 
 #endif // SOLVER_H

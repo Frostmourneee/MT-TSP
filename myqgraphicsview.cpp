@@ -303,7 +303,7 @@ void MyQGraphicsView::wheelEvent(QWheelEvent *e)
     double aDelta = e->angleDelta().y();
     sceneSF = aDelta > 0 ? 1.1 : 0.9;
 
-    if (unit*sceneSF < 0.48 || unit*sceneSF > 230) return; // Zoom in up to x4 and zoom out up to x100
+    if (unit*sceneSF < 0.1 || unit*sceneSF > 230) return; // Zoom in up to x4 and zoom out up to x500
     sCoordCenter = sAnchor + sceneSF*(sCoordCenter-sAnchor);
     zoomGraphics(sceneSF);
 }
@@ -412,7 +412,7 @@ void MyQGraphicsView::zoomGraphics(double scaleFactor)
 {
     double prevUnit = unit;
     unit *= scaleFactor;
-    if ((prevUnit-baseUnit)*(unit-baseUnit) < 0 || scaleFactor == 1) unit = baseUnit; // sF == 1 means indicates call to reset zoom at all
+    if ((prevUnit-baseUnit)*(unit-baseUnit) < 0 || scaleFactor == 1) unit = baseUnit; // sF == 1 indicates call to reset zoom at all
 
     for (Prey* p : prey) preyTransform(p, p->getCurr());
     for (Yerp* y : yerp) yerpTransform(y, y->getCurr());
@@ -465,7 +465,9 @@ void MyQGraphicsView::resizeCoordlines()
     else if (basicCoordLineUnit <= 10) basicCoordLineUnit = 10;
     else if (basicCoordLineUnit <= 20) basicCoordLineUnit = 20;
     else if (basicCoordLineUnit <= 50) basicCoordLineUnit = 50;
-    else basicCoordLineUnit = 100;
+    else if (basicCoordLineUnit <= 100) basicCoordLineUnit = 100;
+    else if (basicCoordLineUnit <= 200) basicCoordLineUnit = 200;
+    else basicCoordLineUnit = 500;
 
     double distV = fabs(lU.x());
     double distH = fabs(rD.y());
@@ -546,7 +548,7 @@ void MyQGraphicsView::transformViewToOptimal()
     double sWidth = (coordCenter.x()-xMin)*unit;
     double sHeight = (coordCenter.y()-yMin)*unit;
     sceneSF = qMin(0.45*w/sWidth, 0.45*h/sHeight);
-    if (unit*sceneSF < 0.48 || unit*sceneSF > 230) return;
+    if (unit*sceneSF < 0.1 || unit*sceneSF > 230) return; // Zoom in up to x4 and zoom out up to x500
     sCoordCenter = QPointF(w/2., h/2.) + sceneSF*(sCoordCenter-QPointF(w/2., h/2.));
     zoomGraphics(sceneSF); // Zoom part
 }
