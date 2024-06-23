@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QTimer>
+#include <QObject>
 
 #define PI 3.1415926535
 
@@ -20,7 +21,7 @@ enum class GenRectSide {noSide, topSide, rightSide, botSide, leftSide};
 enum class StatusScene {settingPreyStart, settingPreyEnd, settingPreyVelocity, disabled, draggingGenRect, animationMode};
 class MyQGraphicsView : public QGraphicsView
 {
-
+    Q_OBJECT
 public:
     MyQGraphicsView(QWidget *parent = 0);
     QPointF sceneToCoords(QPointF);
@@ -52,6 +53,10 @@ public:
     QTimer* timer;
     QGraphicsScene* scene;
     QGraphicsRectItem* genRect;
+
+signals:
+    void preyWasCreatedOrDestroyed();
+    void yerpWasCreatedOrDestroyed();
 
 public slots:
     void mousePressEvent(QMouseEvent* e) override;

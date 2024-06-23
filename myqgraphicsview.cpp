@@ -53,7 +53,7 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
     }
 
     switch (status) {
-        case StatusScene::settingPreyStart: // Click borns the preyStart point
+        case StatusScene::settingPreyStart: // Click borns Prey the preyStart point
         {
             if (onGenRect(pScene)) // Start resizing genRect
             {
@@ -90,6 +90,7 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
             preyInst->sEll = ellipse;
             prey.push_back(preyInst);
             scene->addItem(preyInst);
+            emit preyWasCreatedOrDestroyed();
 
             arrow->show();
             arrow->setPen(QPen(QBrush(Qt::black), 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -356,6 +357,8 @@ void MyQGraphicsView::createYerp(QPointF pMath)
     yerpInst->setCurr(pMath);
     scene->addItem(yerpInst);
     yerp.push_back(yerpInst);
+
+    emit yerpWasCreatedOrDestroyed();
 }
 void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
 {
@@ -401,6 +404,8 @@ void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
     preyInst->setAlpha(alpha);
     preyInst->setVel(v*cos(alpha*PI/180.), v*sin(alpha*PI/180.));
     preyInst->setV(v);
+
+    emit preyWasCreatedOrDestroyed();
 }
 
 void MyQGraphicsView::zoomGraphics(double scaleFactor)
@@ -597,6 +602,7 @@ void MyQGraphicsView::backAction()
                 scene->removeItem(yerp.last());
                 delete yerp.last();
                 yerp.removeLast();
+                emit yerpWasCreatedOrDestroyed();
                 return;
             }
 
@@ -619,6 +625,7 @@ void MyQGraphicsView::backAction()
             prey.last()->deleteSEll();
             delete prey.last();
             prey.removeLast();
+            emit preyWasCreatedOrDestroyed();
             status = StatusScene::settingPreyStart;
 
             break;

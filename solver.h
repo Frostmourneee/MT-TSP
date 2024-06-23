@@ -1,7 +1,6 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 
-#include <QObject>
 #include <myqgraphicsview.h>
 
 class Solver : public QObject

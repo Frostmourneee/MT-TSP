@@ -34,6 +34,10 @@ MainWindow::MainWindow(QWidget *parent)
     solver->moveToThread(thread);
 
     ui->progressBar->setStyleSheet("text-align: center");
+    ui->buttonUsePlan->setIcon(QIcon("usePlanIcon.png"));
+    ui->actionUsePlan->setIcon(QIcon("usePlanIcon.png"));
+    ui->buttonBestPlan->setIcon(QIcon("bestPlanIcon.png"));
+    ui->actionUseBestPlan->setIcon(QIcon("bestPlanIcon.png"));
     ui->optimalZoomButton->setIcon(QIcon("optimalZoomIcon.png"));
     ui->actionOptimalZoom->setIcon(QIcon("optimalZoomIcon.png"));
     ui->playButton->setIcon(QIcon("playIcon.png"));
@@ -43,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->resetZoomButton->setIcon(QIcon("resetIcon.png"));
     ui->actionDefaultZoom->setIcon(QIcon("resetIcon.png"));
     ui->optionsButton->setIcon(QIcon("optionsIcon.png"));
+    ui->actionShow->setIcon(QIcon("optionsIcon.png"));
     ui->actionClear->setIcon(QIcon("newConfigIcon.png"));
     ui->actionLoad_from_file->setIcon(QIcon("openConfigIcon.png"));
     ui->actionSave_as->setIcon(QIcon("saveAsIcon.png"));
@@ -54,6 +59,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionExit->setIcon(QIcon("exitIcon.png"));
 
     connect(view->timer, SIGNAL(timeout()), this, SLOT(sliderTick()));
+
+    connect(view, SIGNAL(preyWasCreatedOrDestroyed()), this, SLOT(preyWasCreatedOrDestroyed()));
+    connect(view, SIGNAL(yerpWasCreatedOrDestroyed()), this, SLOT(yerpWasCreatedOrDestroyed()));
+
+    ui->controlPanel->setStyleSheet("background-color: rgb(240, 240, 240);");
 }
 
 MainWindow::~MainWindow()
@@ -153,6 +163,14 @@ void MainWindow::mouseMoveEvent(QMouseEvent * e) {
     view->setVisibleText(false);
 }
 
+void MainWindow::preyWasCreatedOrDestroyed()
+{
+    ui->labelPreysNum->setText(QString::number(view->prey.size()));
+}
+void MainWindow::yerpWasCreatedOrDestroyed()
+{
+    ui->labelYerpsNum->setText(QString::number(view->yerp.size()));
+}
 void MainWindow::sliderTick()
 {
     if (view->getStatus() != StatusScene::animationMode) return;
@@ -342,11 +360,27 @@ void MainWindow::on_actionOptimalZoom_triggered()
 }
 void MainWindow::on_optionsButton_clicked()
 {
-    qDebug() << "haha";
+    ui->controlPanel->isVisible() ? ui->controlPanel->hide() : ui->controlPanel->show();
 }
-void MainWindow::on_actionShowControlPanel_triggered()
+void MainWindow::on_actionShow_triggered()
 {
     on_optionsButton_clicked();
+}
+void MainWindow::on_buttonUsePlan_clicked()
+{
+
+}
+void MainWindow::on_actionUsePlan_triggered()
+{
+    on_buttonUsePlan_clicked();
+}
+void MainWindow::on_buttonBestPlan_clicked()
+{
+
+}
+void MainWindow::on_actionUseBestPlan_triggered()
+{
+    on_buttonBestPlan_clicked();
 }
 void MainWindow::on_rBConstruction_toggled(bool checked)
 {
@@ -362,6 +396,9 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     view->genRect->show();
     ui->dSBTime->setValue(0);
     ui->sliderTime->setValue(0);
+    ui->lineEditUsePlan->clear();
+    ui->lineEditUsePlan->setEnabled(false);
+    ui->lineEditUsePlan->setStyleSheet("background-color: rgb(240, 240, 240);");
     ui->optimalZoomButton->setEnabled(false);
     ui->actionOptimalZoom->setEnabled(false);
     ui->playButton->setIcon(QIcon("playIcon.png"));
@@ -372,6 +409,10 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     ui->sliderTime->setEnabled(false);
     ui->speedUpButton->setEnabled(false);
     ui->actionSpeedUp->setEnabled(false);
+    ui->buttonUsePlan->setEnabled(false);
+    ui->actionUsePlan->setEnabled(false);
+    ui->buttonBestPlan->setEnabled(false);
+    ui->actionUseBestPlan->setEnabled(false);
     on_resetZoomButton_clicked();
 
     view->timer->start(10);
@@ -397,6 +438,11 @@ void MainWindow::on_actionClear_triggered()
     setFocus();
 
     view->clear();
+    ui->labelPreysNum->setText("0");
+    ui->labelYerpsNum->setText("0");
+    ui->lineEditUsePlan->clear();
+    ui->lineEditUsePlan->setEnabled(false);
+    ui->lineEditUsePlan->setStyleSheet("background-color: rgb(240, 240, 240);");
     view->genRect->show();
     view->setSF(1);
     ui->rBConstruction->setChecked(true);
@@ -413,6 +459,10 @@ void MainWindow::on_actionClear_triggered()
     ui->sliderTime->setEnabled(false);
     ui->speedUpButton->setEnabled(false);
     ui->actionSpeedUp->setEnabled(false);
+    ui->buttonUsePlan->setEnabled(false);
+    ui->actionUsePlan->setEnabled(false);
+    ui->buttonBestPlan->setEnabled(false);
+    ui->actionUseBestPlan->setEnabled(false);
     on_resetZoomButton_clicked();
 
     QPointF pMathCursorPos = view->sceneToCoords(view->mapFromGlobal(QCursor::pos()));
@@ -731,6 +781,8 @@ void MainWindow::solvingEnded()
     ui->rBAnimation->setEnabled(true);
     ui->rBAnimation->setChecked(true);
 
+    ui->lineEditUsePlan->setEnabled(true);
+    ui->lineEditUsePlan->setStyleSheet("background-color: rgb(255, 255, 255);");
     ui->progressBar->setValue(0);
     ui->dSBTime->setMaximum(solver->getResT());
     ui->dSBTime->setValue(0);
@@ -744,6 +796,10 @@ void MainWindow::solvingEnded()
     ui->sliderTime->setEnabled(true);
     ui->speedUpButton->setEnabled(true);
     ui->actionSpeedUp->setEnabled(true);
+    ui->buttonUsePlan->setEnabled(true);
+    ui->actionUsePlan->setEnabled(true);
+    ui->buttonBestPlan->setEnabled(true);
+    ui->actionUseBestPlan->setEnabled(true);
     view->timer->stop();
 
     for (Prey* p : view->prey)
@@ -793,4 +849,3 @@ int MainWindow::signs(double r)
 
     return tmp++;
 }
-

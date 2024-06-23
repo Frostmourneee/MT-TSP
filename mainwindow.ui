@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>425</width>
-    <height>291</height>
+    <width>694</width>
+    <height>315</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,28 +16,284 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QRadioButton" name="rBConstruction">
-        <property name="text">
-         <string>Construction mode</string>
+     <widget class="QTabWidget" name="controlPanel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>400</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>400</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="tabPosition">
+       <enum>QTabWidget::North</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="documentMode">
+       <bool>false</bool>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="movable">
+       <bool>false</bool>
+      </property>
+      <property name="tabBarAutoHide">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="info">
+       <attribute name="title">
+        <string>General Info</string>
+       </attribute>
+       <widget class="QWidget" name="horizontalLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>9</x>
+          <y>9</y>
+          <width>361</width>
+          <height>31</height>
+         </rect>
         </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
+        <layout class="QHBoxLayout" name="layoutEntities">
+         <item>
+          <widget class="QLabel" name="labelYerps">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Preys:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelPreysNum">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelPreys">
+           <property name="text">
+            <string>Yerps:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelYerpsNum">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="rBAnimation">
-        <property name="enabled">
-         <bool>false</bool>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>110</y>
+          <width>361</width>
+          <height>52</height>
+         </rect>
         </property>
-        <property name="text">
-         <string>Animation mode</string>
-        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QRadioButton" name="rBConstruction">
+           <property name="text">
+            <string>Construction mode</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rBAnimation">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Animation mode</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
-      </item>
-     </layout>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>61</y>
+          <width>361</width>
+          <height>34</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="layoutUsePlan">
+         <item>
+          <widget class="QLabel" name="labelUsePlan">
+           <property name="minimumSize">
+            <size>
+             <width>88</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>88</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Use plan:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEditUsePlan">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="buttonUsePlan">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+           <property name="default">
+            <bool>false</bool>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="buttonBestPlan">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+           <property name="default">
+            <bool>false</bool>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="randomGen">
+       <attribute name="title">
+        <string>Generation options</string>
+       </attribute>
+      </widget>
+     </widget>
     </item>
     <item>
      <layout class="QVBoxLayout" name="vLScene">
@@ -284,79 +540,187 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>425</width>
+     <width>694</width>
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuOptions">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>Actions</string>
+     <string>File</string>
     </property>
-    <widget class="QMenu" name="menuAnimation_control">
-     <property name="title">
-      <string>Animation control</string>
-     </property>
-     <addaction name="actionPlay"/>
-     <addaction name="actionSpeedUp"/>
-     <addaction name="actionOptimalZoom"/>
-     <addaction name="actionDefaultZoom"/>
-    </widget>
     <addaction name="actionClear"/>
     <addaction name="actionLoad_from_file"/>
     <addaction name="actionSave_as"/>
-    <addaction name="separator"/>
-    <addaction name="actionRandom"/>
-    <addaction name="actionStart"/>
-    <addaction name="actionBack"/>
-    <addaction name="separator"/>
-    <addaction name="actionShowControlPanel"/>
-    <addaction name="menuAnimation_control"/>
-    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
     <addaction name="actionFullscreen"/>
     <addaction name="actionExit"/>
    </widget>
-   <addaction name="menuOptions"/>
+   <widget class="QMenu" name="menuAction">
+    <property name="title">
+     <string>Action</string>
+    </property>
+    <addaction name="actionRandom"/>
+    <addaction name="actionStart"/>
+    <addaction name="actionBack"/>
+   </widget>
+   <widget class="QMenu" name="menuControl_Panel_2">
+    <property name="title">
+     <string>Control Panel</string>
+    </property>
+    <addaction name="actionShow"/>
+    <addaction name="actionUsePlan"/>
+    <addaction name="actionUseBestPlan"/>
+   </widget>
+   <widget class="QMenu" name="menuAnimation_Control">
+    <property name="title">
+     <string>Animation Control</string>
+    </property>
+    <addaction name="actionPlay"/>
+    <addaction name="actionSpeedUp"/>
+    <addaction name="actionOptimalZoom"/>
+    <addaction name="actionDefaultZoom"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+   <addaction name="menuAction"/>
+   <addaction name="menuControl_Panel_2"/>
+   <addaction name="menuAnimation_Control"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionStart">
+  <action name="actionStart1">
    <property name="text">
     <string>Start Calculation</string>
    </property>
    <property name="toolTip">
     <string>Start optimal plans calculation process</string>
    </property>
-   <property name="shortcut">
-    <string>Shift+Return</string>
-   </property>
   </action>
-  <action name="actionSave_as">
+  <action name="actionSave_as1">
    <property name="text">
     <string>Save As</string>
    </property>
    <property name="toolTip">
     <string>Choose file to save data about preys and yerps</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
-   </property>
   </action>
-  <action name="actionLoad_from_file">
+  <action name="actionLoad_from_file1">
    <property name="text">
     <string>Load Configuration...</string>
    </property>
    <property name="toolTip">
     <string>Choose file to load data about preys and yerps</string>
    </property>
+  </action>
+  <action name="actionExit1">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionFullscreen1">
+   <property name="text">
+    <string>Fullscreen</string>
+   </property>
+  </action>
+  <action name="actionRandom1">
+   <property name="text">
+    <string>Random Generation</string>
+   </property>
+   <property name="toolTip">
+    <string>Generate preys and yerps randomly</string>
+   </property>
+  </action>
+  <action name="actionBack1">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="toolTip">
+    <string>Rollback change</string>
+   </property>
+  </action>
+  <action name="actionClear_2">
+   <property name="text">
+    <string>New Configuration...</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear the scene, restarts everything</string>
+   </property>
+  </action>
+  <action name="actionPlay1">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Play</string>
+   </property>
+  </action>
+  <action name="actionSpeedUp1">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Speed up x1, x2, x5, x10</string>
+   </property>
+  </action>
+  <action name="actionDefaultZoom1">
+   <property name="text">
+    <string>Default Scene View</string>
+   </property>
+  </action>
+  <action name="actionOptimalZoom1">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Change View to Optimal</string>
+   </property>
+  </action>
+  <action name="actionShow1">
+   <property name="text">
+    <string>Show</string>
+   </property>
+  </action>
+  <action name="actionUsePlan1">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Use Plan</string>
+   </property>
+  </action>
+  <action name="actionUseBestPlan1">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Use Best Plan</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>New Configuration...</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
+  </action>
+  <action name="actionLoad_from_file">
+   <property name="text">
+    <string>Load Configuration...</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
    </property>
   </action>
-  <action name="actionExit">
+  <action name="actionSave_as">
    <property name="text">
-    <string>Exit</string>
+    <string>Save As...</string>
    </property>
    <property name="shortcut">
-    <string>Q</string>
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionFullscreen">
@@ -367,37 +731,66 @@
     <string>F11</string>
    </property>
   </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Q</string>
+   </property>
+  </action>
   <action name="actionRandom">
    <property name="text">
     <string>Random Generation</string>
    </property>
-   <property name="toolTip">
-    <string>Generate preys and yerps randomly</string>
-   </property>
    <property name="shortcut">
     <string>G</string>
+   </property>
+  </action>
+  <action name="actionStart">
+   <property name="text">
+    <string>Start Calculation</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+Return</string>
    </property>
   </action>
   <action name="actionBack">
    <property name="text">
     <string>Undo</string>
    </property>
-   <property name="toolTip">
-    <string>Rollback change</string>
-   </property>
    <property name="shortcut">
     <string>Ctrl+Z</string>
    </property>
   </action>
-  <action name="actionClear">
+  <action name="actionShow">
    <property name="text">
-    <string>New Configuration...</string>
-   </property>
-   <property name="toolTip">
-    <string>Clear the scene, restarts everything</string>
+    <string>Show</string>
    </property>
    <property name="shortcut">
-    <string>R</string>
+    <string>I</string>
+   </property>
+  </action>
+  <action name="actionUsePlan">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Use Plan</string>
+   </property>
+   <property name="shortcut">
+    <string>U</string>
+   </property>
+  </action>
+  <action name="actionUseBestPlan">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Use Best Plan</string>
+   </property>
+   <property name="shortcut">
+    <string>B</string>
    </property>
   </action>
   <action name="actionPlay">
@@ -422,14 +815,6 @@
     <string>Up</string>
    </property>
   </action>
-  <action name="actionDefaultZoom">
-   <property name="text">
-    <string>Default Scene View</string>
-   </property>
-   <property name="shortcut">
-    <string>H</string>
-   </property>
-  </action>
   <action name="actionOptimalZoom">
    <property name="enabled">
     <bool>false</bool>
@@ -441,12 +826,12 @@
     <string>Z</string>
    </property>
   </action>
-  <action name="actionShowControlPanel">
+  <action name="actionDefaultZoom">
    <property name="text">
-    <string>Show Control Panel</string>
+    <string>Default Scene View</string>
    </property>
    <property name="shortcut">
-    <string>I</string>
+    <string>H</string>
    </property>
   </action>
  </widget>

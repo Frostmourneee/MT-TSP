@@ -43,6 +43,8 @@ private slots:
     void solvingEnded();
     void sliderTick();
     void changeProgressBar(long long vC, long long vAll);
+    void preyWasCreatedOrDestroyed();
+    void yerpWasCreatedOrDestroyed();
     void keyPressEvent(QKeyEvent *) override;
     void keyReleaseEvent(QKeyEvent *) override;
     void mouseMoveEvent(QMouseEvent *) override;
@@ -67,7 +69,10 @@ private slots:
     void on_optimalZoomButton_clicked();
     void on_actionOptimalZoom_triggered();
     void on_optionsButton_clicked();
-    void on_actionShowControlPanel_triggered();
-
+    void on_actionShow_triggered();
+    void on_buttonUsePlan_clicked();
+    void on_buttonBestPlan_clicked();
+    void on_actionUsePlan_triggered();
+    void on_actionUseBestPlan_triggered();
 };
 #endif // MAINWINDOW_H
