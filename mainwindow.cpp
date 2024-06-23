@@ -34,9 +34,14 @@ MainWindow::MainWindow(QWidget *parent)
     solver->moveToThread(thread);
 
     ui->progressBar->setStyleSheet("text-align: center");
+    ui->optimalZoomButton->setIcon(QIcon("optimalZoomIcon.png"));
+    ui->actionOptimalZoom->setIcon(QIcon("optimalZoomIcon.png"));
     ui->playButton->setIcon(QIcon("playIcon.png"));
+    ui->actionPlay->setIcon(QIcon("playIcon.png"));
     ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
+    ui->actionSpeedUp->setIcon(QIcon("speedUpIcon.png"));
     ui->resetZoomButton->setIcon(QIcon("resetIcon.png"));
+    ui->actionDefaultZoom->setIcon(QIcon("resetIcon.png"));
     ui->actionClear->setIcon(QIcon("newConfigIcon.png"));
     ui->actionLoad_from_file->setIcon(QIcon("openConfigIcon.png"));
     ui->actionSave_as->setIcon(QIcon("saveAsIcon.png"));
@@ -57,6 +62,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
+    int translateSpeed = 5;
     switch (e->key())
     {
         case Qt::Key_I:
@@ -71,36 +77,36 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         case 1062:
         {
             isWPressed = true;
-            if (isWPressed == true && isAPressed == false && isSPressed == false && isDPressed == false) view->translateGraphics(TranslateDir::U);
-            if (isWPressed == true && isAPressed == true && isSPressed == false && isDPressed == false) view->translateGraphics(TranslateDir::UL);
-            if (isWPressed == true && isAPressed == false && isSPressed == false && isDPressed == true) view->translateGraphics(TranslateDir::UR);
+            if (isWPressed == true && isAPressed == false && isSPressed == false && isDPressed == false) view->translateGraphics(translateSpeed*QPointF(0, 1));
+            if (isWPressed == true && isAPressed == true && isSPressed == false && isDPressed == false) view->translateGraphics(translateSpeed*QPointF(sqrt(2)/2, sqrt(2)/2));
+            if (isWPressed == true && isAPressed == false && isSPressed == false && isDPressed == true) view->translateGraphics(translateSpeed*QPointF(-sqrt(2)/2, sqrt(2)/2));
             break;
         }
         case Qt::Key_A:
         case 1060:
         {
             isAPressed = true;
-            if (isWPressed == false && isAPressed == true && isSPressed == false && isDPressed == false) view->translateGraphics(TranslateDir::L);
-            if (isWPressed == true && isAPressed == true && isSPressed == false && isDPressed == false) view->translateGraphics(TranslateDir::UL);
-            if (isWPressed == false && isAPressed == true && isSPressed == true && isDPressed == false) view->translateGraphics(TranslateDir::DL);
+            if (isWPressed == false && isAPressed == true && isSPressed == false && isDPressed == false) view->translateGraphics(translateSpeed*QPointF(1, 0));
+            if (isWPressed == true && isAPressed == true && isSPressed == false && isDPressed == false) view->translateGraphics(translateSpeed*QPointF(sqrt(2)/2, sqrt(2)/2));
+            if (isWPressed == false && isAPressed == true && isSPressed == true && isDPressed == false) view->translateGraphics(translateSpeed*QPointF(sqrt(2)/2, -sqrt(2)/2));
             break;
         }
         case Qt::Key_S:
         case 1067:
         {
             isSPressed = true;
-            if (isWPressed == false && isAPressed == false && isSPressed == true && isDPressed == false) view->translateGraphics(TranslateDir::D);
-            if (isWPressed == false && isAPressed == true && isSPressed == true && isDPressed == false) view->translateGraphics(TranslateDir::DL);
-            if (isWPressed == false && isAPressed == false && isSPressed == true && isDPressed == true) view->translateGraphics(TranslateDir::DR);
+            if (isWPressed == false && isAPressed == false && isSPressed == true && isDPressed == false) view->translateGraphics(translateSpeed*QPointF(0, -1));
+            if (isWPressed == false && isAPressed == true && isSPressed == true && isDPressed == false) view->translateGraphics(translateSpeed*QPointF(sqrt(2)/2, -sqrt(2)/2));
+            if (isWPressed == false && isAPressed == false && isSPressed == true && isDPressed == true) view->translateGraphics(translateSpeed*QPointF(-sqrt(2)/2, -sqrt(2)/2));
             break;
         }
         case Qt::Key_D:
         case 1042:
         {
             isDPressed = true;
-            if (isWPressed == false && isAPressed == false && isSPressed == false && isDPressed == true) view->translateGraphics(TranslateDir::R);
-            if (isWPressed == true && isAPressed == false && isSPressed == false && isDPressed == true) view->translateGraphics(TranslateDir::UR);
-            if (isWPressed == false && isAPressed == false && isSPressed == true && isDPressed == true) view->translateGraphics(TranslateDir::DR);
+            if (isWPressed == false && isAPressed == false && isSPressed == false && isDPressed == true) view->translateGraphics(translateSpeed*QPointF(-1, 0));
+            if (isWPressed == true && isAPressed == false && isSPressed == false && isDPressed == true) view->translateGraphics(translateSpeed*QPointF(-sqrt(2)/2, sqrt(2)/2));
+            if (isWPressed == false && isAPressed == false && isSPressed == true && isDPressed == true) view->translateGraphics(translateSpeed*QPointF(-sqrt(2)/2, -sqrt(2)/2));
             break;
         }
         case Qt::Key_T: // Test key
@@ -225,6 +231,7 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
 
     if (newT == ui->dSBTime->maximum()) { // Animation has ended
         ui->playButton->setIcon(QIcon("playIcon.png"));
+        ui->actionPlay->setIcon(QIcon("playIcon.png"));
         ui->sliderTime->setEnabled(true);
         view->timer->stop();
     } // Animation has ended
@@ -283,15 +290,21 @@ void MainWindow::on_playButton_clicked()
     if (view->timer->isActive()) {
         view->timer->stop();
         ui->playButton->setIcon(QIcon("playIcon.png"));
+        ui->actionPlay->setIcon(QIcon("playIcon.png"));
         ui->sliderTime->setEnabled(true);
     } else {
         view->timer->start(10);
         ui->playButton->setIcon(QIcon("pauseIcon.png"));
+        ui->actionPlay->setIcon(QIcon("pauseIcon.png"));
         ui->sliderTime->setEnabled(false);
         if (ui->dSBTime->value() == ui->dSBTime->maximum()) { // Pressed when the whole animation was played
             ui->sliderTime->setValue(0);
         }
     }
+}
+void MainWindow::on_actionPlay_triggered()
+{
+    on_playButton_clicked();
 }
 void MainWindow::on_speedUpButton_clicked()
 {
@@ -302,6 +315,10 @@ void MainWindow::on_speedUpButton_clicked()
 
     view->timer->setInterval(tick);
 }
+void MainWindow::on_actionSpeedUp_triggered()
+{
+    on_speedUpButton_clicked();
+}
 void MainWindow::on_resetZoomButton_clicked()
 {
     view->setSF(1);
@@ -309,6 +326,18 @@ void MainWindow::on_resetZoomButton_clicked()
     view->setSCoordCenter(QPointF(view->width()/2., view->height()/2.));
 
     view->zoomGraphics(1);
+}
+void MainWindow::on_actionDefaultZoom_triggered()
+{
+    on_resetZoomButton_clicked();
+}
+void MainWindow::on_optimalZoomButton_clicked()
+{
+    view->transformViewToOptimal();
+}
+void MainWindow::on_actionOptimalZoom_triggered()
+{
+    on_optimalZoomButton_clicked();
 }
 void MainWindow::on_rBConstruction_toggled(bool checked)
 {
@@ -324,10 +353,14 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     view->genRect->show();
     ui->dSBTime->setValue(0);
     ui->sliderTime->setValue(0);
+    ui->optimalZoomButton->setEnabled(false);
+    ui->actionOptimalZoom->setEnabled(false);
     ui->playButton->setIcon(QIcon("playIcon.png"));
     ui->playButton->setEnabled(false);
-    ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
+    ui->actionPlay->setIcon(QIcon("playIcon.png"));
+    ui->actionPlay->setEnabled(false);
     ui->speedUpButton->setEnabled(false);
+    ui->actionSpeedUp->setEnabled(false);
     on_resetZoomButton_clicked();
 
     view->timer->start(10);
@@ -359,10 +392,14 @@ void MainWindow::on_actionClear_triggered()
     ui->rBAnimation->setEnabled(false);
     ui->dSBTime->setValue(0);
     ui->sliderTime->setValue(0);
+    ui->optimalZoomButton->setEnabled(false);
+    ui->actionOptimalZoom->setEnabled(false);
     ui->playButton->setIcon(QIcon("playIcon.png"));
     ui->playButton->setEnabled(false);
-    ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
+    ui->actionPlay->setIcon(QIcon("playIcon.png"));
+    ui->actionPlay->setEnabled(false);
     ui->speedUpButton->setEnabled(false);
+    ui->actionSpeedUp->setEnabled(false);
     on_resetZoomButton_clicked();
 
     QPointF pMathCursorPos = view->sceneToCoords(view->mapFromGlobal(QCursor::pos()));
@@ -686,8 +723,12 @@ void MainWindow::solvingEnded()
     ui->dSBTime->setValue(0);
     ui->sliderTime->setMaximum(100*solver->getResT()-(int)(solver->getResT()*100) < 0.5 ? (int)(solver->getResT()*100):(int)(solver->getResT()*100)+1);
     ui->sliderTime->setValue(0);
+    ui->optimalZoomButton->setEnabled(true);
+    ui->actionOptimalZoom->setEnabled(true);
     ui->playButton->setEnabled(true);
+    ui->actionPlay->setEnabled(true);
     ui->speedUpButton->setEnabled(true);
+    ui->actionSpeedUp->setEnabled(true);
     view->timer->stop();
 
     for (Prey* p : view->prey)

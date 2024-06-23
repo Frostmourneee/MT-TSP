@@ -61,5 +61,10 @@ private slots:
     void on_dSBTime_editingFinished() {setFocus();}
     void on_speedUpButton_clicked();
     void on_resetZoomButton_clicked();
+    void on_actionPlay_triggered();
+    void on_actionSpeedUp_triggered();
+    void on_actionDefaultZoom_triggered();
+    void on_optimalZoomButton_clicked();
+    void on_actionOptimalZoom_triggered();
 };
 #endif // MAINWINDOW_H

@@ -299,18 +299,8 @@ void MyQGraphicsView::wheelEvent(QWheelEvent *e)
     QPointF sAnchor = mapToScene(e->pos());
     anchor = sceneToCoords(sAnchor); // Should be before changing sceneSF because it affects sceneToCoords
 
-    //===============// Calculating new sceneSF
     double aDelta = e->angleDelta().y();
-    if (mouseSF == 1)
-    {
-        mouseSF += aDelta > 0 ? aDelta / 1200. : aDelta / 120000.; // +-0.1 || +-0.0001
-    }
-    else mouseSF += mouseSF > 1 ? aDelta / 1200. : aDelta / 120000.;
-
-    mouseSF = clamp(mouseSF, 0.51, 50);
-    sceneSF = mouseSF >= 1 ? mouseSF : 1/(1+100*(1-mouseSF)); // Zooming in or out from 1 to 100 with step 0.1 (zoom in 1, 1.1, 1.2, ..., 100 times or zoom out 1, 1.1, 1.2, ... 100 times
     sceneSF = aDelta > 0 ? 1.1 : 0.9;
-    //===============//
 
     if (unit*sceneSF < 0.48 || unit*sceneSF > 230) return; // Zoom in up to x4 and zoom out up to x100
     sCoordCenter = sAnchor + sceneSF*(sCoordCenter-sAnchor);
@@ -498,98 +488,62 @@ void MyQGraphicsView::resizeCoordlines()
 
     return;
 }
-void MyQGraphicsView::translateGraphics(TranslateDir dir)
+void MyQGraphicsView::translateGraphics(QPointF sTranslateVec)
 {
     if (status != StatusScene::animationMode) return;
 
-    int translateVelocity = 5;
-    switch (dir)
+    sCoordCenter += sTranslateVec;
+    for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+sTranslateVec));
+    for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+sTranslateVec));
+
+    resizeCoordlines();
+}
+void MyQGraphicsView::transformViewToOptimal()
+{
+    int w = width();
+    int h = height();
+    sceneSF = 1;
+    anchor = QPointF(0, 0);
+    sCoordCenter = QPointF(w/2., h/2.);
+    zoomGraphics(1); // Reseting to default view to avoid problems
+
+    double xMin = yerp[0]->getStart().x(), xMax = yerp[0]->getStart().x(), yMin = yerp[0]->getStart().y(), yMax = yerp[0]->getStart().y();
+    double sX, sY, dX, dY;
+    for (Prey* p : prey)
     {
-        case TranslateDir::U:
-        {
-            QPointF pDir = translateVelocity*QPointF(0, 1);
-            sCoordCenter += pDir;
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
-
-            resizeCoordlines();
-            break;
-        }
-        case TranslateDir::UR:
-        {
-            QPointF pDir = translateVelocity*QPointF(-sqrt(2)/2, sqrt(2)/2);
-            sCoordCenter += pDir;
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
-
-            resizeCoordlines();
-            break;
-        }
-        case TranslateDir::UL:
-        {
-            QPointF pDir = translateVelocity*QPointF(sqrt(2)/2, sqrt(2)/2);
-            sCoordCenter += pDir;
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
-
-            resizeCoordlines();
-            break;
-        }
-        case TranslateDir::L:
-        {
-            QPointF pDir = translateVelocity*QPointF(1, 0);
-            sCoordCenter += pDir;
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
-
-            resizeCoordlines();
-            break;
-        }
-        case TranslateDir::D:
-        {
-            QPointF pDir = translateVelocity*QPointF(0, -1);
-            sCoordCenter += pDir;
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
-
-            resizeCoordlines();
-            break;
-        }
-        case TranslateDir::DR:
-        {
-            QPointF pDir = translateVelocity*QPointF(-sqrt(2)/2, -sqrt(2)/2);
-            sCoordCenter += pDir;
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
-
-            resizeCoordlines();
-            break;
-        }
-        case TranslateDir::DL:
-        {
-            QPointF pDir = translateVelocity*QPointF(sqrt(2)/2, -sqrt(2)/2);
-            sCoordCenter += pDir;
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
-
-            resizeCoordlines();
-            break;
-        }
-        case TranslateDir::R:
-        {
-            QPointF pDir = translateVelocity*QPointF(-1, 0);
-            sCoordCenter += pDir;
-            for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+pDir));
-            for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+pDir));
-
-            resizeCoordlines();
-            break;
-        }
-        default:
-        {
-            break;
-        }
+        sX = p->getStart().x();
+        sY = p->getStart().y();
+        dX = p->getDiePoint().x();
+        dY = p->getDiePoint().y();
+        if (xMin > sX) xMin = sX;
+        if (xMin > dX) xMin = dX;
+        if (xMax < sX) xMax = sX;
+        if (xMax < dX) xMax = dX;
+        if (yMin > sY) yMin = sY;
+        if (yMin > dY) yMin = dY;
+        if (yMax < sY) yMax = sY;
+        if (yMax < dY) yMax = dY;
     }
+
+    for (Yerp* y : yerp)
+    {
+        sX = y->getStart().x();
+        sY = y->getStart().y();
+        if (xMin > sX) xMin = sX;
+        if (xMax < sX) xMax = sX;
+        if (yMin > sY) yMin = sY;
+        if (yMax < sY) yMax = sY;
+    }
+
+    QPointF coordCenter = QPointF((xMin+xMax)/2, (yMin+yMax)/2);
+    translateGraphics(QPointF(w/2., h/2.) - coordsToScene(coordCenter)); // Translation part
+
+    double sWidth = (coordCenter.x()-xMin)*unit;
+    double sHeight = (coordCenter.y()-yMin)*unit;
+    sceneSF = qMin(0.45*w/sWidth, 0.45*h/sHeight);
+    if (unit*sceneSF < 0.48 || unit*sceneSF > 230) return;
+    sCoordCenter = QPointF(w/2., h/2.) + sceneSF*(sCoordCenter-QPointF(w/2., h/2.));
+    zoomGraphics(sceneSF); // Zoom part
 }
 void MyQGraphicsView::preyTransform(Prey* p, QPointF st)
 {

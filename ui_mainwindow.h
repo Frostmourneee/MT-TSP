@@ -38,6 +38,10 @@ public:
     QAction *actionRandom;
     QAction *actionBack;
     QAction *actionClear;
+    QAction *actionPlay;
+    QAction *actionSpeedUp;
+    QAction *actionDefaultZoom;
+    QAction *actionOptimalZoom;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout_2;
     QVBoxLayout *verticalLayout_2;
@@ -48,18 +52,20 @@ public:
     QHBoxLayout *horizontalLayout;
     QPushButton *playButton;
     QPushButton *speedUpButton;
-    QPushButton *resetZoomButton;
     QDoubleSpinBox *dSBTime;
     QSlider *sliderTime;
+    QPushButton *optimalZoomButton;
+    QPushButton *resetZoomButton;
     QMenuBar *menubar;
     QMenu *menuOptions;
+    QMenu *menuAnimation_control;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(639, 420);
+        MainWindow->resize(425, 291);
         actionStart = new QAction(MainWindow);
         actionStart->setObjectName(QString::fromUtf8("actionStart"));
         actionSave_as = new QAction(MainWindow);
@@ -76,6 +82,17 @@ public:
         actionBack->setObjectName(QString::fromUtf8("actionBack"));
         actionClear = new QAction(MainWindow);
         actionClear->setObjectName(QString::fromUtf8("actionClear"));
+        actionPlay = new QAction(MainWindow);
+        actionPlay->setObjectName(QString::fromUtf8("actionPlay"));
+        actionPlay->setEnabled(false);
+        actionSpeedUp = new QAction(MainWindow);
+        actionSpeedUp->setObjectName(QString::fromUtf8("actionSpeedUp"));
+        actionSpeedUp->setEnabled(false);
+        actionDefaultZoom = new QAction(MainWindow);
+        actionDefaultZoom->setObjectName(QString::fromUtf8("actionDefaultZoom"));
+        actionOptimalZoom = new QAction(MainWindow);
+        actionOptimalZoom->setObjectName(QString::fromUtf8("actionOptimalZoom"));
+        actionOptimalZoom->setEnabled(false);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout_2 = new QHBoxLayout(centralwidget);
@@ -129,17 +146,6 @@ public:
 
         horizontalLayout->addWidget(speedUpButton);
 
-        resetZoomButton = new QPushButton(centralwidget);
-        resetZoomButton->setObjectName(QString::fromUtf8("resetZoomButton"));
-        resetZoomButton->setEnabled(true);
-        resetZoomButton->setMinimumSize(QSize(32, 32));
-        resetZoomButton->setMaximumSize(QSize(32, 32));
-        resetZoomButton->setIconSize(QSize(32, 32));
-        resetZoomButton->setAutoDefault(false);
-        resetZoomButton->setFlat(true);
-
-        horizontalLayout->addWidget(resetZoomButton);
-
         dSBTime = new QDoubleSpinBox(centralwidget);
         dSBTime->setObjectName(QString::fromUtf8("dSBTime"));
         dSBTime->setMinimumSize(QSize(80, 28));
@@ -157,6 +163,28 @@ public:
 
         horizontalLayout->addWidget(sliderTime);
 
+        optimalZoomButton = new QPushButton(centralwidget);
+        optimalZoomButton->setObjectName(QString::fromUtf8("optimalZoomButton"));
+        optimalZoomButton->setEnabled(false);
+        optimalZoomButton->setMinimumSize(QSize(32, 32));
+        optimalZoomButton->setMaximumSize(QSize(32, 32));
+        optimalZoomButton->setIconSize(QSize(32, 32));
+        optimalZoomButton->setAutoDefault(false);
+        optimalZoomButton->setFlat(true);
+
+        horizontalLayout->addWidget(optimalZoomButton);
+
+        resetZoomButton = new QPushButton(centralwidget);
+        resetZoomButton->setObjectName(QString::fromUtf8("resetZoomButton"));
+        resetZoomButton->setEnabled(true);
+        resetZoomButton->setMinimumSize(QSize(32, 32));
+        resetZoomButton->setMaximumSize(QSize(32, 32));
+        resetZoomButton->setIconSize(QSize(32, 32));
+        resetZoomButton->setAutoDefault(false);
+        resetZoomButton->setFlat(true);
+
+        horizontalLayout->addWidget(resetZoomButton);
+
 
         vLScene->addLayout(horizontalLayout);
 
@@ -166,9 +194,11 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 639, 21));
+        menubar->setGeometry(QRect(0, 0, 425, 21));
         menuOptions = new QMenu(menubar);
         menuOptions->setObjectName(QString::fromUtf8("menuOptions"));
+        menuAnimation_control = new QMenu(menuOptions);
+        menuAnimation_control->setObjectName(QString::fromUtf8("menuAnimation_control"));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
@@ -183,13 +213,20 @@ public:
         menuOptions->addAction(actionStart);
         menuOptions->addAction(actionBack);
         menuOptions->addSeparator();
+        menuOptions->addAction(menuAnimation_control->menuAction());
+        menuOptions->addSeparator();
         menuOptions->addAction(actionFullscreen);
         menuOptions->addAction(actionExit);
+        menuAnimation_control->addAction(actionPlay);
+        menuAnimation_control->addAction(actionSpeedUp);
+        menuAnimation_control->addAction(actionOptimalZoom);
+        menuAnimation_control->addAction(actionDefaultZoom);
 
         retranslateUi(MainWindow);
 
         playButton->setDefault(false);
         speedUpButton->setDefault(false);
+        optimalZoomButton->setDefault(false);
         resetZoomButton->setDefault(false);
 
 
@@ -213,12 +250,12 @@ public:
 #if QT_CONFIG(shortcut)
         actionSave_as->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+S", nullptr));
 #endif // QT_CONFIG(shortcut)
-        actionLoad_from_file->setText(QCoreApplication::translate("MainWindow", "Open Configuration...", nullptr));
+        actionLoad_from_file->setText(QCoreApplication::translate("MainWindow", "Load Configuration...", nullptr));
 #if QT_CONFIG(tooltip)
         actionLoad_from_file->setToolTip(QCoreApplication::translate("MainWindow", "Choose file to load data about preys and yerps", nullptr));
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(shortcut)
-        actionLoad_from_file->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+O", nullptr));
+        actionLoad_from_file->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+L", nullptr));
 #endif // QT_CONFIG(shortcut)
         actionExit->setText(QCoreApplication::translate("MainWindow", "Exit", nullptr));
 #if QT_CONFIG(shortcut)
@@ -249,21 +286,30 @@ public:
 #if QT_CONFIG(shortcut)
         actionClear->setShortcut(QCoreApplication::translate("MainWindow", "R", nullptr));
 #endif // QT_CONFIG(shortcut)
+        actionPlay->setText(QCoreApplication::translate("MainWindow", "Play", nullptr));
+#if QT_CONFIG(shortcut)
+        actionPlay->setShortcut(QCoreApplication::translate("MainWindow", "Space", nullptr));
+#endif // QT_CONFIG(shortcut)
+        actionSpeedUp->setText(QCoreApplication::translate("MainWindow", "Speed up x1, x2, x5, x10", nullptr));
+#if QT_CONFIG(shortcut)
+        actionSpeedUp->setShortcut(QCoreApplication::translate("MainWindow", "Up", nullptr));
+#endif // QT_CONFIG(shortcut)
+        actionDefaultZoom->setText(QCoreApplication::translate("MainWindow", "Default Scene View", nullptr));
+#if QT_CONFIG(shortcut)
+        actionDefaultZoom->setShortcut(QCoreApplication::translate("MainWindow", "H", nullptr));
+#endif // QT_CONFIG(shortcut)
+        actionOptimalZoom->setText(QCoreApplication::translate("MainWindow", "Change View to Optimal", nullptr));
+#if QT_CONFIG(shortcut)
+        actionOptimalZoom->setShortcut(QCoreApplication::translate("MainWindow", "Z", nullptr));
+#endif // QT_CONFIG(shortcut)
         rBConstruction->setText(QCoreApplication::translate("MainWindow", "Construction mode", nullptr));
         rBAnimation->setText(QCoreApplication::translate("MainWindow", "Animation mode", nullptr));
         playButton->setText(QString());
-#if QT_CONFIG(shortcut)
-        playButton->setShortcut(QCoreApplication::translate("MainWindow", "Space", nullptr));
-#endif // QT_CONFIG(shortcut)
         speedUpButton->setText(QString());
-#if QT_CONFIG(shortcut)
-        speedUpButton->setShortcut(QCoreApplication::translate("MainWindow", "Up", nullptr));
-#endif // QT_CONFIG(shortcut)
+        optimalZoomButton->setText(QString());
         resetZoomButton->setText(QString());
-#if QT_CONFIG(shortcut)
-        resetZoomButton->setShortcut(QCoreApplication::translate("MainWindow", "H", nullptr));
-#endif // QT_CONFIG(shortcut)
         menuOptions->setTitle(QCoreApplication::translate("MainWindow", "Actions", nullptr));
+        menuAnimation_control->setTitle(QCoreApplication::translate("MainWindow", "Animation control", nullptr));
     } // retranslateUi
 
 };
