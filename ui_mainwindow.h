@@ -42,6 +42,7 @@ public:
     QAction *actionSpeedUp;
     QAction *actionDefaultZoom;
     QAction *actionOptimalZoom;
+    QAction *actionShowControlPanel;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout_2;
     QVBoxLayout *verticalLayout_2;
@@ -54,6 +55,7 @@ public:
     QPushButton *speedUpButton;
     QDoubleSpinBox *dSBTime;
     QSlider *sliderTime;
+    QPushButton *optionsButton;
     QPushButton *optimalZoomButton;
     QPushButton *resetZoomButton;
     QMenuBar *menubar;
@@ -93,6 +95,8 @@ public:
         actionOptimalZoom = new QAction(MainWindow);
         actionOptimalZoom->setObjectName(QString::fromUtf8("actionOptimalZoom"));
         actionOptimalZoom->setEnabled(false);
+        actionShowControlPanel = new QAction(MainWindow);
+        actionShowControlPanel->setObjectName(QString::fromUtf8("actionShowControlPanel"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout_2 = new QHBoxLayout(centralwidget);
@@ -148,6 +152,7 @@ public:
 
         dSBTime = new QDoubleSpinBox(centralwidget);
         dSBTime->setObjectName(QString::fromUtf8("dSBTime"));
+        dSBTime->setEnabled(false);
         dSBTime->setMinimumSize(QSize(80, 28));
         dSBTime->setFrame(true);
         dSBTime->setAlignment(Qt::AlignCenter);
@@ -157,11 +162,23 @@ public:
 
         sliderTime = new QSlider(centralwidget);
         sliderTime->setObjectName(QString::fromUtf8("sliderTime"));
+        sliderTime->setEnabled(false);
         sliderTime->setMaximum(10000000);
         sliderTime->setPageStep(1);
         sliderTime->setOrientation(Qt::Horizontal);
 
         horizontalLayout->addWidget(sliderTime);
+
+        optionsButton = new QPushButton(centralwidget);
+        optionsButton->setObjectName(QString::fromUtf8("optionsButton"));
+        optionsButton->setEnabled(true);
+        optionsButton->setMinimumSize(QSize(32, 32));
+        optionsButton->setMaximumSize(QSize(32, 32));
+        optionsButton->setIconSize(QSize(32, 32));
+        optionsButton->setAutoDefault(false);
+        optionsButton->setFlat(true);
+
+        horizontalLayout->addWidget(optionsButton);
 
         optimalZoomButton = new QPushButton(centralwidget);
         optimalZoomButton->setObjectName(QString::fromUtf8("optimalZoomButton"));
@@ -213,6 +230,7 @@ public:
         menuOptions->addAction(actionStart);
         menuOptions->addAction(actionBack);
         menuOptions->addSeparator();
+        menuOptions->addAction(actionShowControlPanel);
         menuOptions->addAction(menuAnimation_control->menuAction());
         menuOptions->addSeparator();
         menuOptions->addAction(actionFullscreen);
@@ -226,6 +244,7 @@ public:
 
         playButton->setDefault(false);
         speedUpButton->setDefault(false);
+        optionsButton->setDefault(false);
         optimalZoomButton->setDefault(false);
         resetZoomButton->setDefault(false);
 
@@ -302,10 +321,15 @@ public:
 #if QT_CONFIG(shortcut)
         actionOptimalZoom->setShortcut(QCoreApplication::translate("MainWindow", "Z", nullptr));
 #endif // QT_CONFIG(shortcut)
+        actionShowControlPanel->setText(QCoreApplication::translate("MainWindow", "Show Control Panel", nullptr));
+#if QT_CONFIG(shortcut)
+        actionShowControlPanel->setShortcut(QCoreApplication::translate("MainWindow", "I", nullptr));
+#endif // QT_CONFIG(shortcut)
         rBConstruction->setText(QCoreApplication::translate("MainWindow", "Construction mode", nullptr));
         rBAnimation->setText(QCoreApplication::translate("MainWindow", "Animation mode", nullptr));
         playButton->setText(QString());
         speedUpButton->setText(QString());
+        optionsButton->setText(QString());
         optimalZoomButton->setText(QString());
         resetZoomButton->setText(QString());
         menuOptions->setTitle(QCoreApplication::translate("MainWindow", "Actions", nullptr));

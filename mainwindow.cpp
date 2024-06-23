@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionSpeedUp->setIcon(QIcon("speedUpIcon.png"));
     ui->resetZoomButton->setIcon(QIcon("resetIcon.png"));
     ui->actionDefaultZoom->setIcon(QIcon("resetIcon.png"));
+    ui->optionsButton->setIcon(QIcon("optionsIcon.png"));
     ui->actionClear->setIcon(QIcon("newConfigIcon.png"));
     ui->actionLoad_from_file->setIcon(QIcon("openConfigIcon.png"));
     ui->actionSave_as->setIcon(QIcon("saveAsIcon.png"));
@@ -339,6 +340,14 @@ void MainWindow::on_actionOptimalZoom_triggered()
 {
     on_optimalZoomButton_clicked();
 }
+void MainWindow::on_optionsButton_clicked()
+{
+    qDebug() << "haha";
+}
+void MainWindow::on_actionShowControlPanel_triggered()
+{
+    on_optionsButton_clicked();
+}
 void MainWindow::on_rBConstruction_toggled(bool checked)
 {
     if (!checked) return;
@@ -359,6 +368,8 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     ui->playButton->setEnabled(false);
     ui->actionPlay->setIcon(QIcon("playIcon.png"));
     ui->actionPlay->setEnabled(false);
+    ui->dSBTime->setEnabled(false);
+    ui->sliderTime->setEnabled(false);
     ui->speedUpButton->setEnabled(false);
     ui->actionSpeedUp->setEnabled(false);
     on_resetZoomButton_clicked();
@@ -398,6 +409,8 @@ void MainWindow::on_actionClear_triggered()
     ui->playButton->setEnabled(false);
     ui->actionPlay->setIcon(QIcon("playIcon.png"));
     ui->actionPlay->setEnabled(false);
+    ui->dSBTime->setEnabled(false);
+    ui->sliderTime->setEnabled(false);
     ui->speedUpButton->setEnabled(false);
     ui->actionSpeedUp->setEnabled(false);
     on_resetZoomButton_clicked();
@@ -727,6 +740,8 @@ void MainWindow::solvingEnded()
     ui->actionOptimalZoom->setEnabled(true);
     ui->playButton->setEnabled(true);
     ui->actionPlay->setEnabled(true);
+    ui->dSBTime->setEnabled(true);
+    ui->sliderTime->setEnabled(true);
     ui->speedUpButton->setEnabled(true);
     ui->actionSpeedUp->setEnabled(true);
     view->timer->stop();
@@ -778,3 +793,4 @@ int MainWindow::signs(double r)
 
     return tmp++;
 }
+

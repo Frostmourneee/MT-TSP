@@ -11,6 +11,8 @@ public:
     GraphicsEntities()
     { }
 
+    static const int smallGraphicsUnit = 7; // In pixels
+
     QPointF getStart() {return start;};
     QPointF getSStart() {return sStart;}
     QPointF getCurr() {return curr;}
@@ -20,7 +22,6 @@ public:
     void setSStart(QPointF sS) {sStart = sS;}
     void setCurr(QPointF p) {curr = p;}
     void setVel(double velx, double vely) {vx = velx; vy = vely;}
-    static const int smallGraphicsUnit = 5; // Pixels
 
 protected:
     QPointF start; // Stored in Scene coords for Arrow, in Math coords for Prey, Yerp

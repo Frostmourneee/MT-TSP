@@ -437,8 +437,8 @@ void MyQGraphicsView::resizeCoordlines()
 
     int w = width();
     int h = height();
-    QPointF sRD = QPointF(0.98*w, 0.98*h); // Scene right down point
-    QPointF sLU = QPointF(0.02*w, 0.02*h); // Scene left up point
+    QPointF sRD = QPointF(0.99*w, 0.99*h); // Scene right down point
+    QPointF sLU = QPointF(0.01*w, 0.01*h); // Scene left up point
     QPointF rD = sceneToCoords(sRD);
     QPointF lU = sceneToCoords(sLU);
 
@@ -467,7 +467,7 @@ void MyQGraphicsView::resizeCoordlines()
     double leftVLineCoord = (lU.x() > 0 ? 1 : -1)*basicCoordLineUnit*(((int)(distV/basicCoordLineUnit))+(lU.x() > 0 ? 1 : 0));
     double botHLineCoord = (rD.y() > 0 ? 1 : -1)*basicCoordLineUnit*(((int)(distH/basicCoordLineUnit))+(rD.y() > 0 ? 1 : 0));
 
-    for (double xCoord = leftVLineCoord; xCoord < rD.x(); xCoord += basicCoordLineUnit) // Thin vertical lines, need to be renewed because amount of them isn't constant
+    for (double xCoord = leftVLineCoord; xCoord < rD.x(); xCoord += basicCoordLineUnit) // Thin vertical lines, need to be recreated because amount of them isn't constant
     {
         GridLineItem* coordL = new GridLineItem(0, (sLU-sCoordCenter).y(), 0, (sRD-sCoordCenter).y(), xCoord, 0);
         coordL->setPos(coordsToScene(QPointF(xCoord, 0)));
@@ -476,7 +476,7 @@ void MyQGraphicsView::resizeCoordlines()
         scene->addItem(coordL);
         if (fabs(xCoord) < 1.e-4) coordL->hide(); // Ordinate is on scene, so no need to draw dott thin line on it
     }
-    for (double yCoord = botHLineCoord; yCoord < lU.y(); yCoord += basicCoordLineUnit) // Thin horizontal lines, need to be renewed because amount of them isn't constant
+    for (double yCoord = botHLineCoord; yCoord < lU.y(); yCoord += basicCoordLineUnit) // Thin horizontal lines, need to be recreated because amount of them isn't constant
     {
         GridLineItem* coordL = new GridLineItem((sLU-sCoordCenter).x(), 0, (sRD-sCoordCenter).x(), 0, 0, yCoord);
         coordL->setPos(coordsToScene(QPointF(0, yCoord)));

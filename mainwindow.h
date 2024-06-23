@@ -66,5 +66,8 @@ private slots:
     void on_actionDefaultZoom_triggered();
     void on_optimalZoomButton_clicked();
     void on_actionOptimalZoom_triggered();
+    void on_optionsButton_clicked();
+    void on_actionShowControlPanel_triggered();
+
 };
 #endif // MAINWINDOW_H

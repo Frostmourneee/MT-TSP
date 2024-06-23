@@ -126,6 +126,9 @@
         </item>
         <item>
          <widget class="QDoubleSpinBox" name="dSBTime">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="minimumSize">
            <size>
             <width>80</width>
@@ -145,6 +148,9 @@
         </item>
         <item>
          <widget class="QSlider" name="sliderTime">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="maximum">
            <number>10000000</number>
           </property>
@@ -153,6 +159,43 @@
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="optionsButton">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>false</bool>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -266,6 +309,7 @@
     <addaction name="actionStart"/>
     <addaction name="actionBack"/>
     <addaction name="separator"/>
+    <addaction name="actionShowControlPanel"/>
     <addaction name="menuAnimation_control"/>
     <addaction name="separator"/>
     <addaction name="actionFullscreen"/>
@@ -395,6 +439,14 @@
    </property>
    <property name="shortcut">
     <string>Z</string>
+   </property>
+  </action>
+  <action name="actionShowControlPanel">
+   <property name="text">
+    <string>Show Control Panel</string>
+   </property>
+   <property name="shortcut">
+    <string>I</string>
    </property>
   </action>
  </widget>
