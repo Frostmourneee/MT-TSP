@@ -12,8 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    setMinimumSize(QSize(800, 600));
-    resize(QSize(800, 600));
+    setMinimumSize(QSize(1200, 600));
+    resize(QSize(1200, 600));
 
     setMouseTracking(true);
     centralWidget()->setMouseTracking(true);

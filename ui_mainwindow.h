@@ -25,6 +25,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSlider>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
@@ -63,23 +64,24 @@ public:
     QLabel *labelPreys;
     QLabel *labelYerpsNum;
     QWidget *randomGen;
-    QWidget *horizontalLayoutWidget_3;
+    QVBoxLayout *verticalLayout_2;
     QHBoxLayout *layoutGenEntities;
     QLabel *labelGenYerps;
     QSpinBox *spinBoxPreys;
     QLabel *labelGenPreys;
     QSpinBox *spinBoxYerps;
+    QFrame *line;
     QCheckBox *checkBoxRandomN;
     QCheckBox *checkBoxRandomM;
-    QFrame *line;
-    QLabel *labelGenVelMin;
-    QFrame *line_2;
     QCheckBox *checkBoxAllYerpsToZero;
-    QWidget *widget;
+    QFrame *line_2;
+    QVBoxLayout *verticalLayout;
+    QLabel *labelGenVelMin;
     QHBoxLayout *layoutVelocity;
     QDoubleSpinBox *dSpinBoxVelMin;
     QLabel *labelGenVelMax;
     QDoubleSpinBox *dSpinBoxVelMax;
+    QSpacerItem *verticalSpacer;
     QVBoxLayout *vLScene;
     QProgressBar *progressBar;
     QHBoxLayout *horizontalLayout_3;
@@ -161,10 +163,10 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(controlPanel->sizePolicy().hasHeightForWidth());
         controlPanel->setSizePolicy(sizePolicy);
-        controlPanel->setMinimumSize(QSize(260, 0));
-        controlPanel->setMaximumSize(QSize(260, 16777215));
+        controlPanel->setMinimumSize(QSize(400, 0));
+        controlPanel->setMaximumSize(QSize(400, 16777215));
         QFont font;
-        font.setPointSize(10);
+        font.setPointSize(12);
         controlPanel->setFont(font);
         controlPanel->setTabPosition(QTabWidget::North);
         controlPanel->setTabShape(QTabWidget::Rounded);
@@ -191,6 +193,7 @@ public:
         labelPreysNum = new QLabel(horizontalLayoutWidget);
         labelPreysNum->setObjectName(QString::fromUtf8("labelPreysNum"));
         QFont font1;
+        font1.setPointSize(14);
         font1.setBold(true);
         font1.setWeight(75);
         labelPreysNum->setFont(font1);
@@ -214,13 +217,11 @@ public:
         controlPanel->addTab(info, QString());
         randomGen = new QWidget();
         randomGen->setObjectName(QString::fromUtf8("randomGen"));
-        horizontalLayoutWidget_3 = new QWidget(randomGen);
-        horizontalLayoutWidget_3->setObjectName(QString::fromUtf8("horizontalLayoutWidget_3"));
-        horizontalLayoutWidget_3->setGeometry(QRect(10, 10, 241, 31));
-        layoutGenEntities = new QHBoxLayout(horizontalLayoutWidget_3);
+        verticalLayout_2 = new QVBoxLayout(randomGen);
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        layoutGenEntities = new QHBoxLayout();
         layoutGenEntities->setObjectName(QString::fromUtf8("layoutGenEntities"));
-        layoutGenEntities->setContentsMargins(0, 0, 0, 0);
-        labelGenYerps = new QLabel(horizontalLayoutWidget_3);
+        labelGenYerps = new QLabel(randomGen);
         labelGenYerps->setObjectName(QString::fromUtf8("labelGenYerps"));
         labelGenYerps->setFont(font);
         labelGenYerps->setLayoutDirection(Qt::LeftToRight);
@@ -228,12 +229,10 @@ public:
 
         layoutGenEntities->addWidget(labelGenYerps);
 
-        spinBoxPreys = new QSpinBox(horizontalLayoutWidget_3);
+        spinBoxPreys = new QSpinBox(randomGen);
         spinBoxPreys->setObjectName(QString::fromUtf8("spinBoxPreys"));
         spinBoxPreys->setEnabled(false);
-        QFont font2;
-        font2.setPointSize(12);
-        spinBoxPreys->setFont(font2);
+        spinBoxPreys->setFont(font);
         spinBoxPreys->setFrame(true);
         spinBoxPreys->setAlignment(Qt::AlignCenter);
         spinBoxPreys->setReadOnly(false);
@@ -243,16 +242,16 @@ public:
 
         layoutGenEntities->addWidget(spinBoxPreys);
 
-        labelGenPreys = new QLabel(horizontalLayoutWidget_3);
+        labelGenPreys = new QLabel(randomGen);
         labelGenPreys->setObjectName(QString::fromUtf8("labelGenPreys"));
         labelGenPreys->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
         layoutGenEntities->addWidget(labelGenPreys);
 
-        spinBoxYerps = new QSpinBox(horizontalLayoutWidget_3);
+        spinBoxYerps = new QSpinBox(randomGen);
         spinBoxYerps->setObjectName(QString::fromUtf8("spinBoxYerps"));
         spinBoxYerps->setEnabled(false);
-        spinBoxYerps->setFont(font2);
+        spinBoxYerps->setFont(font);
         spinBoxYerps->setFrame(true);
         spinBoxYerps->setAlignment(Qt::AlignCenter);
         spinBoxYerps->setReadOnly(false);
@@ -262,54 +261,67 @@ public:
 
         layoutGenEntities->addWidget(spinBoxYerps);
 
-        checkBoxRandomN = new QCheckBox(randomGen);
-        checkBoxRandomN->setObjectName(QString::fromUtf8("checkBoxRandomN"));
-        checkBoxRandomN->setGeometry(QRect(11, 76, 231, 22));
-        checkBoxRandomN->setLayoutDirection(Qt::LeftToRight);
-        checkBoxRandomN->setChecked(true);
-        checkBoxRandomM = new QCheckBox(randomGen);
-        checkBoxRandomM->setObjectName(QString::fromUtf8("checkBoxRandomM"));
-        checkBoxRandomM->setGeometry(QRect(11, 109, 231, 22));
-        checkBoxRandomM->setLayoutDirection(Qt::LeftToRight);
-        checkBoxRandomM->setChecked(true);
+
+        verticalLayout_2->addLayout(layoutGenEntities);
+
         line = new QFrame(randomGen);
         line->setObjectName(QString::fromUtf8("line"));
-        line->setGeometry(QRect(10, 50, 237, 16));
-        line->setMinimumSize(QSize(237, 0));
+        line->setMinimumSize(QSize(365, 0));
         line->setMaximumSize(QSize(237, 16777215));
         line->setFrameShadow(QFrame::Plain);
         line->setFrameShape(QFrame::HLine);
-        labelGenVelMin = new QLabel(randomGen);
-        labelGenVelMin->setObjectName(QString::fromUtf8("labelGenVelMin"));
-        labelGenVelMin->setGeometry(QRect(10, 190, 241, 31));
-        labelGenVelMin->setFont(font);
-        labelGenVelMin->setLayoutDirection(Qt::LeftToRight);
-        labelGenVelMin->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        verticalLayout_2->addWidget(line);
+
+        checkBoxRandomN = new QCheckBox(randomGen);
+        checkBoxRandomN->setObjectName(QString::fromUtf8("checkBoxRandomN"));
+        checkBoxRandomN->setLayoutDirection(Qt::LeftToRight);
+        checkBoxRandomN->setChecked(true);
+
+        verticalLayout_2->addWidget(checkBoxRandomN);
+
+        checkBoxRandomM = new QCheckBox(randomGen);
+        checkBoxRandomM->setObjectName(QString::fromUtf8("checkBoxRandomM"));
+        checkBoxRandomM->setLayoutDirection(Qt::LeftToRight);
+        checkBoxRandomM->setChecked(true);
+
+        verticalLayout_2->addWidget(checkBoxRandomM);
+
+        checkBoxAllYerpsToZero = new QCheckBox(randomGen);
+        checkBoxAllYerpsToZero->setObjectName(QString::fromUtf8("checkBoxAllYerpsToZero"));
+        checkBoxAllYerpsToZero->setLayoutDirection(Qt::LeftToRight);
+        checkBoxAllYerpsToZero->setChecked(false);
+
+        verticalLayout_2->addWidget(checkBoxAllYerpsToZero);
+
         line_2 = new QFrame(randomGen);
         line_2->setObjectName(QString::fromUtf8("line_2"));
-        line_2->setGeometry(QRect(10, 170, 237, 16));
-        line_2->setMinimumSize(QSize(237, 0));
+        line_2->setMinimumSize(QSize(365, 0));
         line_2->setMaximumSize(QSize(237, 16777215));
         line_2->setFrameShadow(QFrame::Plain);
         line_2->setFrameShape(QFrame::HLine);
-        checkBoxAllYerpsToZero = new QCheckBox(randomGen);
-        checkBoxAllYerpsToZero->setObjectName(QString::fromUtf8("checkBoxAllYerpsToZero"));
-        checkBoxAllYerpsToZero->setGeometry(QRect(11, 142, 231, 22));
-        checkBoxAllYerpsToZero->setLayoutDirection(Qt::LeftToRight);
-        checkBoxAllYerpsToZero->setChecked(false);
-        widget = new QWidget(randomGen);
-        widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setGeometry(QRect(10, 230, 241, 41));
-        layoutVelocity = new QHBoxLayout(widget);
+
+        verticalLayout_2->addWidget(line_2);
+
+        verticalLayout = new QVBoxLayout();
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        labelGenVelMin = new QLabel(randomGen);
+        labelGenVelMin->setObjectName(QString::fromUtf8("labelGenVelMin"));
+        labelGenVelMin->setFont(font);
+        labelGenVelMin->setLayoutDirection(Qt::LeftToRight);
+        labelGenVelMin->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        verticalLayout->addWidget(labelGenVelMin);
+
+        layoutVelocity = new QHBoxLayout();
         layoutVelocity->setObjectName(QString::fromUtf8("layoutVelocity"));
-        layoutVelocity->setContentsMargins(0, 0, 0, 0);
-        dSpinBoxVelMin = new QDoubleSpinBox(widget);
+        dSpinBoxVelMin = new QDoubleSpinBox(randomGen);
         dSpinBoxVelMin->setObjectName(QString::fromUtf8("dSpinBoxVelMin"));
-        QFont font3;
-        font3.setPointSize(12);
-        font3.setBold(false);
-        font3.setWeight(50);
-        dSpinBoxVelMin->setFont(font3);
+        QFont font2;
+        font2.setPointSize(12);
+        font2.setBold(false);
+        font2.setWeight(50);
+        dSpinBoxVelMin->setFont(font2);
         dSpinBoxVelMin->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
         dSpinBoxVelMin->setDecimals(2);
         dSpinBoxVelMin->setMinimum(0.010000000000000);
@@ -319,17 +331,19 @@ public:
 
         layoutVelocity->addWidget(dSpinBoxVelMin);
 
-        labelGenVelMax = new QLabel(widget);
+        labelGenVelMax = new QLabel(randomGen);
         labelGenVelMax->setObjectName(QString::fromUtf8("labelGenVelMax"));
-        labelGenVelMax->setFont(font);
+        QFont font3;
+        font3.setPointSize(10);
+        labelGenVelMax->setFont(font3);
         labelGenVelMax->setLayoutDirection(Qt::LeftToRight);
         labelGenVelMax->setAlignment(Qt::AlignCenter);
 
         layoutVelocity->addWidget(labelGenVelMax);
 
-        dSpinBoxVelMax = new QDoubleSpinBox(widget);
+        dSpinBoxVelMax = new QDoubleSpinBox(randomGen);
         dSpinBoxVelMax->setObjectName(QString::fromUtf8("dSpinBoxVelMax"));
-        dSpinBoxVelMax->setFont(font3);
+        dSpinBoxVelMax->setFont(font2);
         dSpinBoxVelMax->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
         dSpinBoxVelMax->setDecimals(2);
         dSpinBoxVelMax->setMinimum(0.010000000000000);
@@ -338,6 +352,16 @@ public:
         dSpinBoxVelMax->setValue(0.950000000000000);
 
         layoutVelocity->addWidget(dSpinBoxVelMax);
+
+
+        verticalLayout->addLayout(layoutVelocity);
+
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer);
+
+
+        verticalLayout_2->addLayout(verticalLayout);
 
         controlPanel->addTab(randomGen, QString());
 
@@ -375,8 +399,8 @@ public:
         layoutUsePlan->setObjectName(QString::fromUtf8("layoutUsePlan"));
         labelUsePlan = new QLabel(centralwidget);
         labelUsePlan->setObjectName(QString::fromUtf8("labelUsePlan"));
-        labelUsePlan->setMinimumSize(QSize(88, 0));
-        labelUsePlan->setMaximumSize(QSize(88, 16777215));
+        labelUsePlan->setMinimumSize(QSize(100, 0));
+        labelUsePlan->setMaximumSize(QSize(100, 16777215));
         labelUsePlan->setFont(font);
         labelUsePlan->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
@@ -401,8 +425,8 @@ public:
 
         labelResT = new QLabel(centralwidget);
         labelResT->setObjectName(QString::fromUtf8("labelResT"));
-        labelResT->setMinimumSize(QSize(110, 0));
-        labelResT->setMaximumSize(QSize(110, 16777215));
+        labelResT->setMinimumSize(QSize(130, 0));
+        labelResT->setMaximumSize(QSize(130, 16777215));
         labelResT->setFont(font);
         labelResT->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
@@ -410,9 +434,13 @@ public:
 
         labelT = new QLabel(centralwidget);
         labelT->setObjectName(QString::fromUtf8("labelT"));
-        labelT->setMinimumSize(QSize(90, 0));
-        labelT->setMaximumSize(QSize(90, 16777215));
-        labelT->setFont(font4);
+        labelT->setMinimumSize(QSize(100, 0));
+        labelT->setMaximumSize(QSize(100, 16777215));
+        QFont font5;
+        font5.setPointSize(12);
+        font5.setBold(true);
+        font5.setWeight(75);
+        labelT->setFont(font5);
         labelT->setFrameShape(QFrame::NoFrame);
         labelT->setLineWidth(1);
         labelT->setAlignment(Qt::AlignCenter);
@@ -655,8 +683,8 @@ public:
         labelGenPreys->setText(QCoreApplication::translate("MainWindow", "Yerps:", nullptr));
         checkBoxRandomN->setText(QCoreApplication::translate("MainWindow", "Preys from 1 to 11", nullptr));
         checkBoxRandomM->setText(QCoreApplication::translate("MainWindow", "Yerps from 1 to 2", nullptr));
-        labelGenVelMin->setText(QCoreApplication::translate("MainWindow", "Set Prey's velocity from", nullptr));
         checkBoxAllYerpsToZero->setText(QCoreApplication::translate("MainWindow", "Set all Yerps to (0, 0)", nullptr));
+        labelGenVelMin->setText(QCoreApplication::translate("MainWindow", "Set Prey's velocity from", nullptr));
         labelGenVelMax->setText(QCoreApplication::translate("MainWindow", "To", nullptr));
         controlPanel->setTabText(controlPanel->indexOf(randomGen), QCoreApplication::translate("MainWindow", "Generation settings", nullptr));
         rBConstruction->setText(QCoreApplication::translate("MainWindow", "Construction Mode", nullptr));
