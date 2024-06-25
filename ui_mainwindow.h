@@ -59,20 +59,17 @@ public:
     QLabel *labelPreysNum;
     QLabel *labelPreys;
     QLabel *labelYerpsNum;
-    QWidget *layoutWidget;
-    QVBoxLayout *verticalLayout;
-    QRadioButton *rBConstruction;
-    QRadioButton *rBAnimation;
-    QWidget *layoutWidget1;
-    QHBoxLayout *layoutResT;
-    QLabel *labelResT;
-    QLabel *labelT;
     QWidget *randomGen;
     QVBoxLayout *vLScene;
     QProgressBar *progressBar;
+    QHBoxLayout *horizontalLayout_3;
+    QRadioButton *rBConstruction;
+    QRadioButton *rBAnimation;
     QHBoxLayout *layoutUsePlan;
     QLabel *labelUsePlan;
     QLineEdit *lineEditUsePlan;
+    QLabel *labelResT;
+    QLabel *labelT;
     QPushButton *buttonUsePlan;
     QPushButton *buttonBestPlan;
     QHBoxLayout *horizontalLayout;
@@ -144,8 +141,8 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(controlPanel->sizePolicy().hasHeightForWidth());
         controlPanel->setSizePolicy(sizePolicy);
-        controlPanel->setMinimumSize(QSize(400, 0));
-        controlPanel->setMaximumSize(QSize(400, 16777215));
+        controlPanel->setMinimumSize(QSize(380, 0));
+        controlPanel->setMaximumSize(QSize(380, 16777215));
         QFont font;
         font.setPointSize(10);
         controlPanel->setFont(font);
@@ -193,42 +190,6 @@ public:
 
         layoutEntities->addWidget(labelYerpsNum);
 
-        layoutWidget = new QWidget(info);
-        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 110, 361, 52));
-        verticalLayout = new QVBoxLayout(layoutWidget);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        verticalLayout->setContentsMargins(0, 0, 0, 0);
-        rBConstruction = new QRadioButton(layoutWidget);
-        rBConstruction->setObjectName(QString::fromUtf8("rBConstruction"));
-        rBConstruction->setChecked(true);
-
-        verticalLayout->addWidget(rBConstruction);
-
-        rBAnimation = new QRadioButton(layoutWidget);
-        rBAnimation->setObjectName(QString::fromUtf8("rBAnimation"));
-        rBAnimation->setEnabled(false);
-
-        verticalLayout->addWidget(rBAnimation);
-
-        layoutWidget1 = new QWidget(info);
-        layoutWidget1->setObjectName(QString::fromUtf8("layoutWidget1"));
-        layoutWidget1->setGeometry(QRect(10, 180, 221, 21));
-        layoutResT = new QHBoxLayout(layoutWidget1);
-        layoutResT->setObjectName(QString::fromUtf8("layoutResT"));
-        layoutResT->setContentsMargins(0, 0, 0, 0);
-        labelResT = new QLabel(layoutWidget1);
-        labelResT->setObjectName(QString::fromUtf8("labelResT"));
-
-        layoutResT->addWidget(labelResT);
-
-        labelT = new QLabel(layoutWidget1);
-        labelT->setObjectName(QString::fromUtf8("labelT"));
-        labelT->setFont(font1);
-        labelT->setAlignment(Qt::AlignCenter);
-
-        layoutResT->addWidget(labelT);
-
         controlPanel->addTab(info, QString());
         randomGen = new QWidget();
         randomGen->setObjectName(QString::fromUtf8("randomGen"));
@@ -243,6 +204,26 @@ public:
         progressBar->setValue(0);
 
         vLScene->addWidget(progressBar);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        rBConstruction = new QRadioButton(centralwidget);
+        rBConstruction->setObjectName(QString::fromUtf8("rBConstruction"));
+        rBConstruction->setFont(font);
+        rBConstruction->setChecked(true);
+
+        horizontalLayout_3->addWidget(rBConstruction);
+
+        rBAnimation = new QRadioButton(centralwidget);
+        rBAnimation->setObjectName(QString::fromUtf8("rBAnimation"));
+        rBAnimation->setEnabled(false);
+        rBAnimation->setFont(font);
+        rBAnimation->setLayoutDirection(Qt::LeftToRight);
+
+        horizontalLayout_3->addWidget(rBAnimation);
+
+
+        vLScene->addLayout(horizontalLayout_3);
 
         layoutUsePlan = new QHBoxLayout();
         layoutUsePlan->setObjectName(QString::fromUtf8("layoutUsePlan"));
@@ -271,6 +252,24 @@ public:
         lineEditUsePlan->setAlignment(Qt::AlignCenter);
 
         layoutUsePlan->addWidget(lineEditUsePlan);
+
+        labelResT = new QLabel(centralwidget);
+        labelResT->setObjectName(QString::fromUtf8("labelResT"));
+        labelResT->setMinimumSize(QSize(110, 0));
+        labelResT->setMaximumSize(QSize(110, 16777215));
+        labelResT->setFont(font);
+        labelResT->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        layoutUsePlan->addWidget(labelResT);
+
+        labelT = new QLabel(centralwidget);
+        labelT->setObjectName(QString::fromUtf8("labelT"));
+        labelT->setMinimumSize(QSize(120, 0));
+        labelT->setMaximumSize(QSize(120, 16777215));
+        labelT->setFont(font2);
+        labelT->setAlignment(Qt::AlignCenter);
+
+        layoutUsePlan->addWidget(labelT);
 
         buttonUsePlan = new QPushButton(centralwidget);
         buttonUsePlan->setObjectName(QString::fromUtf8("buttonUsePlan"));
@@ -325,6 +324,7 @@ public:
         dSBTime->setObjectName(QString::fromUtf8("dSBTime"));
         dSBTime->setEnabled(false);
         dSBTime->setMinimumSize(QSize(80, 28));
+        dSBTime->setFont(font);
         dSBTime->setFrame(true);
         dSBTime->setAlignment(Qt::AlignCenter);
         dSBTime->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -502,16 +502,16 @@ public:
         labelPreysNum->setText(QCoreApplication::translate("MainWindow", "0", nullptr));
         labelPreys->setText(QCoreApplication::translate("MainWindow", "Yerps:", nullptr));
         labelYerpsNum->setText(QCoreApplication::translate("MainWindow", "0", nullptr));
-        rBConstruction->setText(QCoreApplication::translate("MainWindow", "Construction mode", nullptr));
-        rBAnimation->setText(QCoreApplication::translate("MainWindow", "Animation mode", nullptr));
-        labelResT->setText(QCoreApplication::translate("MainWindow", "Result Time:", nullptr));
-        labelT->setText(QString());
         controlPanel->setTabText(controlPanel->indexOf(info), QCoreApplication::translate("MainWindow", "General Info", nullptr));
         controlPanel->setTabText(controlPanel->indexOf(randomGen), QCoreApplication::translate("MainWindow", "Generation options", nullptr));
+        rBConstruction->setText(QCoreApplication::translate("MainWindow", "Construction Mode", nullptr));
+        rBAnimation->setText(QCoreApplication::translate("MainWindow", "Animation Mode", nullptr));
 #if QT_CONFIG(tooltip)
         labelUsePlan->setToolTip(QCoreApplication::translate("MainWindow", "Shows the control panel", nullptr));
 #endif // QT_CONFIG(tooltip)
         labelUsePlan->setText(QCoreApplication::translate("MainWindow", "Use Plan:", nullptr));
+        labelResT->setText(QCoreApplication::translate("MainWindow", "Result Time:", nullptr));
+        labelT->setText(QString());
 #if QT_CONFIG(tooltip)
         buttonUsePlan->setToolTip(QCoreApplication::translate("MainWindow", "Forces Yerps to intercept Preys in specified order", nullptr));
 #endif // QT_CONFIG(tooltip)

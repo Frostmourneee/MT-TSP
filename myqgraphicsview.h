@@ -45,12 +45,12 @@ public:
     void createPreyOnFullInfo(QPointF, QPointF, double);
     void zoomGraphics(double);
     void translateGraphics(QPointF);
-    void transformViewToOptimal();
     void preyTransform(Prey*, QPointF);
     void yerpTransform(Yerp*, QPointF);
     QVector<Prey* > prey;
     QVector<Yerp* > yerp;
-    QTimer* timer;
+    QTimer* timer4Animation;
+    QTimer* timer4DelayDueToResize;
     QGraphicsScene* scene;
     QGraphicsRectItem* genRect;
 
@@ -64,6 +64,7 @@ public slots:
     void mouseReleaseEvent(QMouseEvent* e) override;
     void wheelEvent(QWheelEvent *) override;
     void resizeEvent(QResizeEvent* e) override;
+    void transformViewToOptimal();
 
 private:
     double distSqr(QPointF a, QPointF b) {return (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y());};

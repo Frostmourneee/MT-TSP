@@ -5,6 +5,8 @@
 //TODO сортировка по иксам работает?
 //TODO нельзя задать план из двузначной цели
 //TODO позволить при большом N не искать оптимум, а просто летать
+//TODO посмотреть размер итогового времени лейбла
+//TODO исправить почему-то Z->I->I не даёт оптимального вью
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -60,7 +62,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionFullscreen->setIcon(QIcon("fullscreenIcon.png"));
     ui->actionExit->setIcon(QIcon("exitIcon.png"));
 
-    connect(view->timer, SIGNAL(timeout()), this, SLOT(sliderTick()));
+    connect(view->timer4Animation, SIGNAL(timeout()), this, SLOT(sliderTick()));
+    connect(view->timer4DelayDueToResize, SIGNAL(timeout()), view, SLOT(transformViewToOptimal()));
 
     connect(view, SIGNAL(preyWasCreatedOrDestroyed()), this, SLOT(preyWasCreatedOrDestroyed()));
     connect(view, SIGNAL(yerpWasCreatedOrDestroyed()), this, SLOT(yerpWasCreatedOrDestroyed()));
@@ -68,7 +71,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->controlPanel->setStyleSheet("background-color: rgb(240, 240, 240);");
     ui->controlPanel->hide();
 
-    connect(ui->lineEditUsePlan, SIGNAL(returnPressed()), this, SLOT(setFocus()));    
+    connect(ui->lineEditUsePlan, SIGNAL(returnPressed()), this, SLOT(setFocus()));
 }
 
 MainWindow::~MainWindow()
@@ -127,7 +130,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         }
         case Qt::Key_T: // Test key
         {
-
+            qDebug() << view->width() << view->height();
             break;
         }
     }
@@ -195,7 +198,6 @@ void MainWindow::setBestPlanToLineEditUsePlan()
         toLineEdit += "; ";
     }
     toLineEdit.chop(1);
-    if (view->yerp.size() == 1) toLineEdit += " ;";
     ui->lineEditUsePlan->setText(toLineEdit);
 }
 void MainWindow::on_sliderTime_valueChanged(int newV)
@@ -277,11 +279,11 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
         ui->playButton->setIcon(QIcon("playIcon.png"));
         ui->actionPlay->setIcon(QIcon("playIcon.png"));
         ui->sliderTime->setEnabled(true);
-        view->timer->stop();
+        view->timer4Animation->stop();
     } // Animation has ended
 
     //===============// Placing positions via mouse click
-    if (view->timer->isActive()) return;
+    if (view->timer4Animation->isActive()) return;
     QPointF newP;
     for (Prey* p : view->prey) {
         if (p->getIsDied()) {
@@ -334,13 +336,13 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
 void MainWindow::on_playButton_clicked()
 {
     if (view->getStatus() != StatusScene::animationMode) return;
-    if (view->timer->isActive()) {
-        view->timer->stop();
+    if (view->timer4Animation->isActive()) {
+        view->timer4Animation->stop();
         ui->playButton->setIcon(QIcon("playIcon.png"));
         ui->actionPlay->setIcon(QIcon("playIcon.png"));
         ui->sliderTime->setEnabled(true);
     } else {
-        view->timer->start(10);
+        view->timer4Animation->start(10);
         ui->playButton->setIcon(QIcon("pauseIcon.png"));
         ui->actionPlay->setIcon(QIcon("pauseIcon.png"));
         ui->sliderTime->setEnabled(false);
@@ -358,9 +360,9 @@ void MainWindow::on_speedUpButton_clicked()
     QVector<int> tickVar;
     tickVar.push_back(10); tickVar.push_back(5); tickVar.push_back(2); tickVar.push_back(1);
 
-    int tick = tickVar[(tickVar.indexOf(view->timer->interval())+1) % 4]; // 10 -> 5 -> 2 -> 1 -> 10
+    int tick = tickVar[(tickVar.indexOf(view->timer4Animation->interval())+1) % 4]; // 10 -> 5 -> 2 -> 1 -> 10
 
-    view->timer->setInterval(tick);
+    view->timer4Animation->setInterval(tick);
 }
 void MainWindow::on_actionSpeedUp_triggered()
 {
@@ -393,7 +395,8 @@ void MainWindow::on_actionOptimalZoom_triggered()
 void MainWindow::on_optionsButton_clicked()
 {
     ui->controlPanel->isVisible() ? ui->controlPanel->hide() : ui->controlPanel->show();
-    view->transformViewToOptimal();
+    view->timer4DelayDueToResize->start(1); // 1ms delay to wait for view resizement due to ui->controlPanel->hide()
+    //view->transformViewToOptimal();
 }
 void MainWindow::on_actionShow_triggered()
 {
@@ -412,6 +415,13 @@ void MainWindow::on_buttonUsePlan_clicked()
                 plan4SecondYerp.push_back(i.toInt());
 
     QPalette palette;
+    if (view->yerp.size() == 2 && !plan4SecondYerp.isEmpty())
+    {
+        palette.setColor(QPalette::Text,Qt::red);
+        ui->lineEditUsePlan->setPalette(palette);
+        return;
+    } // Only one Yerp but smth is written in lineEdit after first Yerp
+
     if (plan4FirstYerp.size()+plan4SecondYerp.size() != view->prey.size()) {
         palette.setColor(QPalette::Text,Qt::red);
         ui->lineEditUsePlan->setPalette(palette);
@@ -527,7 +537,7 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     ui->buttonBestPlan->setEnabled(false);
     ui->actionUseBestPlan->setEnabled(false);
 
-    view->timer->start(10);
+    view->timer4Animation->start(10);
 
     for (Prey* p : view->prey)
     {
@@ -580,7 +590,7 @@ void MainWindow::on_actionClear_triggered()
     double x = pMathCursorPos.x();
     double y = pMathCursorPos.y();
     view->textCoords(x + 0.02, y - 0.02);
-    view->timer->start(10);
+    view->timer4Animation->start(10);
 }
 void MainWindow::on_actionExit_triggered()
 {
@@ -911,7 +921,7 @@ void MainWindow::solvingEnded()
     ui->actionUsePlan->setEnabled(true);
     ui->buttonBestPlan->setEnabled(true);
     ui->actionUseBestPlan->setEnabled(true);
-    view->timer->stop();
+    view->timer4Animation->stop();
 
     for (Prey* p : view->prey)
     {

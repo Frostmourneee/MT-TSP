@@ -27,13 +27,12 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent) : QGraphicsView(parent)
     genRect->setBrush(QBrush(Qt::transparent));
     scene->addItem(genRect);
 
-    timer = new QTimer(this);
-    timer->setSingleShot(false);
-    connect(timer, SIGNAL(timeout()), scene, SLOT(advance()));
-    timer->start(10);
+    timer4Animation = new QTimer(this);
+    connect(timer4Animation, SIGNAL(timeout()), scene, SLOT(advance()));
+    timer4Animation->start(10);
 
-
-
+    timer4DelayDueToResize = new QTimer(this);
+    timer4DelayDueToResize->setSingleShot(true);
 }
 
 void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
@@ -514,7 +513,11 @@ void MyQGraphicsView::transformViewToOptimal()
     sCoordCenter = QPointF(w/2., h/2.);
     zoomGraphics(1); // Reseting to default view to avoid problems
 
-    double xMin = yerp[0]->getStart().x(), xMax = yerp[0]->getStart().x(), yMin = yerp[0]->getStart().y(), yMax = yerp[0]->getStart().y();
+    QPointF initP = yerp.isEmpty() ? prey[0]->getStart() : yerp[0]->getStart();
+    double xMin = initP.x();
+    double xMax = initP.x();
+    double yMin = initP.y();
+    double yMax = initP.y();
     double sX, sY; // Start X, Y
     for (Prey* p : prey)
     {
