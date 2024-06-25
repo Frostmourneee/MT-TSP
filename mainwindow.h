@@ -77,5 +77,9 @@ private slots:
     void on_buttonBestPlan_clicked();
     void on_actionUsePlan_triggered();
     void on_actionUseBestPlan_triggered();
+    void on_checkBoxRandomM_stateChanged(int);
+    void on_checkBoxRandomN_stateChanged(int);
+    void on_dSpinBoxVelMin_editingFinished();
+    void on_dSpinBoxVelMax_editingFinished();
 };
 #endif // MAINWINDOW_H

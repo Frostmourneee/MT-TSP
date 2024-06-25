@@ -35,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(solver, SIGNAL(changeProgressBar(long long, long long)), this, SLOT(changeProgressBar(long long, long long)));
     solver->moveToThread(thread);
 
-    ui->progressBar->setStyleSheet("text-align: center");
     ui->buttonUsePlan->setIcon(QIcon("usePlanIcon.png"));
     ui->actionUsePlan->setIcon(QIcon("usePlanIcon.png"));
     ui->buttonBestPlan->setIcon(QIcon("bestPlanIcon.png"));
@@ -65,10 +64,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(view, SIGNAL(preyWasCreatedOrDestroyed()), this, SLOT(preyWasCreatedOrDestroyed()));
     connect(view, SIGNAL(yerpWasCreatedOrDestroyed()), this, SLOT(yerpWasCreatedOrDestroyed()));
 
+    ui->progressBar->setStyleSheet("text-align: center");
     ui->controlPanel->setStyleSheet("background-color: rgb(240, 240, 240);");
     ui->controlPanel->hide();
+    ui->spinBoxPreys->setStyleSheet("background-color: white;");
+    ui->spinBoxYerps->setStyleSheet("background-color: white;");
+    ui->dSpinBoxVelMin->setStyleSheet("background-color: white;");
+    ui->dSpinBoxVelMax->setStyleSheet("background-color: white;");
 
     connect(ui->lineEditUsePlan, SIGNAL(returnPressed()), this, SLOT(setFocus()));
+    connect(ui->spinBoxPreys, SIGNAL(editingFinished()), this, SLOT(setFocus()));
+    connect(ui->spinBoxYerps, SIGNAL(editingFinished()), this, SLOT(setFocus()));
+    connect(ui->dSpinBoxVelMin, SIGNAL(editingFinished()), this, SLOT(setFocus()));
+    connect(ui->dSpinBoxVelMax, SIGNAL(editingFinished()), this, SLOT(setFocus()));
 }
 
 MainWindow::~MainWindow()
@@ -392,7 +400,7 @@ void MainWindow::on_actionOptimalZoom_triggered()
 void MainWindow::on_optionsButton_clicked()
 {
     view->setResizeDueToOnOptionsButtonClicked(true); // Should be BEFORE the next code
-    ui->controlPanel->isVisible() ? ui->controlPanel->hide() : ui->controlPanel->show(); // This code will trigger resizeEvent on view, so view->ViewToOptimal() will be triggered properly there
+    ui->controlPanel->setVisible(!ui->controlPanel->isVisible()); // This code will trigger resizeEvent on view, so view->ViewToOptimal() will be triggered properly there
 }
 void MainWindow::on_actionShow_triggered()
 {
@@ -607,8 +615,8 @@ void MainWindow::on_actionRandom_triggered()
     double xmin = QString::number(genLeft.x(), 'f', 2).toDouble();
     double ymax = QString::number(genLeft.y(), 'f', 2).toDouble();
     double ymin = QString::number(genRight.y(), 'f', 2).toDouble();
-    double maxVel1f = 7;
-    double minVel1f = 5;
+    double maxVel = ui->dSpinBoxVelMax->value();
+    double minVel = ui->dSpinBoxVelMin->value();
 
     if (xmax <= xmin || ymax <= ymin) {
         QMessageBox::critical(this, "MT-TSP", "Invalid generation bounds\n");
@@ -617,13 +625,19 @@ void MainWindow::on_actionRandom_triggered()
 
     on_actionClear_triggered();
     srand(time(NULL));
-    int M = rand()%2 + 1;
-    int N = rand()%12 + 1;
+    int M = ui->checkBoxRandomM->isChecked() ? rand()%2 + 1 : ui->spinBoxYerps->value();
+    int N = ui->checkBoxRandomN->isChecked() ? rand()%11 + 1 : ui->spinBoxPreys->value();
 
     int parts;
     double r2fValue, x, y, v, xEnd, yEnd;
     for (int i = 0; i < M; i++) // Yerps generation
     {
+        if (ui->checkBoxAllYerpsToZero->isChecked())
+        {
+            view->createYerp(QPointF(0., 0.));
+            continue;
+        }
+
         parts = (xmax-xmin)*100;
         r2fValue = xmin + rand()%(parts + 1)*0.01;
         if (r2fValue > xmax) r2fValue = xmax;
@@ -670,10 +684,10 @@ void MainWindow::on_actionRandom_triggered()
         else if (r2fValue < ymin) r2fValue = ymin;
         yEnd = r2fValue;
 
-        parts = (maxVel1f-minVel1f)*10;
-        r2fValue = minVel1f*0.1 + rand()%(parts + 1)*0.01;
+        parts = (maxVel-minVel)*100;
+        r2fValue = minVel + rand()%(parts + 1)*0.01;
         v = r2fValue;
-        if (r2fValue >= maxVel1f*0.1) v = maxVel1f*0.1;
+        if (r2fValue >= maxVel) v = maxVel;
 
         view->createPreyOnFullInfo(QPointF(x, y), QPointF(xEnd, yEnd), v);
     }
@@ -801,6 +815,24 @@ void MainWindow::on_actionLoad_from_file_triggered()
 
     view->transformViewToOptimal();
 }
+void MainWindow::on_checkBoxRandomM_stateChanged(int isChecked)
+{
+    ui->spinBoxYerps->setEnabled(!isChecked);
+}
+void MainWindow::on_checkBoxRandomN_stateChanged(int isChecked)
+{
+    ui->spinBoxPreys->setEnabled(!isChecked);
+}
+void MainWindow::on_dSpinBoxVelMin_editingFinished()
+{
+    ui->dSpinBoxVelMax->setMinimum(ui->dSpinBoxVelMin->value());
+}
+void MainWindow::on_dSpinBoxVelMax_editingFinished()
+{
+    ui->dSpinBoxVelMin->setMaximum(ui->dSpinBoxVelMax->value());
+}
+
+
 void MainWindow::saveDataToFile(FILE *f)
 {
     fprintf(f, "Yerps #\n");
@@ -855,7 +887,6 @@ void MainWindow::saveDataToFile(FILE *f)
                                                        maxSignsX, maxSignsY, maxSignsAlpha, maxSignsV, maxSignsXEnd, maxSignsYEnd).toStdString().c_str());
     fclose(f);
 }
-
 QString MainWindow::preyDataStrSave(double x, double y, double alpha, double v, double xEnd, double yEnd, int maxX, int maxY, int maxAlpha, int maxV, int maxXEnd, int maxYEnd)
 {
     QString str = "";
@@ -898,7 +929,7 @@ void MainWindow::solvingEnded()
     ui->rBAnimation->setChecked(true);
 
     ui->lineEditUsePlan->setEnabled(true);
-    ui->lineEditUsePlan->setStyleSheet("background-color: rgb(255, 255, 255);");
+    ui->lineEditUsePlan->setStyleSheet("background-color: white;");
     ui->progressBar->setValue(0);
     ui->dSBTime->setMaximum(solver->getResT());
     ui->dSBTime->setValue(0);
@@ -976,3 +1007,4 @@ int MainWindow::signs(double r)
 
     return tmp++;
 }
+
