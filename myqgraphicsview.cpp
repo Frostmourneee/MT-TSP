@@ -31,8 +31,7 @@ MyQGraphicsView::MyQGraphicsView(QWidget *parent) : QGraphicsView(parent)
     connect(timer4Animation, SIGNAL(timeout()), scene, SLOT(advance()));
     timer4Animation->start(10);
 
-    timer4DelayDueToResize = new QTimer(this);
-    timer4DelayDueToResize->setSingleShot(true);
+
 }
 
 void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
@@ -345,6 +344,9 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
         y->moveBy(delta.x(), delta.y());
         y->setSStart(newSStart);
     }
+
+    if (resizeDueToOnOptionsButtonClicked) transformViewToOptimal();
+    resizeDueToOnOptionsButtonClicked = false;
 }
 void MyQGraphicsView::createYerp(QPointF pMath)
 {

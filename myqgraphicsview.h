@@ -35,6 +35,7 @@ public:
     void setSF(double fact) {mouseSF = fact; sceneSF = mouseSF >= 1 ? mouseSF : 1/(1+100*(1-mouseSF));}
     void setAnchor(QPointF p) {anchor = p;}
     void setSCoordCenter(QPointF p) {sCoordCenter = p;}
+    void setResizeDueToOnOptionsButtonClicked(bool b) {resizeDueToOnOptionsButtonClicked = b;}
     void clear();
     void backAction();
     void textCoords(double x, double y);
@@ -45,12 +46,12 @@ public:
     void createPreyOnFullInfo(QPointF, QPointF, double);
     void zoomGraphics(double);
     void translateGraphics(QPointF);
+    void transformViewToOptimal();
     void preyTransform(Prey*, QPointF);
     void yerpTransform(Yerp*, QPointF);
     QVector<Prey* > prey;
     QVector<Yerp* > yerp;
     QTimer* timer4Animation;
-    QTimer* timer4DelayDueToResize;
     QGraphicsScene* scene;
     QGraphicsRectItem* genRect;
 
@@ -64,7 +65,6 @@ public slots:
     void mouseReleaseEvent(QMouseEvent* e) override;
     void wheelEvent(QWheelEvent *) override;
     void resizeEvent(QResizeEvent* e) override;
-    void transformViewToOptimal();
 
 private:
     double distSqr(QPointF a, QPointF b) {return (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y());};
@@ -86,6 +86,7 @@ private:
     double unit{baseUnit}; // Pixels per 1 coord unit
     double mouseSF = 1;
     double sceneSF = 1;
+    bool resizeDueToOnOptionsButtonClicked = false;
 };
 
 #endif // MYQGRAPCHICSVIEW_H

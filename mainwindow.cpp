@@ -63,7 +63,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionExit->setIcon(QIcon("exitIcon.png"));
 
     connect(view->timer4Animation, SIGNAL(timeout()), this, SLOT(sliderTick()));
-    connect(view->timer4DelayDueToResize, SIGNAL(timeout()), view, SLOT(transformViewToOptimal()));
 
     connect(view, SIGNAL(preyWasCreatedOrDestroyed()), this, SLOT(preyWasCreatedOrDestroyed()));
     connect(view, SIGNAL(yerpWasCreatedOrDestroyed()), this, SLOT(yerpWasCreatedOrDestroyed()));
@@ -394,9 +393,8 @@ void MainWindow::on_actionOptimalZoom_triggered()
 }
 void MainWindow::on_optionsButton_clicked()
 {
-    ui->controlPanel->isVisible() ? ui->controlPanel->hide() : ui->controlPanel->show();
-    view->timer4DelayDueToResize->start(1); // 1ms delay to wait for view resizement due to ui->controlPanel->hide()
-    //view->transformViewToOptimal();
+    view->setResizeDueToOnOptionsButtonClicked(true); // Should be BEFORE the next code
+    ui->controlPanel->isVisible() ? ui->controlPanel->hide() : ui->controlPanel->show(); // This code will trigger resizeEvent on view, so view->ViewToOptimal() will be triggered properly there
 }
 void MainWindow::on_actionShow_triggered()
 {
