@@ -169,137 +169,6 @@
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
-          <x>11</x>
-          <y>61</y>
-          <width>361</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="layoutUsePlan">
-         <item>
-          <widget class="QLabel" name="labelUsePlan">
-           <property name="minimumSize">
-            <size>
-             <width>88</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>88</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Use plan:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEditUsePlan">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="buttonUsePlan">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-           <property name="default">
-            <bool>false</bool>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="buttonBestPlan">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-           <property name="default">
-            <bool>false</bool>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="">
-        <property name="geometry">
-         <rect>
           <x>10</x>
           <y>180</y>
           <width>221</width>
@@ -350,6 +219,143 @@
        </widget>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="layoutUsePlan">
+        <item>
+         <widget class="QLabel" name="labelUsePlan">
+          <property name="minimumSize">
+           <size>
+            <width>88</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>88</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Shows the control panel</string>
+          </property>
+          <property name="text">
+           <string>Use Plan:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEditUsePlan">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="buttonUsePlan">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Forces Yerps to intercept Preys in specified order</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>false</bool>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="buttonBestPlan">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Sets interception order to the optimal one</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>false</bool>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QPushButton" name="playButton">
@@ -367,6 +373,9 @@
             <width>32</width>
             <height>32</height>
            </size>
+          </property>
+          <property name="toolTip">
+           <string>Starts the animation in Animation mode</string>
           </property>
           <property name="text">
            <string/>
@@ -404,6 +413,9 @@
             <width>32</width>
             <height>32</height>
            </size>
+          </property>
+          <property name="toolTip">
+           <string>Speeds up animation by x2, x5, x10, x1</string>
           </property>
           <property name="text">
            <string/>
@@ -480,6 +492,9 @@
             <height>32</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Shows the control panel</string>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -517,6 +532,9 @@
             <height>32</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Sets the view to have all Preys and Yerps on it</string>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -538,7 +556,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="resetZoomButton">
+         <widget class="QPushButton" name="resetViewButton">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -553,6 +571,9 @@
             <width>32</width>
             <height>32</height>
            </size>
+          </property>
+          <property name="toolTip">
+           <string>Reset view to default</string>
           </property>
           <property name="text">
            <string/>
@@ -593,7 +614,6 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionClear"/>
     <addaction name="actionLoad_from_file"/>
     <addaction name="actionSave_as"/>
    </widget>
@@ -608,6 +628,7 @@
     <property name="title">
      <string>Action</string>
     </property>
+    <addaction name="actionClear"/>
     <addaction name="actionRandom"/>
     <addaction name="actionStart"/>
     <addaction name="actionBack"/>
@@ -627,7 +648,7 @@
     <addaction name="actionPlay"/>
     <addaction name="actionSpeedUp"/>
     <addaction name="actionOptimalZoom"/>
-    <addaction name="actionDefaultZoom"/>
+    <addaction name="actionResetView"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -636,12 +657,9 @@
    <addaction name="menuAnimation_Control"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionClear">
+  <action name="actionClear1">
    <property name="text">
-    <string>New Configuration...</string>
-   </property>
-   <property name="shortcut">
-    <string>R</string>
+    <string>Restart</string>
    </property>
   </action>
   <action name="actionLoad_from_file">
@@ -763,12 +781,20 @@
     <string>Z</string>
    </property>
   </action>
-  <action name="actionDefaultZoom">
+  <action name="actionResetView">
    <property name="text">
     <string>Default Scene View</string>
    </property>
    <property name="shortcut">
     <string>H</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>Restart</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
    </property>
   </action>
  </widget>

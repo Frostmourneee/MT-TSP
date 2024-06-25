@@ -497,8 +497,6 @@ void MyQGraphicsView::resizeCoordlines()
 }
 void MyQGraphicsView::translateGraphics(QPointF sTranslateVec)
 {
-    if (status != StatusScene::animationMode) return;
-
     sCoordCenter += sTranslateVec;
     for (Prey* p : prey) preyTransform(p, sceneToCoords(p->pos()+sTranslateVec));
     for (Yerp* y : yerp) yerpTransform(y, sceneToCoords(y->pos()+sTranslateVec));
@@ -507,6 +505,8 @@ void MyQGraphicsView::translateGraphics(QPointF sTranslateVec)
 }
 void MyQGraphicsView::transformViewToOptimal()
 {
+    if (prey.size() < 2 && yerp.size() < 2) return;
+
     int w = width();
     int h = height();
     sceneSF = 1;
@@ -515,21 +515,15 @@ void MyQGraphicsView::transformViewToOptimal()
     zoomGraphics(1); // Reseting to default view to avoid problems
 
     double xMin = yerp[0]->getStart().x(), xMax = yerp[0]->getStart().x(), yMin = yerp[0]->getStart().y(), yMax = yerp[0]->getStart().y();
-    double sX, sY, dX, dY;
+    double sX, sY; // Start X, Y
     for (Prey* p : prey)
     {
         sX = p->getStart().x();
         sY = p->getStart().y();
-        dX = p->getDiePoint().x();
-        dY = p->getDiePoint().y();
         if (xMin > sX) xMin = sX;
-        if (xMin > dX) xMin = dX;
         if (xMax < sX) xMax = sX;
-        if (xMax < dX) xMax = dX;
         if (yMin > sY) yMin = sY;
-        if (yMin > dY) yMin = dY;
         if (yMax < sY) yMax = sY;
-        if (yMax < dY) yMax = dY;
     }
 
     for (Yerp* y : yerp)
@@ -542,6 +536,32 @@ void MyQGraphicsView::transformViewToOptimal()
         if (yMax < sY) yMax = sY;
     }
 
+    double eX, eY, dX, dY; // End X, Y, Die X, Y
+    if (status == StatusScene::animationMode)
+    {
+        for (Prey* p : prey)
+        {
+            dX = p->getDiePoint().x();
+            dY = p->getDiePoint().y();
+            if (xMin > dX) xMin = dX;
+            if (xMax < dX) xMax = dX;
+            if (yMin > dY) yMin = dY;
+            if (yMax < dY) yMax = dY;
+        }
+    }
+    else
+    {
+        for (Prey* p : prey)
+        {
+            eX = p->getEnd().x();
+            eY = p->getEnd().y();
+            if (xMin > eX) xMin = eX;
+            if (xMax < eX) xMax = eX;
+            if (yMin > eY) yMin = eY;
+            if (yMax < eY) yMax = eY;
+        }
+    }
+
     QPointF coordCenter = QPointF((xMin+xMax)/2, (yMin+yMax)/2);
     translateGraphics(QPointF(w/2., h/2.) - coordsToScene(coordCenter)); // Translation part
 
@@ -552,6 +572,7 @@ void MyQGraphicsView::transformViewToOptimal()
     sCoordCenter = QPointF(w/2., h/2.) + sceneSF*(sCoordCenter-QPointF(w/2., h/2.));
     zoomGraphics(sceneSF); // Zoom part
 }
+
 void MyQGraphicsView::preyTransform(Prey* p, QPointF st)
 {
     p->setPos(coordsToScene(st));

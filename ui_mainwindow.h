@@ -33,7 +33,7 @@ QT_BEGIN_NAMESPACE
 class Ui_MainWindow
 {
 public:
-    QAction *actionClear;
+    QAction *actionClear1;
     QAction *actionLoad_from_file;
     QAction *actionSave_as;
     QAction *actionFullscreen;
@@ -47,7 +47,8 @@ public:
     QAction *actionPlay;
     QAction *actionSpeedUp;
     QAction *actionOptimalZoom;
-    QAction *actionDefaultZoom;
+    QAction *actionResetView;
+    QAction *actionClear;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout_2;
     QTabWidget *controlPanel;
@@ -63,18 +64,17 @@ public:
     QRadioButton *rBConstruction;
     QRadioButton *rBAnimation;
     QWidget *layoutWidget1;
-    QHBoxLayout *layoutUsePlan;
-    QLabel *labelUsePlan;
-    QLineEdit *lineEditUsePlan;
-    QPushButton *buttonUsePlan;
-    QPushButton *buttonBestPlan;
-    QWidget *widget;
     QHBoxLayout *layoutResT;
     QLabel *labelResT;
     QLabel *labelT;
     QWidget *randomGen;
     QVBoxLayout *vLScene;
     QProgressBar *progressBar;
+    QHBoxLayout *layoutUsePlan;
+    QLabel *labelUsePlan;
+    QLineEdit *lineEditUsePlan;
+    QPushButton *buttonUsePlan;
+    QPushButton *buttonBestPlan;
     QHBoxLayout *horizontalLayout;
     QPushButton *playButton;
     QPushButton *speedUpButton;
@@ -82,7 +82,7 @@ public:
     QSlider *sliderTime;
     QPushButton *optionsButton;
     QPushButton *optimalZoomButton;
-    QPushButton *resetZoomButton;
+    QPushButton *resetViewButton;
     QMenuBar *menubar;
     QMenu *menuFile;
     QMenu *menuView;
@@ -96,8 +96,8 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
         MainWindow->resize(719, 315);
-        actionClear = new QAction(MainWindow);
-        actionClear->setObjectName(QString::fromUtf8("actionClear"));
+        actionClear1 = new QAction(MainWindow);
+        actionClear1->setObjectName(QString::fromUtf8("actionClear1"));
         actionLoad_from_file = new QAction(MainWindow);
         actionLoad_from_file->setObjectName(QString::fromUtf8("actionLoad_from_file"));
         actionSave_as = new QAction(MainWindow);
@@ -129,8 +129,10 @@ public:
         actionOptimalZoom = new QAction(MainWindow);
         actionOptimalZoom->setObjectName(QString::fromUtf8("actionOptimalZoom"));
         actionOptimalZoom->setEnabled(false);
-        actionDefaultZoom = new QAction(MainWindow);
-        actionDefaultZoom->setObjectName(QString::fromUtf8("actionDefaultZoom"));
+        actionResetView = new QAction(MainWindow);
+        actionResetView->setObjectName(QString::fromUtf8("actionResetView"));
+        actionClear = new QAction(MainWindow);
+        actionClear->setObjectName(QString::fromUtf8("actionClear"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout_2 = new QHBoxLayout(centralwidget);
@@ -211,69 +213,16 @@ public:
 
         layoutWidget1 = new QWidget(info);
         layoutWidget1->setObjectName(QString::fromUtf8("layoutWidget1"));
-        layoutWidget1->setGeometry(QRect(11, 61, 361, 34));
-        layoutUsePlan = new QHBoxLayout(layoutWidget1);
-        layoutUsePlan->setObjectName(QString::fromUtf8("layoutUsePlan"));
-        layoutUsePlan->setContentsMargins(0, 0, 0, 0);
-        labelUsePlan = new QLabel(layoutWidget1);
-        labelUsePlan->setObjectName(QString::fromUtf8("labelUsePlan"));
-        labelUsePlan->setMinimumSize(QSize(88, 0));
-        labelUsePlan->setMaximumSize(QSize(88, 16777215));
-        labelUsePlan->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
-
-        layoutUsePlan->addWidget(labelUsePlan);
-
-        lineEditUsePlan = new QLineEdit(layoutWidget1);
-        lineEditUsePlan->setObjectName(QString::fromUtf8("lineEditUsePlan"));
-        lineEditUsePlan->setEnabled(false);
-        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(lineEditUsePlan->sizePolicy().hasHeightForWidth());
-        lineEditUsePlan->setSizePolicy(sizePolicy1);
-        QFont font2;
-        font2.setPointSize(10);
-        font2.setBold(true);
-        font2.setWeight(75);
-        lineEditUsePlan->setFont(font2);
-        lineEditUsePlan->setAlignment(Qt::AlignCenter);
-
-        layoutUsePlan->addWidget(lineEditUsePlan);
-
-        buttonUsePlan = new QPushButton(layoutWidget1);
-        buttonUsePlan->setObjectName(QString::fromUtf8("buttonUsePlan"));
-        buttonUsePlan->setEnabled(false);
-        buttonUsePlan->setMinimumSize(QSize(32, 32));
-        buttonUsePlan->setMaximumSize(QSize(32, 32));
-        buttonUsePlan->setIconSize(QSize(32, 32));
-        buttonUsePlan->setAutoDefault(false);
-        buttonUsePlan->setFlat(true);
-
-        layoutUsePlan->addWidget(buttonUsePlan);
-
-        buttonBestPlan = new QPushButton(layoutWidget1);
-        buttonBestPlan->setObjectName(QString::fromUtf8("buttonBestPlan"));
-        buttonBestPlan->setEnabled(false);
-        buttonBestPlan->setMinimumSize(QSize(32, 32));
-        buttonBestPlan->setMaximumSize(QSize(32, 32));
-        buttonBestPlan->setIconSize(QSize(32, 32));
-        buttonBestPlan->setAutoDefault(false);
-        buttonBestPlan->setFlat(true);
-
-        layoutUsePlan->addWidget(buttonBestPlan);
-
-        widget = new QWidget(info);
-        widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setGeometry(QRect(10, 180, 221, 21));
-        layoutResT = new QHBoxLayout(widget);
+        layoutWidget1->setGeometry(QRect(10, 180, 221, 21));
+        layoutResT = new QHBoxLayout(layoutWidget1);
         layoutResT->setObjectName(QString::fromUtf8("layoutResT"));
         layoutResT->setContentsMargins(0, 0, 0, 0);
-        labelResT = new QLabel(widget);
+        labelResT = new QLabel(layoutWidget1);
         labelResT->setObjectName(QString::fromUtf8("labelResT"));
 
         layoutResT->addWidget(labelResT);
 
-        labelT = new QLabel(widget);
+        labelT = new QLabel(layoutWidget1);
         labelT->setObjectName(QString::fromUtf8("labelT"));
         labelT->setFont(font1);
         labelT->setAlignment(Qt::AlignCenter);
@@ -294,6 +243,59 @@ public:
         progressBar->setValue(0);
 
         vLScene->addWidget(progressBar);
+
+        layoutUsePlan = new QHBoxLayout();
+        layoutUsePlan->setObjectName(QString::fromUtf8("layoutUsePlan"));
+        labelUsePlan = new QLabel(centralwidget);
+        labelUsePlan->setObjectName(QString::fromUtf8("labelUsePlan"));
+        labelUsePlan->setMinimumSize(QSize(88, 0));
+        labelUsePlan->setMaximumSize(QSize(88, 16777215));
+        labelUsePlan->setFont(font);
+        labelUsePlan->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        layoutUsePlan->addWidget(labelUsePlan);
+
+        lineEditUsePlan = new QLineEdit(centralwidget);
+        lineEditUsePlan->setObjectName(QString::fromUtf8("lineEditUsePlan"));
+        lineEditUsePlan->setEnabled(false);
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(lineEditUsePlan->sizePolicy().hasHeightForWidth());
+        lineEditUsePlan->setSizePolicy(sizePolicy1);
+        QFont font2;
+        font2.setPointSize(10);
+        font2.setBold(true);
+        font2.setWeight(75);
+        lineEditUsePlan->setFont(font2);
+        lineEditUsePlan->setAlignment(Qt::AlignCenter);
+
+        layoutUsePlan->addWidget(lineEditUsePlan);
+
+        buttonUsePlan = new QPushButton(centralwidget);
+        buttonUsePlan->setObjectName(QString::fromUtf8("buttonUsePlan"));
+        buttonUsePlan->setEnabled(false);
+        buttonUsePlan->setMinimumSize(QSize(32, 32));
+        buttonUsePlan->setMaximumSize(QSize(32, 32));
+        buttonUsePlan->setIconSize(QSize(32, 32));
+        buttonUsePlan->setAutoDefault(false);
+        buttonUsePlan->setFlat(true);
+
+        layoutUsePlan->addWidget(buttonUsePlan);
+
+        buttonBestPlan = new QPushButton(centralwidget);
+        buttonBestPlan->setObjectName(QString::fromUtf8("buttonBestPlan"));
+        buttonBestPlan->setEnabled(false);
+        buttonBestPlan->setMinimumSize(QSize(32, 32));
+        buttonBestPlan->setMaximumSize(QSize(32, 32));
+        buttonBestPlan->setIconSize(QSize(32, 32));
+        buttonBestPlan->setAutoDefault(false);
+        buttonBestPlan->setFlat(true);
+
+        layoutUsePlan->addWidget(buttonBestPlan);
+
+
+        vLScene->addLayout(layoutUsePlan);
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
@@ -360,16 +362,16 @@ public:
 
         horizontalLayout->addWidget(optimalZoomButton);
 
-        resetZoomButton = new QPushButton(centralwidget);
-        resetZoomButton->setObjectName(QString::fromUtf8("resetZoomButton"));
-        resetZoomButton->setEnabled(true);
-        resetZoomButton->setMinimumSize(QSize(32, 32));
-        resetZoomButton->setMaximumSize(QSize(32, 32));
-        resetZoomButton->setIconSize(QSize(32, 32));
-        resetZoomButton->setAutoDefault(false);
-        resetZoomButton->setFlat(true);
+        resetViewButton = new QPushButton(centralwidget);
+        resetViewButton->setObjectName(QString::fromUtf8("resetViewButton"));
+        resetViewButton->setEnabled(true);
+        resetViewButton->setMinimumSize(QSize(32, 32));
+        resetViewButton->setMaximumSize(QSize(32, 32));
+        resetViewButton->setIconSize(QSize(32, 32));
+        resetViewButton->setAutoDefault(false);
+        resetViewButton->setFlat(true);
 
-        horizontalLayout->addWidget(resetZoomButton);
+        horizontalLayout->addWidget(resetViewButton);
 
 
         vLScene->addLayout(horizontalLayout);
@@ -401,11 +403,11 @@ public:
         menubar->addAction(menuAction->menuAction());
         menubar->addAction(menuControl_Panel_2->menuAction());
         menubar->addAction(menuAnimation_Control->menuAction());
-        menuFile->addAction(actionClear);
         menuFile->addAction(actionLoad_from_file);
         menuFile->addAction(actionSave_as);
         menuView->addAction(actionFullscreen);
         menuView->addAction(actionExit);
+        menuAction->addAction(actionClear);
         menuAction->addAction(actionRandom);
         menuAction->addAction(actionStart);
         menuAction->addAction(actionBack);
@@ -415,7 +417,7 @@ public:
         menuAnimation_Control->addAction(actionPlay);
         menuAnimation_Control->addAction(actionSpeedUp);
         menuAnimation_Control->addAction(actionOptimalZoom);
-        menuAnimation_Control->addAction(actionDefaultZoom);
+        menuAnimation_Control->addAction(actionResetView);
 
         retranslateUi(MainWindow);
 
@@ -426,7 +428,7 @@ public:
         speedUpButton->setDefault(false);
         optionsButton->setDefault(false);
         optimalZoomButton->setDefault(false);
-        resetZoomButton->setDefault(false);
+        resetViewButton->setDefault(false);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -435,10 +437,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MT-TSP", nullptr));
-        actionClear->setText(QCoreApplication::translate("MainWindow", "New Configuration...", nullptr));
-#if QT_CONFIG(shortcut)
-        actionClear->setShortcut(QCoreApplication::translate("MainWindow", "R", nullptr));
-#endif // QT_CONFIG(shortcut)
+        actionClear1->setText(QCoreApplication::translate("MainWindow", "Restart", nullptr));
         actionLoad_from_file->setText(QCoreApplication::translate("MainWindow", "Load Configuration...", nullptr));
 #if QT_CONFIG(shortcut)
         actionLoad_from_file->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+L", nullptr));
@@ -491,9 +490,13 @@ public:
 #if QT_CONFIG(shortcut)
         actionOptimalZoom->setShortcut(QCoreApplication::translate("MainWindow", "Z", nullptr));
 #endif // QT_CONFIG(shortcut)
-        actionDefaultZoom->setText(QCoreApplication::translate("MainWindow", "Default Scene View", nullptr));
+        actionResetView->setText(QCoreApplication::translate("MainWindow", "Default Scene View", nullptr));
 #if QT_CONFIG(shortcut)
-        actionDefaultZoom->setShortcut(QCoreApplication::translate("MainWindow", "H", nullptr));
+        actionResetView->setShortcut(QCoreApplication::translate("MainWindow", "H", nullptr));
+#endif // QT_CONFIG(shortcut)
+        actionClear->setText(QCoreApplication::translate("MainWindow", "Restart", nullptr));
+#if QT_CONFIG(shortcut)
+        actionClear->setShortcut(QCoreApplication::translate("MainWindow", "R", nullptr));
 #endif // QT_CONFIG(shortcut)
         labelYerps->setText(QCoreApplication::translate("MainWindow", "Preys:", nullptr));
         labelPreysNum->setText(QCoreApplication::translate("MainWindow", "0", nullptr));
@@ -501,18 +504,42 @@ public:
         labelYerpsNum->setText(QCoreApplication::translate("MainWindow", "0", nullptr));
         rBConstruction->setText(QCoreApplication::translate("MainWindow", "Construction mode", nullptr));
         rBAnimation->setText(QCoreApplication::translate("MainWindow", "Animation mode", nullptr));
-        labelUsePlan->setText(QCoreApplication::translate("MainWindow", "Use plan:", nullptr));
-        buttonUsePlan->setText(QString());
-        buttonBestPlan->setText(QString());
         labelResT->setText(QCoreApplication::translate("MainWindow", "Result Time:", nullptr));
         labelT->setText(QString());
         controlPanel->setTabText(controlPanel->indexOf(info), QCoreApplication::translate("MainWindow", "General Info", nullptr));
         controlPanel->setTabText(controlPanel->indexOf(randomGen), QCoreApplication::translate("MainWindow", "Generation options", nullptr));
+#if QT_CONFIG(tooltip)
+        labelUsePlan->setToolTip(QCoreApplication::translate("MainWindow", "Shows the control panel", nullptr));
+#endif // QT_CONFIG(tooltip)
+        labelUsePlan->setText(QCoreApplication::translate("MainWindow", "Use Plan:", nullptr));
+#if QT_CONFIG(tooltip)
+        buttonUsePlan->setToolTip(QCoreApplication::translate("MainWindow", "Forces Yerps to intercept Preys in specified order", nullptr));
+#endif // QT_CONFIG(tooltip)
+        buttonUsePlan->setText(QString());
+#if QT_CONFIG(tooltip)
+        buttonBestPlan->setToolTip(QCoreApplication::translate("MainWindow", "Sets interception order to the optimal one", nullptr));
+#endif // QT_CONFIG(tooltip)
+        buttonBestPlan->setText(QString());
+#if QT_CONFIG(tooltip)
+        playButton->setToolTip(QCoreApplication::translate("MainWindow", "Starts the animation in Animation mode", nullptr));
+#endif // QT_CONFIG(tooltip)
         playButton->setText(QString());
+#if QT_CONFIG(tooltip)
+        speedUpButton->setToolTip(QCoreApplication::translate("MainWindow", "Speeds up animation by x2, x5, x10, x1", nullptr));
+#endif // QT_CONFIG(tooltip)
         speedUpButton->setText(QString());
+#if QT_CONFIG(tooltip)
+        optionsButton->setToolTip(QCoreApplication::translate("MainWindow", "Shows the control panel", nullptr));
+#endif // QT_CONFIG(tooltip)
         optionsButton->setText(QString());
+#if QT_CONFIG(tooltip)
+        optimalZoomButton->setToolTip(QCoreApplication::translate("MainWindow", "Sets the view to have all Preys and Yerps on it", nullptr));
+#endif // QT_CONFIG(tooltip)
         optimalZoomButton->setText(QString());
-        resetZoomButton->setText(QString());
+#if QT_CONFIG(tooltip)
+        resetViewButton->setToolTip(QCoreApplication::translate("MainWindow", "Reset view to default", nullptr));
+#endif // QT_CONFIG(tooltip)
+        resetViewButton->setText(QString());
         menuFile->setTitle(QCoreApplication::translate("MainWindow", "File", nullptr));
         menuView->setTitle(QCoreApplication::translate("MainWindow", "View", nullptr));
         menuAction->setTitle(QCoreApplication::translate("MainWindow", "Action", nullptr));

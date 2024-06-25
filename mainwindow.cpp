@@ -46,11 +46,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionPlay->setIcon(QIcon("playIcon.png"));
     ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
     ui->actionSpeedUp->setIcon(QIcon("speedUpIcon.png"));
-    ui->resetZoomButton->setIcon(QIcon("resetIcon.png"));
-    ui->actionDefaultZoom->setIcon(QIcon("resetIcon.png"));
+    ui->resetViewButton->setIcon(QIcon("resetIcon.png"));
+    ui->actionResetView->setIcon(QIcon("resetIcon.png"));
     ui->optionsButton->setIcon(QIcon("optionsIcon.png"));
     ui->actionShow->setIcon(QIcon("optionsIcon.png"));
-    ui->actionClear->setIcon(QIcon("newConfigIcon.png"));
+    ui->actionClear->setIcon(QIcon("restartIcon.png"));
     ui->actionLoad_from_file->setIcon(QIcon("openConfigIcon.png"));
     ui->actionSave_as->setIcon(QIcon("saveAsIcon.png"));
     ui->actionBack->setIcon(QIcon("backIcon.png"));
@@ -66,8 +66,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(view, SIGNAL(yerpWasCreatedOrDestroyed()), this, SLOT(yerpWasCreatedOrDestroyed()));
 
     ui->controlPanel->setStyleSheet("background-color: rgb(240, 240, 240);");
+    ui->controlPanel->hide();
 
-    connect(ui->lineEditUsePlan, SIGNAL(returnPressed()), this, SLOT(setFocus()));
+    connect(ui->lineEditUsePlan, SIGNAL(returnPressed()), this, SLOT(setFocus()));    
 }
 
 MainWindow::~MainWindow()
@@ -194,6 +195,7 @@ void MainWindow::setBestPlanToLineEditUsePlan()
         toLineEdit += "; ";
     }
     toLineEdit.chop(1);
+    if (view->yerp.size() == 1) toLineEdit += " ;";
     ui->lineEditUsePlan->setText(toLineEdit);
 }
 void MainWindow::on_sliderTime_valueChanged(int newV)
@@ -364,17 +366,21 @@ void MainWindow::on_actionSpeedUp_triggered()
 {
     on_speedUpButton_clicked();
 }
-void MainWindow::on_resetZoomButton_clicked()
+void MainWindow::on_resetViewButton_clicked()
 {
     view->setSF(1);
     view->setAnchor(QPointF(0, 0));
     view->setSCoordCenter(QPointF(view->width()/2., view->height()/2.));
 
     view->zoomGraphics(1);
+
+    QGraphicsRectItem* genRect = view->genRect;
+    QRectF newRect = QRectF(20, 20, view->width()-40, view->height()-40).normalized();
+    genRect->setRect(newRect);
 }
-void MainWindow::on_actionDefaultZoom_triggered()
+void MainWindow::on_actionResetView_triggered()
 {
-    on_resetZoomButton_clicked();
+    on_resetViewButton_clicked();
 }
 void MainWindow::on_optimalZoomButton_clicked()
 {
@@ -387,6 +393,7 @@ void MainWindow::on_actionOptimalZoom_triggered()
 void MainWindow::on_optionsButton_clicked()
 {
     ui->controlPanel->isVisible() ? ui->controlPanel->hide() : ui->controlPanel->show();
+    view->transformViewToOptimal();
 }
 void MainWindow::on_actionShow_triggered()
 {
@@ -498,6 +505,7 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     ui->actionBack->setEnabled(true);
 
     view->genRect->show();
+    view->transformViewToOptimal();
     ui->labelT->setText("");
     ui->dSBTime->setValue(0);
     ui->sliderTime->setValue(0);
@@ -518,7 +526,6 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     ui->actionUsePlan->setEnabled(false);
     ui->buttonBestPlan->setEnabled(false);
     ui->actionUseBestPlan->setEnabled(false);
-    on_resetZoomButton_clicked();
 
     view->timer->start(10);
 
@@ -550,7 +557,6 @@ void MainWindow::on_actionClear_triggered()
     ui->lineEditUsePlan->setEnabled(false);
     ui->lineEditUsePlan->setStyleSheet("background-color: rgb(240, 240, 240);");
     view->genRect->show();
-    view->setSF(1);
     ui->rBConstruction->setChecked(true);
     ui->rBAnimation->setEnabled(false);
     ui->dSBTime->setValue(0);
@@ -569,7 +575,6 @@ void MainWindow::on_actionClear_triggered()
     ui->actionUsePlan->setEnabled(false);
     ui->buttonBestPlan->setEnabled(false);
     ui->actionUseBestPlan->setEnabled(false);
-    on_resetZoomButton_clicked();
 
     QPointF pMathCursorPos = view->sceneToCoords(view->mapFromGlobal(QCursor::pos()));
     double x = pMathCursorPos.x();
@@ -729,7 +734,6 @@ void MainWindow::on_actionLoad_from_file_triggered()
     if (strcmp(filename.toStdString().c_str(), "") == 0)
     {
         QMessageBox::critical(this, "MT-TSP", "Can't open the file");
-        on_actionClear_triggered();
         return;
     }
 
@@ -765,7 +769,6 @@ void MainWindow::on_actionLoad_from_file_triggered()
     N = strtol(tmpstr1, &tmpstr1, 0); // Catching # of Yerps
     if (N < 0 || N > 12) {
         QMessageBox::critical(this, "MT-TSP", "Invalid amount of Preys");
-        on_actionClear_triggered();
         return;
     }
     fgets(buffer1, 256, f); // X, Y, alpha, v, xEnd, yEnd string
@@ -788,8 +791,9 @@ void MainWindow::on_actionLoad_from_file_triggered()
 
         view->createPreyOnFullInfo(QPointF(x, y), QPointF(xEnd, yEnd), v);
     }
-
     fclose(f);
+
+    view->transformViewToOptimal();
 }
 void MainWindow::saveDataToFile(FILE *f)
 {
