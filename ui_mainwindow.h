@@ -141,8 +141,8 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(controlPanel->sizePolicy().hasHeightForWidth());
         controlPanel->setSizePolicy(sizePolicy);
-        controlPanel->setMinimumSize(QSize(380, 0));
-        controlPanel->setMaximumSize(QSize(380, 16777215));
+        controlPanel->setMinimumSize(QSize(260, 0));
+        controlPanel->setMaximumSize(QSize(260, 16777215));
         QFont font;
         font.setPointSize(10);
         controlPanel->setFont(font);
@@ -155,7 +155,7 @@ public:
         info->setObjectName(QString::fromUtf8("info"));
         horizontalLayoutWidget = new QWidget(info);
         horizontalLayoutWidget->setObjectName(QString::fromUtf8("horizontalLayoutWidget"));
-        horizontalLayoutWidget->setGeometry(QRect(9, 9, 361, 31));
+        horizontalLayoutWidget->setGeometry(QRect(9, 9, 241, 31));
         layoutEntities = new QHBoxLayout(horizontalLayoutWidget);
         layoutEntities->setObjectName(QString::fromUtf8("layoutEntities"));
         layoutEntities->setContentsMargins(0, 0, 0, 0);
@@ -179,7 +179,7 @@ public:
 
         labelPreys = new QLabel(horizontalLayoutWidget);
         labelPreys->setObjectName(QString::fromUtf8("labelPreys"));
-        labelPreys->setAlignment(Qt::AlignCenter);
+        labelPreys->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
         layoutEntities->addWidget(labelPreys);
 
@@ -264,9 +264,11 @@ public:
 
         labelT = new QLabel(centralwidget);
         labelT->setObjectName(QString::fromUtf8("labelT"));
-        labelT->setMinimumSize(QSize(120, 0));
-        labelT->setMaximumSize(QSize(120, 16777215));
+        labelT->setMinimumSize(QSize(90, 0));
+        labelT->setMaximumSize(QSize(90, 16777215));
         labelT->setFont(font2);
+        labelT->setFrameShape(QFrame::NoFrame);
+        labelT->setLineWidth(1);
         labelT->setAlignment(Qt::AlignCenter);
 
         layoutUsePlan->addWidget(labelT);

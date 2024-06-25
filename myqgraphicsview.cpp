@@ -301,7 +301,11 @@ void MyQGraphicsView::wheelEvent(QWheelEvent *e)
     double aDelta = e->angleDelta().y();
     sceneSF = aDelta > 0 ? 1.1 : 0.9;
 
-    if (unit*sceneSF < 0.1 || unit*sceneSF > 230) return; // Zoom in up to x4 and zoom out up to x500
+    if (unit*sceneSF < 0.01 || unit*sceneSF > 230)
+    {
+        QMessageBox::critical(this, "MT-TSP", "Enormous zoom (due to enormous time and/or coordinates) prevented. To make everything works properly please change the configuration in Construction Mode.\n");
+        return; // Zoom in up to x4 and zoom out up to x5000
+    }
     sCoordCenter = sAnchor + sceneSF*(sCoordCenter-sAnchor);
     zoomGraphics(sceneSF);
 }
@@ -312,7 +316,11 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
     int w = width();
     int h = height();
     scene->setSceneRect(0, 0, w, h);
+
+    sceneSF = 1;
+    anchor = QPointF(0, 0);
     sCoordCenter = QPointF(w/2., h/2.);
+    zoomGraphics(1); // Reseting to default view to avoid problems
 
     QRectF rect = genRect->rect();
     double needRectW = rect.width() < w-20-rect.x() ? rect.width() : w-20-rect.x(); // Stuff for checking whether genRect is smaller than scene or not
@@ -468,7 +476,10 @@ void MyQGraphicsView::resizeCoordlines()
     else if (basicCoordLineUnit <= 50) basicCoordLineUnit = 50;
     else if (basicCoordLineUnit <= 100) basicCoordLineUnit = 100;
     else if (basicCoordLineUnit <= 200) basicCoordLineUnit = 200;
-    else basicCoordLineUnit = 500;
+    else if (basicCoordLineUnit <= 500) basicCoordLineUnit = 500;
+    else if (basicCoordLineUnit <= 1000) basicCoordLineUnit = 1000;
+    else if (basicCoordLineUnit <= 2000) basicCoordLineUnit = 2000;
+    else basicCoordLineUnit = 5000;
 
     double distV = fabs(lU.x());
     double distH = fabs(rD.y());
@@ -507,13 +518,6 @@ void MyQGraphicsView::translateGraphics(QPointF sTranslateVec)
 void MyQGraphicsView::transformViewToOptimal()
 {
     if (prey.size() < 2 && yerp.size() < 2) return;
-
-    int w = width();
-    int h = height();
-    sceneSF = 1;
-    anchor = QPointF(0, 0);
-    sCoordCenter = QPointF(w/2., h/2.);
-    zoomGraphics(1); // Reseting to default view to avoid problems
 
     QPointF initP = yerp.isEmpty() ? prey[0]->getStart() : yerp[0]->getStart();
     double xMin = initP.x();
@@ -567,13 +571,24 @@ void MyQGraphicsView::transformViewToOptimal()
         }
     }
 
+    int w = width();
+    int h = height();
     QPointF coordCenter = QPointF((xMin+xMax)/2, (yMin+yMax)/2);
-    translateGraphics(QPointF(w/2., h/2.) - coordsToScene(coordCenter)); // Translation part
+    double sWidth = (coordCenter.x()-xMin)*baseUnit;
+    double sHeight = (coordCenter.y()-yMin)*baseUnit;
+    if (baseUnit*qMin(0.45*w/sWidth, 0.45*h/sHeight) < 0.01 || baseUnit*qMin(0.45*w/sWidth, 0.45*h/sHeight) > 230)
+    {
+        QMessageBox::critical(this, "MT-TSP", "Enormous zoom (due to enormous time and/or coordinates) prevented. \nTo make everything works properly please change the configuration in Construction Mode.\n");
+        return; // Zoom in up to x4 and zoom out up to x5000
+    }
 
-    double sWidth = (coordCenter.x()-xMin)*unit;
-    double sHeight = (coordCenter.y()-yMin)*unit;
+    sceneSF = 1;
+    anchor = QPointF(0, 0);
+    sCoordCenter = QPointF(w/2., h/2.);
+    zoomGraphics(1); // Reseting to default view to avoid problems
+
     sceneSF = qMin(0.45*w/sWidth, 0.45*h/sHeight);
-    if (unit*sceneSF < 0.1 || unit*sceneSF > 230) return; // Zoom in up to x4 and zoom out up to x500
+    translateGraphics(QPointF(w/2., h/2.) - coordsToScene(coordCenter)); // Translation part
     sCoordCenter = QPointF(w/2., h/2.) + sceneSF*(sCoordCenter-QPointF(w/2., h/2.));
     zoomGraphics(sceneSF); // Zoom part
 }
