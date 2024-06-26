@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-//TODO ускоренный полет
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -375,9 +373,9 @@ void MainWindow::on_actionStart_triggered()
 {
     setFocus();
     if (!isDataReadyToUsePlan()) return;
-    if (view->prey.size()+view->yerp.size() > 13)
+    if ((view->yerp.size() == 1 && view->prey.size() > 20) || (view->yerp.size() == 2 && view->prey.size() > 14))
     {
-        QMessageBox::critical(this, "MT-TSP", "Should be less than 13 Entities to look for the optimal plan.\nUse \"Use Plan\" option if you want to investigate one specified plan not to look for the optimal.");
+        QMessageBox::critical(this, "MT-TSP", "One Yerp can look for optimal plan with up to 20 Preys. Two yerps - up to 14. \nUse \"Use Plan\" option if you want to investigate one specified plan not to look for the optimal.");
         return;
     }
 

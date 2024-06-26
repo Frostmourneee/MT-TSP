@@ -17,15 +17,22 @@ signals:
     void changeProgressBar(long long vC, long long vAll); // Vars calculated and vars at all
 
 private:
-    double timeOneYerp(double bestT, int* realPlan, int rPSize, int yerpNum, bool shouldIgnoreOptimization);
-    double planOneM(double bestT, int* plan, int rPSize, int yerpNum, bool shouldIgnoreOptimization);
+    double timeOneYerp(int rPSize, int* realPlan, int yerpNum);
+    double timeOneYerpBase(int rPSize, int *realPlan, int yerpNum);
+    double timeOnePredWFixedEnd(int rPSize, int *realPlan, int pred, int end);
+    double planOneM(int rPSize, int* plan, int yerpNum);
     double oneIntercept(int preyNum, int yerpNum);
+    double shiftTime(int prey, double mx, double my, double prevT);
+    void rearrange(long int M, int N, int* realPlan, int ***lA, int ***rA, int n, double** t, double** mx, double** my);
+    long int bitSet(int N, int* a);
     void resetOne(int yerpNum);
     void fullReset();
     long long vars(int M, int N);
     long long C(int, int);
     long long fact(int);
     void swap (int *a, int *b);
+    void swapp(int *a, int *b);
+    int next_combination(int x);
     void storeInterceptionInfo(MyQGraphicsView* view, int* plan, int rPSize, int yerpNum);
     void freeMallocs();
     int M; // Yerps
