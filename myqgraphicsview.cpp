@@ -709,11 +709,10 @@ void MyQGraphicsView::clear()
 
     for (Yerp* y : yerp)
     {
-        scene->removeItem(y);
+        if (scene->items().indexOf(y) != -1) scene->removeItem(y);
         delete y;
     }
     yerp.clear();
-
 }
 
 bool MyQGraphicsView::onGenRect(QPointF pScene)

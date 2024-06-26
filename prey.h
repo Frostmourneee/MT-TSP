@@ -9,13 +9,21 @@
 class Prey : public GraphicsEntities
 {
 public:
+    Prey(QPointF st, QPointF vel)
+    {
+        start = st;
+        vx = vel.x();
+        vy = vel.y();
+    }
+    Prey()
+    { }
     QPointF getEnd() {return end;}
     QPointF getSEnd() {return sEnd;}
     QPointF getDiePoint() {return start+dieTime*QPointF(vx, vy);}
     double getAlpha() {return alpha;} // Degrees
     double getV() {return v;}
     double getDieTime() {return dieTime;}
-    double getYerpNum() {return yerpNum;}
+    int getYerpNum() {return yerpNum;}
     bool getIsDied() {return isDied; update();}
     void setEnd(QPointF e) {end = e;}
     void setSEnd(QPointF sE) {sEnd = sE;}

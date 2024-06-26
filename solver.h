@@ -27,6 +27,7 @@ private:
     long long fact(int);
     void swap (int *a, int *b);
     void storeInterceptionInfo(MyQGraphicsView* view, int* plan, int rPSize, int yerpNum);
+    void freeMallocs();
     int M; // Yerps
     int N; // Preys
     int k1; // 1st optimal plan size

@@ -63,22 +63,7 @@ void Solver::solve(MyQGraphicsView* view)
         for (int i = 0; i < N; i++) {y1->bestPlan.push_back(curPlan[i]); y1->plan4AP.push_back(curPlan[i]); y1->curPlan.push_back(curPlan[i]);}
         y1->setPlan4APTime(resT);
 
-        free(x);
-        free(y);
-        free(vx);
-        free(vy);
-        free(mx);
-        free(my);
-        free(initmx);
-        free(initmy);
-        free(initx);
-        free(inity);
-        free(initvx);
-        free(initvy);
-        free(curPlan);
-        free(curPlan1);
-        free(curPlan2);
-
+        freeMallocs();
         emit solvingEnded();
 
         clock_t clockEnd = clock();
@@ -93,17 +78,21 @@ void Solver::solve(MyQGraphicsView* view)
 
     y1->plan4AP.clear();
     y2->plan4AP.clear();
-    for (int i = 0; i < M; i++) { // Worth only if initial Yerps positions are not the same
+    for (int i = 0; i < M; i++) // Worth only if initial Yerps positions are not the same
+    {
         mTourTime[i] = timeOneYerp(resT, planFirst, N, i, true);
         view->yerp[i]->setPlan4APTime(mTourTime[i]);
         for (int j = 0; j < N; j++) view->yerp[i]->plan4AP.push_back(planFirst[j]);
-        if (resT == 0) {
+        if (resT == 0)
+        {
             resT = mTourTime[i];
             k1 = N;
             k2 = 0;
             storeInterceptionInfo(view, planFirst, N, 0);
             for (int j = 0; j < N; j++) {curPlan1[j] = planFirst[j]; curPlan[j] = planFirst[j];}
-        } else if (resT > mTourTime[i]) {
+        }
+        else if (resT > mTourTime[i])
+        {
             resT = mTourTime[i];
             k1 = 0;
             k2 = N;
@@ -167,22 +156,7 @@ void Solver::solve(MyQGraphicsView* view)
     for (int i = 0; i < k1; i++) {y1->bestPlan.push_back(curPlan1[i]); y1->curPlan.push_back(curPlan1[i]);}
     for (int i = 0; i < k2; i++) {y2->bestPlan.push_back(curPlan2[i]); y2->curPlan.push_back(curPlan2[i]);}
 
-    free(x);
-    free(y);
-    free(vx);
-    free(vy);
-    free(mx);
-    free(my);
-    free(initmx);
-    free(initmy);
-    free(initx);
-    free(inity);
-    free(initvx);
-    free(initvy);
-    free(curPlan);
-    free(curPlan1);
-    free(curPlan2);
-
+    freeMallocs();
     emit solvingEnded();
 
     clock_t clockEnd = clock();
@@ -396,4 +370,22 @@ void Solver::swap(int *a, int *b)
     int t = *a;
     *a = *b;
     *b = t;
+}
+void Solver::freeMallocs()
+{
+    free(x);
+    free(y);
+    free(vx);
+    free(vy);
+    free(mx);
+    free(my);
+    free(initmx);
+    free(initmy);
+    free(initx);
+    free(inity);
+    free(initvx);
+    free(initvy);
+    free(curPlan);
+    free(curPlan1);
+    free(curPlan2);
 }

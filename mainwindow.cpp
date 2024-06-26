@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 
 //TODO ускоренный полет
-//TODO тесты
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -141,7 +140,20 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         }
         case Qt::Key_T: // Test key
         {
-            qDebug() << view->width() << view->height();
+            if (e->modifiers().testFlag(Qt::ShiftModifier) && e->modifiers().testFlag(Qt::ControlModifier)) // CTRL+SHIFT+T pressed
+            {
+                testAmount = 0;
+                QString filename = "C:/Qt/MT-TSP/tests/" + QString::number(testAmount) + ".txt";
+                while (QFile(filename).exists())
+                {
+                    testAmount++;
+                    filename = "C:/Qt/MT-TSP/tests/" + QString::number(testAmount) + ".txt";
+                }
+
+                testFileNum = 0;
+                oneTest();
+            }
+            else qDebug() << view->width() << view->height(); // T pressed
             break;
         }
     }
@@ -384,6 +396,7 @@ void MainWindow::on_actionStart_triggered()
 
     FILE* initDataFile = fopen("initData.txt", "w+"); // Saving all the data to the default "initData.txt" file
     saveDataToFile(initDataFile);
+    fclose(initDataFile);
 
     thread->start();
     emit solve(view);
@@ -792,6 +805,7 @@ void MainWindow::on_actionSave_as_triggered()
 
     FILE* f = fopen(filename.toStdString().c_str(), "w+"); // Saving all the data to the chosen file
     saveDataToFile(f);
+    fclose(f);
 }
 void MainWindow::on_actionLoad_from_file_triggered()
 {
@@ -1195,6 +1209,7 @@ void MainWindow::createPreyTableItem(Prey *p)
 
     item = new QStandardItem(); // yerpNum
     item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setForeground(QBrush(Qt::red));
     item->setFlags(Qt::ItemIsEnabled);
     item->setTextAlignment(Qt::AlignCenter);
     modelPrey->setItem(modelPrey->rowCount() - 1, 6, item);
@@ -1330,7 +1345,28 @@ void MainWindow::saveDataToFile(FILE *f)
                                                        p->getAlpha(), p->getV(),
                                                        p->getEnd().x(), p->getEnd().y(),
                                                        maxSignsX, maxSignsY, maxSignsAlpha, maxSignsV, maxSignsXEnd, maxSignsYEnd).toStdString().c_str());
-    fclose(f);
+}
+void MainWindow::saveTestDataToFile(FILE *f)
+{
+    int M = view->yerp.size();
+    int N = view->prey.size();
+
+    fprintf(f, "%d\n", M);
+    for (Yerp* y : view->yerp) fprintf(f, "%lf,%lf\n", y->getStart().x(), y->getStart().y());
+    fprintf(f, "%d\n", N);
+    for (Prey* p : view->prey) fprintf(f, "%lf,%lf,%lf,%lf\n", p->getStart().x(), p->getStart().y(), p->getVx(), p->getVy());
+    fprintf(f, "%lf\n", solver->getResT());
+    for (Yerp* y : view->yerp)
+    {
+        QString tmp = y->curPlanToQString()+";"+QString::number(y->curPlanToQString().isEmpty() ? 0 : y->lastPrey->getDieTime(), 'f', 2)+";";
+        fprintf(f, "%s", tmp.toStdString().c_str());
+        tmp = y->plan4APToQString()+";"+QString::number(y->getPlan4APTime(), 'f', 2);
+        fprintf(f, "%s\n", tmp.toStdString().c_str());
+    }
+    for (Prey* p : view->prey)
+    {
+        fprintf(f, "%d,%lf,%lf,%lf\n", p->getYerpNum(), p->getDieTime(), p->getDiePoint().x(), p->getDiePoint().y());
+    }
 }
 QString MainWindow::preyDataStrSave(double x, double y, double alpha, double v, double xEnd, double yEnd, int maxX, int maxY, int maxAlpha, int maxV, int maxXEnd, int maxYEnd)
 {
@@ -1364,6 +1400,113 @@ QString MainWindow::yerpDataStrSave(double x, double y, int maxX, int maxY)
 void MainWindow::solvingEnded()
 {
     thread->exit(0);
+    ui->progressBar->setValue(0); // Should be before test stuff because emit solve(view) causes progressBar to twinkle
+
+    if (testFileNum != -1)
+    {
+        QString filename = "C:/Qt/MT-TSP/tests/" + QString::number(testFileNum) + ".txt";
+        QFile f(filename);
+        f.open(QIODevice::ReadOnly);
+
+        int M, N;
+        QString tmpLine;
+
+        tmpLine = f.readLine();
+        M = tmpLine.toInt(); // Catching # of Yerps
+        for (int i = 0; i < M; i++) tmpLine = f.readLine();
+
+        tmpLine = f.readLine();
+        N = tmpLine.toInt(); // Catching # of Preys
+        for (int i = 0; i < N; i++) tmpLine = f.readLine();
+
+        QVector<int> ansYerpNum;
+        QVector<double> ansDieT, ansDieX, ansDieY;
+        double ansResT, ansCur1T, ansPlan4AP1T, ansCur2T, ansPlan4AP2T;
+        QString ansCurPlanY1, ansPlan4APY1, ansCurPlanY2, ansPlan4APY2;
+
+        tmpLine = f.readLine();
+        ansResT = tmpLine.toDouble(); // Catching resT
+
+        tmpLine = f.readLine();
+        ansCurPlanY1 = tmpLine.split(";")[0];
+        ansCur1T = tmpLine.split(";")[1].toDouble();
+        ansPlan4APY1 = tmpLine.split(";")[2];
+        ansPlan4AP1T = tmpLine.split(";")[3].toDouble();
+
+        if (M == 2)
+        {
+            tmpLine = f.readLine();
+
+            ansCurPlanY2 = tmpLine.split(";")[0];
+            ansCur2T = tmpLine.split(";")[1].toDouble();
+            ansPlan4APY2 = tmpLine.split(";")[2];
+            ansPlan4AP2T = tmpLine.split(";")[3].toDouble();
+        }
+
+        for (int i = 0; i < N; i++)
+        {
+            tmpLine = f.readLine();
+
+            ansYerpNum.push_back(tmpLine.split(",")[0].toInt());
+            ansDieT.push_back(tmpLine.split(",")[1].toDouble());
+            ansDieX.push_back(tmpLine.split(",")[2].toDouble());
+            ansDieY.push_back(tmpLine.split(",")[3].toDouble());
+        }
+        f.close();
+
+        if (fabs(solver->getResT()-ansResT) > 1.e-1)
+        {
+            testFileNum = -1;
+            qDebug() << "Test failed. Result time issue.";
+            return;
+        }
+
+        Yerp* y1 = view->yerp[0];
+        if (ansCurPlanY1 != y1->curPlanToQString() ||
+            ansPlan4APY1 != y1->plan4APToQString() ||
+            fabs((y1->curPlanToQString().isEmpty() ? 0 : y1->lastPrey->getDieTime())-ansCur1T) > 1.e-1 ||
+            fabs(y1->getPlan4APTime()-ansPlan4AP1T) > 1.e-1)
+        {
+            testFileNum = -1;
+            qDebug() << "Test failed. First Yerp issue.";
+            return;
+        }
+
+        Yerp* y2;
+        if (M == 2)
+        {
+            y2 = view->yerp[1];
+            if (ansCurPlanY2 != y2->curPlanToQString() ||
+                ansPlan4APY2 != y2->plan4APToQString() ||
+                fabs((y2->curPlanToQString().isEmpty() ? 0 : y2->lastPrey->getDieTime())-ansCur2T) > 1.e-1 ||
+                fabs(y2->getPlan4APTime()-ansPlan4AP2T) > 1.e-1)
+            {
+                testFileNum = -1;
+                qDebug() << "Test failed. Second Yerp issue.";
+                return;
+            }
+        }
+
+        Prey* tmpPrey;
+        for (int i = 0; i < N; i++)
+        {
+            tmpPrey = view->prey[i];
+            if (tmpPrey->getYerpNum() != ansYerpNum[i] ||
+                fabs(tmpPrey->getDieTime()-ansDieT[i]) > 1.e-1 ||
+                fabs(tmpPrey->getDiePoint().x()-ansDieX[i]) > 1.e-1 ||
+                fabs(tmpPrey->getDiePoint().y()-ansDieY[i]) > 1.e-1)
+            {
+                testFileNum = -1;
+                qDebug() << "Test failed. Prey issue.";
+                return;
+            }
+        }
+
+        qDebug() << filename + "." << "Tests passed: " + QString::number(testFileNum+1)+"/" + QString::number(testAmount);
+        testFileNum++;
+        oneTest();
+        return;
+    }
 
     enableUIAfterUsePlan();
     view->setEnabled(true);
@@ -1372,7 +1515,6 @@ void MainWindow::solvingEnded()
     ui->rBConstruction->setEnabled(true);
     ui->dSBTime->setMaximum(solver->getResT());
     ui->sliderTime->setMaximum(100*solver->getResT()-(int)(solver->getResT()*100) < 0.5 ? (int)(solver->getResT()*100) : (int)(solver->getResT()*100)+1);
-    ui->progressBar->setValue(0);
     ui->labelT->setText(QString::number(solver->getResT(), 'f', 2));
     ui->buttonBestPlan->setEnabled(true);
     ui->actionUseBestPlan->setEnabled(true);
@@ -1388,6 +1530,24 @@ void MainWindow::solvingEnded()
 
     setBestPlanToLineEditUsePlan();
     afterPlanFillTable();
+
+    //===============//
+    // Tests stuff
+    if (!addTest || view->prey.size()+view->yerp.size() > 10) return;
+
+    int i = 0;
+    QString filename = "C:/Qt/MT-TSP/tests/" + QString::number(i) + ".txt";
+
+    while (QFile(filename).exists())
+    {
+        i++;
+        filename = "C:/Qt/MT-TSP/tests/" + QString::number(i) + ".txt";
+    }
+
+    FILE* f = fopen(filename.toStdString().c_str(), "w+"); // Saving all the data to the chosen file
+    saveTestDataToFile(f);
+    fclose(f);
+    //===============//
 }
 void MainWindow::usePlanEnded()
 {
@@ -1414,6 +1574,7 @@ void MainWindow::usePlanEnded()
 
     afterPlanFillTable();
 }
+
 void MainWindow::afterPlanFillTable()
 {
     preyRowsRearrangement(planToRowsRearrangementByYerp());
@@ -1521,4 +1682,54 @@ int MainWindow::signs(double r)
     }
 
     return tmp++;
+}
+
+void MainWindow::oneTest()
+{
+    on_actionClear_triggered();
+
+    QString filename = "C:/Qt/MT-TSP/tests/" + QString::number(testFileNum) + ".txt";
+    if (!QFile(filename).exists())
+    {
+        testFileNum = -1;
+        qDebug() << "\nALL TESTS PASSED";
+        return;
+    }
+
+    QFile f(filename);
+    f.open(QIODevice::ReadOnly);
+
+    QString tmpLine;
+    int M, N;
+    double x, y, vx, vy;
+
+    tmpLine = f.readLine();
+    M = tmpLine.toInt();
+    for (int i = 0; i < M; i++)
+    {
+        tmpLine = f.readLine();
+
+        x = tmpLine.split(",")[0].toDouble();
+        y = tmpLine.split(",")[1].toDouble();
+        Yerp* yerpInst = new Yerp(i, QPointF(x, y));
+        view->yerp.push_back(yerpInst);
+    }
+
+    tmpLine = f.readLine();
+    N = tmpLine.toInt();
+    for (int i = 0; i < N; i++)
+    {
+        tmpLine = f.readLine();
+
+        x = tmpLine.split(",")[0].toDouble();
+        y = tmpLine.split(",")[1].toDouble();
+        vx = tmpLine.split(",")[2].toDouble();
+        vy = tmpLine.split(",")[3].toDouble();
+        Prey* preyInst = new Prey(QPointF(x, y), QPointF(vx, vy));
+        view->prey.push_back(preyInst);
+    }
+    f.close();
+
+    thread->start();
+    emit solve(view);
 }

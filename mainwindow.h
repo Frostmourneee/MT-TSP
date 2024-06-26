@@ -29,6 +29,7 @@ private:
     int preyRowWithNum(int);
     bool isDataReadyToUsePlan();
     void saveDataToFile(FILE*);
+    void saveTestDataToFile(FILE*);
     void setBestPlanToLineEditUsePlan();
     void initTables();
     void fillFullYerpTable();
@@ -40,12 +41,15 @@ private:
     void createYerpTableItem(Yerp*);
     void afterPlanFillTable();
     void enableUIAfterUsePlan();
+    void oneTest();
     Ui::MainWindow *ui;
     QThread* thread;
     MyQGraphicsView* view;
     Solver* solver;
     QStandardItemModel* modelPrey;
     QStandardItemModel* modelYerp;
+    int testFileNum = -1;
+    int testAmount = 0;
     bool userHasntSeenOnlyLatinLettersWarning = true;
     bool sliderVsDSBTime = true; // Technical bool which needs to prevent the recursion in changing values of sliderTime and dSBTime
     bool isWPressed = false;
@@ -54,6 +58,7 @@ private:
     bool isDPressed = false;
     bool isTableViewPreyDataChangedByHand = false;
     bool isTableViewYerpDataChangedByHand = false;
+    bool addTest = false;
 
 
 signals:
@@ -108,6 +113,5 @@ private slots:
     void on_tableViewPrey_doubleClicked(const QModelIndex &index);
     void on_modelPreyDataChanged(QModelIndex, QModelIndex);
     void on_modelYerpDataChanged(QModelIndex, QModelIndex);
-
 };
 #endif // MAINWINDOW_H
