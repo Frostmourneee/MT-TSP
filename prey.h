@@ -16,7 +16,7 @@ public:
     double getV() {return v;}
     double getDieTime() {return dieTime;}
     double getYerpNum() {return yerpNum;}
-    bool getIsDied() {return isDied;}
+    bool getIsDied() {return isDied; update();}
     void setEnd(QPointF e) {end = e;}
     void setSEnd(QPointF sE) {sEnd = sE;}
     void setAlpha(double ang) {alpha = ang;}

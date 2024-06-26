@@ -61,6 +61,7 @@ void Solver::solve(MyQGraphicsView* view)
         y1->plan4AP.clear();
         y1->curPlan.clear();
         for (int i = 0; i < N; i++) {y1->bestPlan.push_back(curPlan[i]); y1->plan4AP.push_back(curPlan[i]); y1->curPlan.push_back(curPlan[i]);}
+        y1->setPlan4APTime(resT);
 
         free(x);
         free(y);
@@ -94,6 +95,7 @@ void Solver::solve(MyQGraphicsView* view)
     y2->plan4AP.clear();
     for (int i = 0; i < M; i++) { // Worth only if initial Yerps positions are not the same
         mTourTime[i] = timeOneYerp(resT, planFirst, N, i, true);
+        view->yerp[i]->setPlan4APTime(mTourTime[i]);
         for (int j = 0; j < N; j++) view->yerp[i]->plan4AP.push_back(planFirst[j]);
         if (resT == 0) {
             resT = mTourTime[i];

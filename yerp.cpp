@@ -39,3 +39,21 @@ void Yerp::advance(int phase)
     moveBy(vx*unit/100., -vy*unit/100.); // Timer shots 100 p/s, so movement velocity is V*unit pixels per second
     curr += QPointF(vx/100., vy/100.);
 }
+
+QString Yerp::plan4APToQString()
+{
+    QString str = "";
+    for (int num : plan4AP) str += QString::number(num)+"-";
+    str.chop(1);
+
+    return str;
+}
+
+QString Yerp::curPlanToQString()
+{
+    QString str = "";
+    for (int num : curPlan) str += QString::number(num)+"-";
+    if (!str.isEmpty() && str[str.size()-1] == "-") str.chop(1);
+
+    return str;
+}

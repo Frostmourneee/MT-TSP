@@ -36,6 +36,7 @@ public:
     void setAnchor(QPointF p) {anchor = p;}
     void setSCoordCenter(QPointF p) {sCoordCenter = p;}
     void setResizeDueToOnOptionsButtonClicked(bool b) {resizeDueToOnOptionsButtonClicked = b;}
+    void eraseHlight();
     void clear();
     void backAction();
     void textCoords(double x, double y);
@@ -56,8 +57,10 @@ public:
     QGraphicsRectItem* genRect;
 
 signals:
-    void preyWasCreatedOrDestroyed();
-    void yerpWasCreatedOrDestroyed();
+    void preyWasCreated(bool);
+    void yerpWasCreated(bool);
+    void fillTableDueToPreyCreation();
+    void fillTableDueToYerpCreation();
 
 public slots:
     void mousePressEvent(QMouseEvent* e) override;

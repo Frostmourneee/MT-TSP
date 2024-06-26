@@ -10,7 +10,11 @@ class Yerp : public GraphicsEntities
 public:
     Yerp(int num, QPointF st) : yerpNum{num}
     {start = st;}
+    QString plan4APToQString();
+    QString curPlanToQString();
     int getYerpNum() {return yerpNum;}
+    double getPlan4APTime() {return plan4APTime;}
+    void setPlan4APTime(double t) {plan4APTime = t;}
     QVector<int> bestPlan;
     QVector<int> plan4AP; // For all Preys
     QVector<int> curPlan; // For lineEditUsePlan
@@ -19,6 +23,7 @@ public:
 
 private:
     QPen pen = QPen(Qt::red, 3);
+    double plan4APTime;
     int yerpNum;
 
 protected:

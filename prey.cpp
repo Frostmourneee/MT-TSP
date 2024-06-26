@@ -8,12 +8,11 @@ void Prey::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
     painter->setRenderHint(QPainter::Antialiasing);
     int rad = GraphicsEntities::smallGraphicsUnit;
-//    if (isHlighted) {
-//        painter->setPen(QPen(QColor(255, 0, 255, 130), 3));
-//        painter->setBrush(Qt::transparent);
-//        painter->drawEllipse(sStart.x() - 2*rad,
-//                             sStart.y() - 2*rad, 4*rad, 4*rad);
-//    }
+    if (isHlighted) {
+        painter->setPen(QPen(QColor(255, 0, 255, 130), 3));
+        painter->setBrush(Qt::transparent);
+        painter->drawEllipse(-2*rad, -2*rad, 4*rad, 4*rad);
+    }
 
     if (isDied) {
         painter->setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));

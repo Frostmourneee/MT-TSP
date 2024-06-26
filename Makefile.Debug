@@ -294,6 +294,12 @@ debug/moc_mainwindow.cpp: mainwindow.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qtimer.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qbasictimer.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/QObject \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtGui/QStandardItemModel \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtGui/qstandarditemmodel.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qabstractitemmodel.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QScrollBar \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qscrollbar.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qabstractslider.h \
 		debug/moc_predefs.h \
 		../Qt5.14.2/5.14.2/mingw73_64/bin/moc.exe
 	C:\Qt\Qt5.14.2\5.14.2\mingw73_64\bin\moc.exe $(DEFINES) --include C:/Qt/MT-TSP/debug/moc_predefs.h -IC:/Qt/Qt5.14.2/5.14.2/mingw73_64/mkspecs/win32-g++ -IC:/Qt/MT-TSP -IC:/Qt/Qt5.14.2/5.14.2/mingw73_64/include -IC:/Qt/Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets -IC:/Qt/Qt5.14.2/5.14.2/mingw73_64/include/QtGui -IC:/Qt/Qt5.14.2/5.14.2/mingw73_64/include/QtANGLE -IC:/Qt/Qt5.14.2/5.14.2/mingw73_64/include/QtCore -IC:/Qt/Qt5.14.2/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++ -IC:/Qt/Qt5.14.2/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Qt5.14.2/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/backward -IC:/Qt/Qt5.14.2/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include -IC:/Qt/Qt5.14.2/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include-fixed -IC:/Qt/Qt5.14.2/Tools/mingw730_64/x86_64-w64-mingw32/include mainwindow.h -o debug\moc_mainwindow.cpp
@@ -1053,6 +1059,12 @@ debug/main.o: main.cpp mainwindow.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qtimer.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qbasictimer.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/QObject \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtGui/QStandardItemModel \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtGui/qstandarditemmodel.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qabstractitemmodel.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QScrollBar \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qscrollbar.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qabstractslider.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QApplication \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qapplication.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qdesktopwidget.h
@@ -1208,6 +1220,12 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qtimer.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qbasictimer.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/QObject \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtGui/QStandardItemModel \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtGui/qstandarditemmodel.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qabstractitemmodel.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QScrollBar \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qscrollbar.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qabstractslider.h \
 		ui_mainwindow.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/QVariant \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QAction \
@@ -1216,16 +1234,30 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QApplication \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qapplication.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qdesktopwidget.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QCheckBox \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qcheckbox.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qabstractbutton.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QDoubleSpinBox \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qspinbox.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qabstractspinbox.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtGui/qvalidator.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qregularexpression.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QFrame \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QHBoxLayout \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qboxlayout.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qlayout.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qlayoutitem.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qgridlayout.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QHeaderView \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qheaderview.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qabstractitemview.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qitemselectionmodel.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qabstractitemdelegate.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qstyleoption.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qslider.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qstyle.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qtabbar.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qrubberband.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QLabel \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qlabel.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QLineEdit \
@@ -1240,15 +1272,16 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qprogressbar.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QPushButton \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qpushbutton.h \
-		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qabstractbutton.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QRadioButton \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qradiobutton.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QSlider \
-		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qslider.h \
-		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qabstractslider.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QSpacerItem \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QSpinBox \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QStatusBar \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qstatusbar.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QTabWidget \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QTableView \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qtableview.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QVBoxLayout \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QWidget
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\mainwindow.o mainwindow.cpp
@@ -1542,7 +1575,13 @@ debug/prey.o: prey.cpp prey.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/QTimer \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qtimer.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qbasictimer.h \
-		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/QObject
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/QObject \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtGui/QStandardItemModel \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtGui/qstandarditemmodel.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qabstractitemmodel.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QScrollBar \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qscrollbar.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qabstractslider.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\prey.o prey.cpp
 
 debug/solver.o: solver.cpp solver.h \
@@ -1835,7 +1874,13 @@ debug/yerp.o: yerp.cpp yerp.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/QTimer \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qtimer.h \
 		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qbasictimer.h \
-		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/QObject
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/QObject \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtGui/QStandardItemModel \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtGui/qstandarditemmodel.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtCore/qabstractitemmodel.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/QScrollBar \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qscrollbar.h \
+		../Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/qabstractslider.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\yerp.o yerp.cpp
 
 debug/moc_mainwindow.o: debug/moc_mainwindow.cpp 

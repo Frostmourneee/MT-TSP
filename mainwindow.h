@@ -5,6 +5,8 @@
 #include <QThread>
 #include <QFileDialog>
 #include <solver.h>
+#include <QStandardItemModel>
+#include <QScrollBar>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,20 +23,36 @@ public:
 private:
     QString preyDataStrSave(double, double, double, double, double, double, int, int, int, int, int, int);
     QString yerpDataStrSave(double, double, int, int);
+    QString planToRowsRearrangementByYerp();
+    QString planToRowsRearrangementByDieTime();
     int signs(double);
+    int preyRowWithNum(int);
     bool isDataReadyToStartProcess();
     void saveDataToFile(FILE*);
     void setBestPlanToLineEditUsePlan();
+    void initTables();
+    void fillFullYerpTable();
+    void fillFullPreyTableAfter();
+    void preyRowsRearrangement(QString);
+    void preyRowsToInit();
+    void yerpRowsToInit();
+    void createPreyTableItem(Prey*);
+    void createYerpTableItem(Yerp*);
+    void afterPlanFillTable();
     Ui::MainWindow *ui;
     QThread* thread;
     MyQGraphicsView* view;
     Solver* solver;
+    QStandardItemModel* modelPrey;
+    QStandardItemModel* modelYerp;
     bool userHasntSeenOnlyLatinLettersWarning = true;
     bool sliderVsDSBTime = true; // Technical bool which needs to prevent the recursion in changing values of sliderTime and dSBTime
     bool isWPressed = false;
     bool isAPressed = false;
     bool isSPressed = false;
     bool isDPressed = false;
+    bool isTableViewPreyDataChangedByHand = false;
+    bool isTableViewYerpDataChangedByHand = false;
 
 
 signals:
@@ -46,8 +64,10 @@ private slots:
     void usePlanEnded();
     void sliderTick();
     void changeProgressBar(long long vC, long long vAll);
-    void preyWasCreatedOrDestroyed();
-    void yerpWasCreatedOrDestroyed();
+    void preyWasCreated(bool);
+    void yerpWasCreated(bool);
+    void fillTableDueToPreyCreation();
+    void fillTableDueToYerpCreation();
     void keyPressEvent(QKeyEvent *) override;
     void keyReleaseEvent(QKeyEvent *) override;
     void mouseMoveEvent(QMouseEvent *) override;
@@ -81,5 +101,12 @@ private slots:
     void on_checkBoxRandomN_stateChanged(int);
     void on_dSpinBoxVelMin_editingFinished();
     void on_dSpinBoxVelMax_editingFinished();
+    void on_tableViewPrey_clicked(const QModelIndex &index);
+    void on_tableViewYerp_clicked(const QModelIndex &index);
+    void on_tableViewYerp_doubleClicked(const QModelIndex &index);
+    void on_tableViewPrey_doubleClicked(const QModelIndex &index);
+    void on_modelPreyDataChanged(QModelIndex, QModelIndex);
+    void on_modelYerpDataChanged(QModelIndex, QModelIndex);
+
 };
 #endif // MAINWINDOW_H

@@ -46,12 +46,13 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
         if (yerp.size() == 2 || status != StatusScene::settingPreyStart) return;
 
         createYerp(pMath);
+        emit fillTableDueToYerpCreation();
 
         return;
     }
 
     switch (status) {
-        case StatusScene::settingPreyStart: // Click borns Prey the preyStart point
+        case StatusScene::settingPreyStart: // Click borns Prey and preyStart point
         {
             if (onGenRect(pScene)) // Start resizing genRect
             {
@@ -88,7 +89,7 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
             preyInst->sEll = ellipse;
             prey.push_back(preyInst);
             scene->addItem(preyInst);
-            emit preyWasCreatedOrDestroyed();
+            emit preyWasCreated(true);
 
             arrow->show();
             arrow->setPen(QPen(QBrush(Qt::black), 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -150,6 +151,7 @@ void MyQGraphicsView::mousePressEvent(QMouseEvent * e)
             arrow->hide();
 
             status = StatusScene::settingPreyStart;
+            emit fillTableDueToPreyCreation();
             break;
         }
         default:
@@ -334,23 +336,14 @@ void MyQGraphicsView::resizeEvent(QResizeEvent *e)
     {
         QPointF newSStart = coordsToScene(p->getStart());
         QPointF delta = newSStart-p->getSStart();
-        p->moveBy(delta.x(), delta.y());
-        p->setSStart(newSStart);
-        p->setSEnd(coordsToScene(p->getEnd()));
-
-        QPointF st = p->getSStart();
-        QPointF e = p->getSEnd();
-        p->sEll->setPos(st);
-        p->eEll->setPos(e);
-        p->line->setLine(QLineF(st, e));
+        preyTransform(p, sceneToCoords(p->pos()+QPointF(delta.x(), delta.y())));
     }
 
     for (Yerp* y : yerp) // Yerp's repositioning
     {
         QPointF newSStart = coordsToScene(y->getStart());
         QPointF delta = newSStart-y->getSStart();
-        y->moveBy(delta.x(), delta.y());
-        y->setSStart(newSStart);
+        yerpTransform(y, sceneToCoords(y->pos()+QPointF(delta.x(), delta.y())));
     }
 
     if (resizeDueToOnOptionsButtonClicked) transformViewToOptimal();
@@ -367,7 +360,7 @@ void MyQGraphicsView::createYerp(QPointF pMath)
     scene->addItem(yerpInst);
     yerp.push_back(yerpInst);
 
-    emit yerpWasCreatedOrDestroyed();
+    emit yerpWasCreated(true);
 }
 void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
 {
@@ -414,7 +407,7 @@ void MyQGraphicsView::createPreyOnFullInfo(QPointF st, QPointF end, double v)
     preyInst->setVel(v*cos(alpha*PI/180.), v*sin(alpha*PI/180.));
     preyInst->setV(v);
 
-    emit preyWasCreatedOrDestroyed();
+    emit preyWasCreated(true);
 }
 
 void MyQGraphicsView::zoomGraphics(double scaleFactor)
@@ -637,15 +630,16 @@ void MyQGraphicsView::textV(double v)
 
 void MyQGraphicsView::backAction()
 {
+    eraseHlight();
     switch (status) {
         case StatusScene::settingPreyStart: // Rollback to previous Prey velocity choosing
         {
             if (!yerp.isEmpty()) // Firstly Yerps will be removed
-            {
+            {   
                 scene->removeItem(yerp.last());
                 delete yerp.last();
                 yerp.removeLast();
-                emit yerpWasCreatedOrDestroyed();
+                emit yerpWasCreated(false);
                 return;
             }
 
@@ -668,7 +662,7 @@ void MyQGraphicsView::backAction()
             prey.last()->deleteSEll();
             delete prey.last();
             prey.removeLast();
-            emit preyWasCreatedOrDestroyed();
+            emit preyWasCreated(false);
             status = StatusScene::settingPreyStart;
 
             break;
@@ -692,6 +686,11 @@ void MyQGraphicsView::backAction()
             break;
         }
     }
+}
+void MyQGraphicsView::eraseHlight()
+{
+    for (Prey* p : prey) if (p->getIsHlighted()) {p->setIsHlighted(false); p->update();}
+    for (Yerp* y : yerp) if (y->getIsHlighted()) y->setIsHlighted(false);
 }
 void MyQGraphicsView::clear()
 {

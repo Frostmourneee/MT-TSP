@@ -16,6 +16,7 @@
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
@@ -29,6 +30,7 @@
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTableView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -57,12 +59,14 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QTabWidget *controlPanel;
     QWidget *info;
-    QWidget *horizontalLayoutWidget;
+    QVBoxLayout *verticalLayout_3;
     QHBoxLayout *layoutEntities;
     QLabel *labelYerps;
     QLabel *labelPreysNum;
     QLabel *labelPreys;
     QLabel *labelYerpsNum;
+    QTableView *tableViewYerp;
+    QTableView *tableViewPrey;
     QWidget *randomGen;
     QVBoxLayout *verticalLayout_2;
     QHBoxLayout *layoutGenEntities;
@@ -114,7 +118,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(719, 422);
+        MainWindow->resize(883, 566);
         actionClear1 = new QAction(MainWindow);
         actionClear1->setObjectName(QString::fromUtf8("actionClear1"));
         actionLoad_from_file = new QAction(MainWindow);
@@ -165,9 +169,17 @@ public:
         controlPanel->setSizePolicy(sizePolicy);
         controlPanel->setMinimumSize(QSize(400, 0));
         controlPanel->setMaximumSize(QSize(400, 16777215));
+        QPalette palette;
+        QBrush brush(QColor(170, 170, 127, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::NoRole, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::NoRole, brush);
+        palette.setBrush(QPalette::Disabled, QPalette::NoRole, brush);
+        controlPanel->setPalette(palette);
         QFont font;
         font.setPointSize(12);
         controlPanel->setFont(font);
+        controlPanel->setAutoFillBackground(false);
         controlPanel->setTabPosition(QTabWidget::North);
         controlPanel->setTabShape(QTabWidget::Rounded);
         controlPanel->setDocumentMode(false);
@@ -176,22 +188,27 @@ public:
         controlPanel->setTabBarAutoHide(false);
         info = new QWidget();
         info->setObjectName(QString::fromUtf8("info"));
-        horizontalLayoutWidget = new QWidget(info);
-        horizontalLayoutWidget->setObjectName(QString::fromUtf8("horizontalLayoutWidget"));
-        horizontalLayoutWidget->setGeometry(QRect(9, 9, 241, 31));
-        layoutEntities = new QHBoxLayout(horizontalLayoutWidget);
+        verticalLayout_3 = new QVBoxLayout(info);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        layoutEntities = new QHBoxLayout();
         layoutEntities->setObjectName(QString::fromUtf8("layoutEntities"));
-        layoutEntities->setContentsMargins(0, 0, 0, 0);
-        labelYerps = new QLabel(horizontalLayoutWidget);
+        labelYerps = new QLabel(info);
         labelYerps->setObjectName(QString::fromUtf8("labelYerps"));
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(labelYerps->sizePolicy().hasHeightForWidth());
+        labelYerps->setSizePolicy(sizePolicy1);
         labelYerps->setFont(font);
         labelYerps->setLayoutDirection(Qt::LeftToRight);
         labelYerps->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
         layoutEntities->addWidget(labelYerps);
 
-        labelPreysNum = new QLabel(horizontalLayoutWidget);
+        labelPreysNum = new QLabel(info);
         labelPreysNum->setObjectName(QString::fromUtf8("labelPreysNum"));
+        sizePolicy1.setHeightForWidth(labelPreysNum->sizePolicy().hasHeightForWidth());
+        labelPreysNum->setSizePolicy(sizePolicy1);
         QFont font1;
         font1.setPointSize(14);
         font1.setBold(true);
@@ -201,18 +218,55 @@ public:
 
         layoutEntities->addWidget(labelPreysNum);
 
-        labelPreys = new QLabel(horizontalLayoutWidget);
+        labelPreys = new QLabel(info);
         labelPreys->setObjectName(QString::fromUtf8("labelPreys"));
+        sizePolicy1.setHeightForWidth(labelPreys->sizePolicy().hasHeightForWidth());
+        labelPreys->setSizePolicy(sizePolicy1);
         labelPreys->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
         layoutEntities->addWidget(labelPreys);
 
-        labelYerpsNum = new QLabel(horizontalLayoutWidget);
+        labelYerpsNum = new QLabel(info);
         labelYerpsNum->setObjectName(QString::fromUtf8("labelYerpsNum"));
+        sizePolicy1.setHeightForWidth(labelYerpsNum->sizePolicy().hasHeightForWidth());
+        labelYerpsNum->setSizePolicy(sizePolicy1);
         labelYerpsNum->setFont(font1);
         labelYerpsNum->setAlignment(Qt::AlignCenter);
 
         layoutEntities->addWidget(labelYerpsNum);
+
+
+        verticalLayout_3->addLayout(layoutEntities);
+
+        tableViewYerp = new QTableView(info);
+        tableViewYerp->setObjectName(QString::fromUtf8("tableViewYerp"));
+        QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(tableViewYerp->sizePolicy().hasHeightForWidth());
+        tableViewYerp->setSizePolicy(sizePolicy2);
+        tableViewYerp->setMinimumSize(QSize(375, 220));
+        tableViewYerp->setMaximumSize(QSize(375, 220));
+        tableViewYerp->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        tableViewYerp->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+        verticalLayout_3->addWidget(tableViewYerp);
+
+        tableViewPrey = new QTableView(info);
+        tableViewPrey->setObjectName(QString::fromUtf8("tableViewPrey"));
+        tableViewPrey->setEnabled(true);
+        sizePolicy2.setHeightForWidth(tableViewPrey->sizePolicy().hasHeightForWidth());
+        tableViewPrey->setSizePolicy(sizePolicy2);
+        tableViewPrey->setMinimumSize(QSize(375, 180));
+        tableViewPrey->setMaximumSize(QSize(375, 16777215));
+        tableViewPrey->setFrameShape(QFrame::StyledPanel);
+        tableViewPrey->setFrameShadow(QFrame::Sunken);
+        tableViewPrey->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        tableViewPrey->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        tableViewPrey->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        tableViewPrey->setShowGrid(true);
+
+        verticalLayout_3->addWidget(tableViewPrey);
 
         controlPanel->addTab(info, QString());
         randomGen = new QWidget();
@@ -324,10 +378,10 @@ public:
         dSpinBoxVelMin->setFont(font2);
         dSpinBoxVelMin->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
         dSpinBoxVelMin->setDecimals(2);
-        dSpinBoxVelMin->setMinimum(0.010000000000000);
+        dSpinBoxVelMin->setMinimum(0.000000000000000);
         dSpinBoxVelMin->setMaximum(0.950000000000000);
         dSpinBoxVelMin->setSingleStep(0.010000000000000);
-        dSpinBoxVelMin->setValue(0.010000000000000);
+        dSpinBoxVelMin->setValue(0.000000000000000);
 
         layoutVelocity->addWidget(dSpinBoxVelMin);
 
@@ -409,9 +463,6 @@ public:
         lineEditUsePlan = new QLineEdit(centralwidget);
         lineEditUsePlan->setObjectName(QString::fromUtf8("lineEditUsePlan"));
         lineEditUsePlan->setEnabled(false);
-        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(lineEditUsePlan->sizePolicy().hasHeightForWidth());
         lineEditUsePlan->setSizePolicy(sizePolicy1);
         QFont font4;
@@ -558,7 +609,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 719, 21));
+        menubar->setGeometry(QRect(0, 0, 883, 21));
         menuFile = new QMenu(menubar);
         menuFile->setObjectName(QString::fromUtf8("menuFile"));
         menuView = new QMenu(menubar);
@@ -597,7 +648,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        controlPanel->setCurrentIndex(1);
+        controlPanel->setCurrentIndex(0);
         buttonUsePlan->setDefault(false);
         buttonBestPlan->setDefault(false);
         playButton->setDefault(false);

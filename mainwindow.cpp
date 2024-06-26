@@ -1,11 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-//TODO тесты
-//TODO сортировка по иксам работает?
-//TODO нельзя задать план из двузначной цели
-//TODO позволить при большом N не искать оптимум, а просто летать
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -60,23 +55,25 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionExit->setIcon(QIcon("exitIcon.png"));
 
     connect(view->timer4Animation, SIGNAL(timeout()), this, SLOT(sliderTick()));
-
-    connect(view, SIGNAL(preyWasCreatedOrDestroyed()), this, SLOT(preyWasCreatedOrDestroyed()));
-    connect(view, SIGNAL(yerpWasCreatedOrDestroyed()), this, SLOT(yerpWasCreatedOrDestroyed()));
+    connect(view, SIGNAL(preyWasCreated(bool)), this, SLOT(preyWasCreated(bool)));
+    connect(view, SIGNAL(yerpWasCreated(bool)), this, SLOT(yerpWasCreated(bool)));
+    connect(view, SIGNAL(fillTableDueToPreyCreation()), this, SLOT(fillTableDueToPreyCreation()));
+    connect(view, SIGNAL(fillTableDueToYerpCreation()), this, SLOT(fillTableDueToYerpCreation()));
 
     ui->progressBar->setStyleSheet("text-align: center");
-    ui->controlPanel->setStyleSheet("background-color: rgb(240, 240, 240);");
+    ui->info->setAutoFillBackground(true);
+    ui->randomGen->setAutoFillBackground(true);
     ui->controlPanel->hide();
-    ui->spinBoxPreys->setStyleSheet("background-color: white;");
-    ui->spinBoxYerps->setStyleSheet("background-color: white;");
-    ui->dSpinBoxVelMin->setStyleSheet("background-color: white;");
-    ui->dSpinBoxVelMax->setStyleSheet("background-color: white;");
 
     connect(ui->lineEditUsePlan, SIGNAL(returnPressed()), this, SLOT(setFocus()));
     connect(ui->spinBoxPreys, SIGNAL(editingFinished()), this, SLOT(setFocus()));
     connect(ui->spinBoxYerps, SIGNAL(editingFinished()), this, SLOT(setFocus()));
     connect(ui->dSpinBoxVelMin, SIGNAL(editingFinished()), this, SLOT(setFocus()));
     connect(ui->dSpinBoxVelMax, SIGNAL(editingFinished()), this, SLOT(setFocus()));
+
+    initTables();
+    connect(modelPrey, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(on_modelPreyDataChanged(QModelIndex, QModelIndex)));
+    connect(modelYerp, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(on_modelYerpDataChanged(QModelIndex, QModelIndex)));
 }
 
 MainWindow::~MainWindow()
@@ -176,13 +173,26 @@ void MainWindow::mouseMoveEvent(QMouseEvent * e) {
     view->setVisibleText(false);
 }
 
-void MainWindow::preyWasCreatedOrDestroyed()
+void MainWindow::preyWasCreated(bool wasCreated)
 {
     ui->labelPreysNum->setText(QString::number(view->prey.size()));
+
+    if (wasCreated) return; // Wasn't destroyed
+
+    modelPrey->removeRow(modelPrey->rowCount() - 1);
+    ui->tableViewPrey->resizeColumnsToContents();
+    ui->tableViewPrey->resizeRowsToContents();
 }
-void MainWindow::yerpWasCreatedOrDestroyed()
+void MainWindow::yerpWasCreated(bool wasCreated)
 {
     ui->labelYerpsNum->setText(QString::number(view->yerp.size()));
+
+    if (wasCreated) return; // Wasn't destroyed
+
+    modelYerp->removeRow(modelYerp->rowCount() - 1);
+    modelYerp->removeRow(modelYerp->rowCount() - 1); // *
+    ui->tableViewYerp->resizeColumnsToContents();
+    ui->tableViewYerp->resizeRowsToContents();
 }
 void MainWindow::sliderTick()
 {
@@ -230,11 +240,10 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
             p->setCurr(p->getStart());
         }
 
-        if (newT - p->getDieTime() > 0) {p->setIsDied(true); p->update();}
-        else if (newT - p->getDieTime() < 0) {p->setIsDied(false); p->update();}
+        if (newT - p->getDieTime() > 0) p->setIsDied(true);
+        else if (newT - p->getDieTime() < 0) p->setIsDied(false);
         else {
             p->setIsDied(true);
-            p->update();
 
             p->setPos(view->coordsToScene(p->getDiePoint()));
             p->setCurr(p->getDiePoint());
@@ -287,8 +296,7 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
         view->timer4Animation->stop();
     } // Animation has ended
 
-    //===============// Placing positions via mouse click
-    if (view->timer4Animation->isActive()) return;
+    //===============// Placing positions via mouse click (equally in time in table click)
     QPointF newP;
     for (Prey* p : view->prey) {
         if (p->getIsDied()) {
@@ -419,7 +427,7 @@ void MainWindow::on_buttonUsePlan_clicked()
                 plan4SecondYerp.push_back(i.toInt());
 
     QPalette palette;
-    if (view->yerp.size() == 2 && !plan4SecondYerp.isEmpty())
+    if (view->yerp.size() == 1 && !plan4SecondYerp.isEmpty())
     {
         palette.setColor(QPalette::Text,Qt::red);
         ui->lineEditUsePlan->setPalette(palette);
@@ -520,12 +528,12 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
 
     view->genRect->show();
     view->transformViewToOptimal();
+    view->eraseHlight();
     ui->labelT->setText("");
     ui->dSBTime->setValue(0);
     ui->sliderTime->setValue(0);
     ui->lineEditUsePlan->clear();
     ui->lineEditUsePlan->setEnabled(false);
-    ui->lineEditUsePlan->setStyleSheet("background-color: rgb(240, 240, 240);");
     ui->optimalZoomButton->setEnabled(false);
     ui->actionOptimalZoom->setEnabled(false);
     ui->playButton->setIcon(QIcon("playIcon.png"));
@@ -558,18 +566,36 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
         y->setPos(view->coordsToScene(y->getStart()));
         y->setCurr(y->getStart());
     }
+
+    preyRowsToInit();
+    yerpRowsToInit();
+    for (int i = 0; i < view->prey.size(); i++) // x0, y0, angle, velocity
+    {
+        modelPrey->item(i, 1)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+        modelPrey->item(i, 2)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+        modelPrey->item(i, 3)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+        modelPrey->item(i, 4)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    }
+    for (int i = 0; i < view->yerp.size(); i++) // x0, y0
+    {
+        modelYerp->item(2*i, 1)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+        modelYerp->item(2*i, 2)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+
+        modelYerp->item(2*i+1, 1)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable); // x0, y0*
+        modelYerp->item(2*i+1, 2)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    }
 }
 void MainWindow::on_actionClear_triggered()
 {
     setFocus();
 
+    view->eraseHlight();
     view->clear();
     ui->labelPreysNum->setText("0");
     ui->labelYerpsNum->setText("0");
     ui->labelT->setText("");
     ui->lineEditUsePlan->clear();
     ui->lineEditUsePlan->setEnabled(false);
-    ui->lineEditUsePlan->setStyleSheet("background-color: rgb(240, 240, 240);");
     view->genRect->show();
     ui->rBConstruction->setChecked(true);
     ui->rBAnimation->setEnabled(false);
@@ -589,6 +615,9 @@ void MainWindow::on_actionClear_triggered()
     ui->actionUsePlan->setEnabled(false);
     ui->buttonBestPlan->setEnabled(false);
     ui->actionUseBestPlan->setEnabled(false);
+
+    modelPrey->removeRows(0, modelPrey->rowCount());
+    modelYerp->removeRows(0, modelYerp->rowCount());
 
     QPointF pMathCursorPos = view->sceneToCoords(view->mapFromGlobal(QCursor::pos()));
     double x = pMathCursorPos.x();
@@ -691,6 +720,9 @@ void MainWindow::on_actionRandom_triggered()
 
         view->createPreyOnFullInfo(QPointF(x, y), QPointF(xEnd, yEnd), v);
     }
+
+    fillFullYerpTable();
+    fillFullPreyTableAfter();
 }
 void MainWindow::on_actionStart_triggered()
 {
@@ -708,6 +740,7 @@ void MainWindow::on_actionStart_triggered()
     ui->actionBack->setEnabled(false);
     view->setVisibleText(false);
     view->genRect->hide();
+    view->eraseHlight();
 
     FILE* initDataFile = fopen("initData.txt", "w+"); // Saving all the data to the default "initData.txt" file
     saveDataToFile(initDataFile);
@@ -814,6 +847,9 @@ void MainWindow::on_actionLoad_from_file_triggered()
     fclose(f);
 
     view->transformViewToOptimal();
+
+    fillFullYerpTable();
+    fillFullPreyTableAfter();
 }
 void MainWindow::on_checkBoxRandomM_stateChanged(int isChecked)
 {
@@ -831,7 +867,397 @@ void MainWindow::on_dSpinBoxVelMax_editingFinished()
 {
     ui->dSpinBoxVelMin->setMaximum(ui->dSpinBoxVelMax->value());
 }
+void MainWindow::on_tableViewPrey_clicked(const QModelIndex &index)
+{
+    if (modelPrey->item(index.row(), index.column())->foreground().color() != Qt::blue) return;
 
+    if (index.column() == 0) // №
+    {
+        int i = modelPrey->data(index, Qt::DisplayRole).toInt();
+        if (view->prey[i]->getIsHlighted()) {
+            view->eraseHlight(); // Can't write it at the beginning of func cause eraseHlight() affects getIsHlighted()
+            return;
+        }
+
+        view->eraseHlight(); // Can't write it at the beginning of func cause eraseHlight() affects getIsHlighted()
+        view->prey[i]->setIsHlighted(true);
+    } else if (index.column() == 5) // dieTime
+    {
+        ui->dSBTime->setValue(modelPrey->data(index, Qt::DisplayRole).toDouble());
+    }
+}
+void MainWindow::on_tableViewYerp_clicked(const QModelIndex &index)
+{
+    if (modelYerp->item(index.row(), index.column())->foreground().color() != Qt::blue) return;
+
+    if (index.column() == 3 && index.row() % 2 == 0) { // Plan
+        int i = index.row()/2;
+        if (view->yerp[i]->getIsHlighted()) {
+            view->eraseHlight(); // Can't write it at the beginning of func cause eraseHlight() affects getIsHlighted()
+            return;
+        }
+
+        view->eraseHlight(); // Can't write it at the beginning of func cause eraseHlight() affects getIsHlighted()
+        view->yerp[i]->setIsHlighted(true);
+        for (int ind : view->yerp[i]->curPlan) view->prey[ind]->setIsHlighted(true);
+    } else if (index.column() == 4 && index.row() % 2 == 0) { // Fly (working) time
+        ui->dSBTime->setValue(modelYerp->data(index, Qt::DisplayRole).toDouble());
+    }
+}
+void MainWindow::on_tableViewPrey_doubleClicked(const QModelIndex &index)
+{
+    if (modelPrey->item(index.row(), index.column())->isEditable()) isTableViewPreyDataChangedByHand = true;
+}
+void MainWindow::on_modelPreyDataChanged(QModelIndex i1, QModelIndex i2)
+{
+    if (!isTableViewPreyDataChangedByHand) return;
+    isTableViewPreyDataChangedByHand = false;
+
+    int row = i1.row();
+    int col = i1.column();
+    if (col == 1 || col == 2) // x0, y0
+    {
+        Prey* p = view->prey[row];
+        QPointF newSt = QPointF(modelPrey->item(row, 1)->data(Qt::DisplayRole).toDouble(), modelPrey->item(row, 2)->data(Qt::DisplayRole).toDouble());
+        QPointF delta = newSt-p->getStart();
+        p->setStart(newSt);
+        p->setEnd(p->getEnd()+delta);
+        view->preyTransform(p, p->getStart());
+    }
+    else if (col == 3) // angle
+    {
+        Prey* p = view->prey[row];
+        double alpha = modelPrey->item(row, 3)->data(Qt::DisplayRole).toDouble();
+        QPointF newEnd = p->getStart() + p->line->line().length()/view->getUnit()*QPointF(cos(PI/180.*alpha), sin(PI/180.*alpha));
+        QPointF sNewEnd = view->coordsToScene(newEnd);
+
+        p->eEll->setPos(sNewEnd);
+        p->setEnd(newEnd);
+        p->setSEnd(sNewEnd);
+        p->setAlpha(alpha);
+        p->line->setLine(QLineF(p->getSStart(), p->getSEnd()));
+        p->setVel(p->getV()*QPointF(cos(PI/180.*alpha), sin(PI/180.*alpha)));
+        p->setPos(p->getSStart());
+    }
+    else if (col == 4) // velocity
+    {
+        Prey* p = view->prey[row];
+        if (modelPrey->item(row, 4)->data(Qt::DisplayRole).toDouble() > 0.95) modelPrey->item(row, 4)->setData(0.95, Qt::EditRole);
+        else if (modelPrey->item(row, 4)->data(Qt::DisplayRole).toDouble() < 0.) modelPrey->item(row, 4)->setData(0., Qt::EditRole);
+
+        p->setV(modelPrey->item(row, 4)->data(Qt::DisplayRole).toDouble());
+        p->setVel(p->getV()*QPointF(cos(PI/180.*p->getAlpha()), sin(PI/180.*p->getAlpha())));
+    }
+
+    Q_UNUSED(i2);
+}
+void MainWindow::on_tableViewYerp_doubleClicked(const QModelIndex &index)
+{
+    if (modelYerp->item(index.row(), index.column())->isEditable()) isTableViewYerpDataChangedByHand = true;
+}
+void MainWindow::on_modelYerpDataChanged(QModelIndex i1, QModelIndex i2)
+{
+    if (!isTableViewYerpDataChangedByHand) return;
+    isTableViewYerpDataChangedByHand = false;
+
+    int row = i1.row();
+    double x = modelYerp->item(row, 1)->data(Qt::DisplayRole).toDouble();
+    double y = modelYerp->item(row, 2)->data(Qt::DisplayRole).toDouble();
+    QPointF newSt = QPointF(x, y);
+    QPointF sNewSt = view->coordsToScene(newSt);
+    view->yerp[row/2]->setStart(newSt);
+    view->yerp[row/2]->setSStart(sNewSt);
+    view->yerp[row/2]->setPos(sNewSt);
+
+    modelYerp->item(row+1, 1)->setData(x, Qt::EditRole);
+    modelYerp->item(row+1, 2)->setData(y, Qt::EditRole);
+
+    Q_UNUSED(i2);
+}
+
+void MainWindow::initTables()
+{
+    ui->tableViewPrey->setShowGrid(true);
+    ui->tableViewPrey->setGridStyle(Qt::SolidLine);
+    ui->tableViewPrey->verticalHeader()->hide();
+    ui->tableViewPrey->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    ui->tableViewPrey->verticalScrollBar()->setSingleStep(3);
+    ui->tableViewPrey->horizontalScrollBar()->setSingleStep(3);
+    ui->tableViewPrey->setSortingEnabled(false);
+
+    ui->tableViewYerp->setShowGrid(true);
+    ui->tableViewYerp->setGridStyle(Qt::SolidLine);
+    ui->tableViewYerp->verticalHeader()->hide();
+    ui->tableViewYerp->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    ui->tableViewYerp->verticalScrollBar()->setSingleStep(3);
+    ui->tableViewYerp->horizontalScrollBar()->setSingleStep(3);
+    ui->tableViewYerp->setSortingEnabled(false);
+
+    modelPrey = new QStandardItemModel();
+    QStringList labels = QString::fromUtf8("№, X(0), Y(0), Angle (deg), V, Died, Yerp, dieX, dieY").simplified().split(",");
+    modelPrey->setHorizontalHeaderLabels(labels);
+    for (int i = 0; i < 9; i++) modelPrey->horizontalHeaderItem(i)->setFont(QFont("MS Shell Dlg 2", 11));
+    ui->tableViewPrey->setModel(modelPrey);
+    ui->tableViewPrey->resizeRowsToContents();
+    ui->tableViewPrey->resizeColumnsToContents();
+
+    modelYerp = new QStandardItemModel();
+    labels = QString::fromUtf8("№, X(0), Y(0), Plan, Time").simplified().split(",");
+    modelYerp->setHorizontalHeaderLabels(labels);
+    for (int i = 0; i < 5; i++) modelYerp->horizontalHeaderItem(i)->setFont(QFont("MS Shell Dlg 2", 11));
+    ui->tableViewYerp->setModel(modelYerp);
+    ui->tableViewYerp->resizeRowsToContents();
+    ui->tableViewYerp->resizeColumnsToContents();
+}
+void MainWindow::fillFullYerpTable()
+{
+    for (Yerp* y : view->yerp) createYerpTableItem(y);
+
+    ui->tableViewYerp->resizeColumnsToContents();
+    ui->tableViewYerp->resizeRowsToContents();
+}
+void MainWindow::fillFullPreyTableAfter()
+{
+    for (Prey* p : view->prey) createPreyTableItem(p);
+
+    ui->tableViewPrey->resizeColumnsToContents();
+    ui->tableViewPrey->resizeRowsToContents();
+}
+void MainWindow::preyRowsRearrangement(QString plan) // Rearrange rows in tableViewPrey according to plan
+{
+    for (int i = 0; i < view->prey.size(); i++) {
+        QList<QStandardItem *> removedRow = modelPrey->takeRow(preyRowWithNum(plan.split("-")[i].toInt()));
+        modelPrey->insertRow(i, removedRow);
+    }
+}
+int MainWindow::preyRowWithNum(int num)
+{
+    for (int k = 0; k < view->prey.size(); k++)
+        if (modelPrey->data(modelPrey->index(k, 0), Qt::DisplayRole).toInt() == num) return k;
+
+    return -1; // Failure code
+}
+QString MainWindow::planToRowsRearrangementByYerp()
+{
+    QString str = "";
+    for (Yerp* y : view->yerp)
+    {
+        for (int num : y->curPlan)
+        {
+            str += QString::number(num)+"-";
+        }
+    }
+    str.chop(1);
+
+    return str;
+}
+QString MainWindow::planToRowsRearrangementByDieTime()
+{
+    if (view->yerp[0]->curPlan.size() == view->prey.size()) return view->yerp[0]->curPlanToQString();
+
+    int i1 = 0;
+    int i2 = 0;
+    Yerp* y1 = view->yerp[0];
+    Yerp* y2 = view->yerp[1];
+    QVector<Prey* > preys = view->prey;
+    QString str = "";
+    while (i1+i2 != preys.size())
+    {
+        if (i1 == y1->curPlan.size())
+        {
+            str += QString::number(y2->curPlan[i2])+"-";
+            i2++;
+            continue;
+        }
+        if (i2 == y2->curPlan.size())
+        {
+            str += QString::number(y1->curPlan[i1])+"-";
+            i1++;
+            continue;
+        }
+
+        if (preys[y1->curPlan[i1]]->getDieTime() < preys[y2->curPlan[i2]]->getDieTime())
+        {
+            str += QString::number(y1->curPlan[i1])+"-";
+            i1++;
+        }
+        else
+        {
+            str += QString::number(y2->curPlan[i2])+"-";
+            i2++;
+        }
+    }
+    str.chop(1);
+
+    return str;
+}
+void MainWindow::preyRowsToInit()
+{
+    for (int i = 0; i < view->prey.size(); i++) {
+        modelPrey->item(i, 5)->setText(QString(""));
+        modelPrey->item(i, 6)->setText(QString(""));
+        modelPrey->item(i, 7)->setText(QString(""));
+        modelPrey->item(i, 8)->setText(QString(""));
+    }
+
+    QString resetPlan = "";
+    for (int i = 0; i <= view->prey.size()-1; i++) resetPlan += i == view->prey.size()-1 ? QString("%1").arg(i) : QString("%1-").arg(i);
+    preyRowsRearrangement(resetPlan);
+}
+void MainWindow::yerpRowsToInit()
+{
+    for (int i = 0; i < view->yerp.size(); i++) {
+        modelYerp->item(2*i, 3)->setText("");
+        modelYerp->item(2*i, 4)->setText("");
+
+        modelYerp->item(2*i+1, 3)->setText(""); // *
+        modelYerp->item(2*i+1, 4)->setText("");
+    }
+}
+void MainWindow::fillTableDueToPreyCreation()
+{
+    createPreyTableItem(view->prey.last());
+
+    ui->tableViewPrey->resizeColumnsToContents();
+    ui->tableViewPrey->resizeRowsToContents();
+}
+void MainWindow::fillTableDueToYerpCreation()
+{
+    createYerpTableItem(view->yerp.last());
+
+    ui->tableViewYerp->resizeColumnsToContents();
+    ui->tableViewYerp->resizeRowsToContents();
+}
+void MainWindow::createPreyTableItem(Prey *p)
+{
+    QStandardItem* item;
+    item = new QStandardItem(); // №
+    item->setData(QString::number(modelPrey->rowCount(), 'f', 2).toDouble(), Qt::EditRole);
+    item->setFont(QFont("MS Shell Dlg 2", 11, QFont::Bold));
+    item->setForeground(QBrush(Qt::blue));
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelPrey->setItem(modelPrey->rowCount(), 0, item);
+
+    item = new QStandardItem(); // x0
+    item->setData(QString::number(p->getStart().x(), 'f', 2).toDouble(), Qt::EditRole);
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelPrey->setItem(modelPrey->rowCount() - 1, 1, item);
+
+    item = new QStandardItem(); // y0
+    item->setData(QString::number(p->getStart().y(), 'f', 2).toDouble(), Qt::EditRole);
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelPrey->setItem(modelPrey->rowCount() - 1, 2, item);
+
+    item = new QStandardItem(); // angle
+    item->setData(QString::number(p->getAlpha(), 'f', 2).toDouble(), Qt::EditRole);
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelPrey->setItem(modelPrey->rowCount() - 1, 3, item);
+
+    item = new QStandardItem(); // velocity
+    item->setData(QString::number(p->getV(), 'f', 2).toDouble(), Qt::EditRole);
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelPrey->setItem(modelPrey->rowCount() - 1, 4, item);
+
+    item = new QStandardItem(); // dieTime
+    item->setFont(QFont("MS Shell Dlg 2", 11, QFont::Bold));
+    item->setForeground(QBrush(Qt::blue));
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelPrey->setItem(modelPrey->rowCount() - 1, 5, item);
+
+    item = new QStandardItem(); // yerpNum
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelPrey->setItem(modelPrey->rowCount() - 1, 6, item);
+
+    item = new QStandardItem(); // dieX
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelPrey->setItem(modelPrey->rowCount() - 1, 7, item);
+
+    item = new QStandardItem(); // dieY
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelPrey->setItem(modelPrey->rowCount() - 1, 8, item);
+}
+void MainWindow::createYerpTableItem(Yerp *y)
+{
+    QStandardItem* item;
+    item = new QStandardItem(); // №
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setData(QString::number(y->getYerpNum(), 'f', 2).toDouble(), Qt::EditRole);
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelYerp->setItem(modelYerp->rowCount(), 0, item);
+    item = new QStandardItem(); // №*
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setData(QString::number(y->getYerpNum())+"*", Qt::EditRole);
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelYerp->setItem(modelYerp->rowCount(), 0, item);
+
+    item = new QStandardItem(); // x0
+    item->setData(QString::number(y->getStart().x(), 'f', 2).toDouble(), Qt::EditRole);
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelYerp->setItem(modelYerp->rowCount() - 2, 1, item);
+    item = new QStandardItem(); // x0*
+    item->setData(QString::number(y->getStart().x(), 'f', 2).toDouble(), Qt::EditRole);
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelYerp->setItem(modelYerp->rowCount() - 1, 1, item);
+
+    item = new QStandardItem(); // y0
+    item->setData(QString::number(y->getStart().y(), 'f', 2).toDouble(), Qt::EditRole);
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelYerp->setItem(modelYerp->rowCount() - 2, 2, item);
+    item = new QStandardItem(); // y0*
+    item->setData(QString::number(y->getStart().y(), 'f', 2).toDouble(), Qt::EditRole);
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelYerp->setItem(modelYerp->rowCount() - 1, 2, item);
+
+    item = new QStandardItem(); // Plan
+    item->setFont(QFont("MS Shell Dlg 2", 11, QFont::Bold));
+    item->setForeground(QBrush(Qt::blue));
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelYerp->setItem(modelYerp->rowCount() - 2, 3, item);
+    item = new QStandardItem(); // Plan*
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelYerp->setItem(modelYerp->rowCount() - 1, 3, item);
+
+    item = new QStandardItem(); // Fly (working) time
+    item->setFont(QFont("MS Shell Dlg 2", 11, QFont::Bold));
+    item->setForeground(QBrush(Qt::blue));
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelYerp->setItem(modelYerp->rowCount() - 2, 4, item);
+    item = new QStandardItem(); // Fly (working) time*
+    item->setFont(QFont("MS Shell Dlg 2", 11));
+    item->setFlags(Qt::ItemIsEnabled);
+    item->setTextAlignment(Qt::AlignCenter);
+    modelYerp->setItem(modelYerp->rowCount() - 1, 4, item);
+}
 
 void MainWindow::saveDataToFile(FILE *f)
 {
@@ -929,7 +1355,6 @@ void MainWindow::solvingEnded()
     ui->rBAnimation->setChecked(true);
 
     ui->lineEditUsePlan->setEnabled(true);
-    ui->lineEditUsePlan->setStyleSheet("background-color: white;");
     ui->progressBar->setValue(0);
     ui->dSBTime->setMaximum(solver->getResT());
     ui->dSBTime->setValue(0);
@@ -960,14 +1385,70 @@ void MainWindow::solvingEnded()
     }
 
     setBestPlanToLineEditUsePlan();
+    afterPlanFillTable();
 }
 void MainWindow::usePlanEnded()
 {
+    thread->exit(0);
+
     double resT = qMax(view->yerp[0]->lastPrey->getDieTime(), view->yerp.size() == 2 ? view->yerp[1]->lastPrey->getDieTime() : view->yerp[0]->lastPrey->getDieTime());
     ui->labelT->setText(QString::number(resT, 'f', 2));
     ui->dSBTime->setMaximum(resT);
     ui->sliderTime->setMaximum(100*resT-(int)(resT*100) < 0.5 ? (int)(resT*100) : (int)(resT*100)+1);
-    thread->exit(0);
+    view->timer4Animation->stop();
+
+    afterPlanFillTable();
+}
+void MainWindow::afterPlanFillTable()
+{
+    preyRowsRearrangement(planToRowsRearrangementByYerp());
+
+    Prey* tmpPrey;
+    for (int i = 0; i < view->yerp[0]->curPlan.size(); i++) // Preys from 1st Yerp
+    {
+        tmpPrey = view->prey[view->yerp[0]->curPlan[i]];
+        modelPrey->item(i, 1)->setFlags(Qt::ItemIsEnabled);
+        modelPrey->item(i, 2)->setFlags(Qt::ItemIsEnabled);
+        modelPrey->item(i, 3)->setFlags(Qt::ItemIsEnabled);
+        modelPrey->item(i, 4)->setFlags(Qt::ItemIsEnabled);
+        modelPrey->item(i, 5)->setData(QString::number(tmpPrey->getDieTime(), 'f', 2).toDouble(), Qt::EditRole);
+        modelPrey->item(i, 6)->setData(1., Qt::EditRole);
+        modelPrey->item(i, 7)->setData(QString::number(tmpPrey->getDiePoint().x(), 'f', 2).toDouble(), Qt::EditRole);
+        modelPrey->item(i, 8)->setData(QString::number(tmpPrey->getDiePoint().y(), 'f', 2).toDouble(), Qt::EditRole);
+    }
+
+    int k1 = view->yerp[0]->curPlan.size();
+    for (int i = view->yerp[0]->curPlan.size(); i < view->prey.size(); i++) // Preys from 2nd Yerp
+    {
+        tmpPrey = view->prey[view->yerp[1]->curPlan[i-k1]];
+        modelPrey->item(i, 1)->setFlags(Qt::ItemIsEnabled);
+        modelPrey->item(i, 2)->setFlags(Qt::ItemIsEnabled);
+        modelPrey->item(i, 3)->setFlags(Qt::ItemIsEnabled);
+        modelPrey->item(i, 4)->setFlags(Qt::ItemIsEnabled);
+        modelPrey->item(i, 5)->setData(QString::number(tmpPrey->getDieTime(), 'f', 2).toDouble(), Qt::EditRole);
+        modelPrey->item(i, 6)->setData(2., Qt::EditRole);
+        modelPrey->item(i, 7)->setData(QString::number(tmpPrey->getDiePoint().x(), 'f', 2).toDouble(), Qt::EditRole);
+        modelPrey->item(i, 8)->setData(QString::number(tmpPrey->getDiePoint().y(), 'f', 2).toDouble(), Qt::EditRole);
+    }
+    ui->tableViewPrey->resizeColumnsToContents();
+    ui->tableViewPrey->resizeRowsToContents();
+
+    Yerp* y;
+    for (int i = 0; i < view->yerp.size(); i++)
+    {
+        y = view->yerp[i];
+        modelYerp->item(2*i, 1)->setFlags(Qt::ItemIsEnabled);
+        modelYerp->item(2*i, 2)->setFlags(Qt::ItemIsEnabled);
+        modelYerp->item(2*i, 3)->setData(y->curPlanToQString(), Qt::EditRole);
+        modelYerp->item(2*i, 4)->setData(QString::number(y->curPlan.isEmpty() ? 0.: y->lastPrey->getDieTime(), 'f', 2).toDouble(), Qt::EditRole);
+
+        modelYerp->item(2*i+1, 3)->setData(y->plan4APToQString(), Qt::EditRole);
+        modelYerp->item(2*i+1, 4)->setData(QString::number(y->getPlan4APTime(), 'f', 2).toDouble(), Qt::EditRole);
+    }
+    ui->tableViewYerp->resizeColumnsToContents();
+    ui->tableViewYerp->resizeRowsToContents();
+
+    preyRowsRearrangement(planToRowsRearrangementByDieTime());
 }
 
 void MainWindow::changeProgressBar(long long vC, long long vAll)
@@ -1007,4 +1488,3 @@ int MainWindow::signs(double r)
 
     return tmp++;
 }
-
