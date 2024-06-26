@@ -27,7 +27,7 @@ private:
     QString planToRowsRearrangementByDieTime();
     int signs(double);
     int preyRowWithNum(int);
-    bool isDataReadyToStartProcess();
+    bool isDataReadyToUsePlan();
     void saveDataToFile(FILE*);
     void setBestPlanToLineEditUsePlan();
     void initTables();
@@ -39,6 +39,7 @@ private:
     void createPreyTableItem(Prey*);
     void createYerpTableItem(Yerp*);
     void afterPlanFillTable();
+    void enableUIAfterUsePlan();
     Ui::MainWindow *ui;
     QThread* thread;
     MyQGraphicsView* view;

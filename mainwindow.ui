@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>883</width>
-    <height>566</height>
+    <height>651</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -207,14 +207,20 @@
           <property name="minimumSize">
            <size>
             <width>375</width>
-            <height>220</height>
+            <height>230</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>375</width>
-            <height>220</height>
+            <height>230</height>
            </size>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOn</enum>
           </property>
           <property name="verticalScrollMode">
            <enum>QAbstractItemView::ScrollPerPixel</enum>
@@ -320,7 +326,7 @@
              <number>1</number>
             </property>
             <property name="maximum">
-             <number>11</number>
+             <number>20</number>
             </property>
            </widget>
           </item>
@@ -394,7 +400,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>Preys from 1 to 11</string>
+           <string>Preys from 1 to 20</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -636,7 +642,7 @@
            </font>
           </property>
           <property name="toolTip">
-           <string>Shows the control panel</string>
+           <string/>
           </property>
           <property name="text">
            <string>Use Plan:</string>
@@ -649,7 +655,7 @@
         <item>
          <widget class="QLineEdit" name="lineEditUsePlan">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -734,7 +740,7 @@
         <item>
          <widget class="QPushButton" name="buttonUsePlan">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="minimumSize">
            <size>
@@ -939,46 +945,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="optionsButton">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>32</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>32</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Shows the control panel</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>32</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>false</bool>
-          </property>
-          <property name="flat">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="optimalZoomButton">
           <property name="enabled">
            <bool>false</bool>
@@ -1037,6 +1003,46 @@
           </property>
           <property name="toolTip">
            <string>Reset view to default</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>false</bool>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="optionsButton">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Shows the control panel</string>
           </property>
           <property name="text">
            <string/>
@@ -1120,11 +1126,6 @@
    <addaction name="menuAnimation_Control"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionClear1">
-   <property name="text">
-    <string>Restart</string>
-   </property>
-  </action>
   <action name="actionLoad_from_file">
    <property name="text">
     <string>Load Configuration...</string>
@@ -1191,7 +1192,7 @@
   </action>
   <action name="actionUsePlan">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Use Plan</string>

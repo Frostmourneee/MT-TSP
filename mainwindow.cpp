@@ -1,14 +1,17 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+//TODO ускоренный полет
+//TODO тесты
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    setMinimumSize(QSize(1200, 600));
-    resize(QSize(1200, 600));
+    setMinimumSize(QSize(1200, 630));
+    resize(QSize(1200, 630));
 
     setMouseTracking(true);
     centralWidget()->setMouseTracking(true);
@@ -36,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionUseBestPlan->setIcon(QIcon("bestPlanIcon.png"));
     ui->optimalZoomButton->setIcon(QIcon("optimalZoomIcon.png"));
     ui->actionOptimalZoom->setIcon(QIcon("optimalZoomIcon.png"));
+    ui->actionStart->setIcon(QIcon("startIcon.png"));
+    ui->actionStart->setText("Start Calculation\tShift+Enter");
     ui->playButton->setIcon(QIcon("playIcon.png"));
     ui->actionPlay->setIcon(QIcon("playIcon.png"));
     ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
@@ -48,8 +53,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionLoad_from_file->setIcon(QIcon("openConfigIcon.png"));
     ui->actionSave_as->setIcon(QIcon("saveAsIcon.png"));
     ui->actionBack->setIcon(QIcon("backIcon.png"));
-    ui->actionStart->setIcon(QIcon("startIcon.png"));
-    ui->actionStart->setText("Start Calculation\tShift+Enter");
     ui->actionRandom->setIcon(QIcon("randomIcon.png"));
     ui->actionFullscreen->setIcon(QIcon("fullscreenIcon.png"));
     ui->actionExit->setIcon(QIcon("exitIcon.png"));
@@ -74,6 +77,12 @@ MainWindow::MainWindow(QWidget *parent)
     initTables();
     connect(modelPrey, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(on_modelPreyDataChanged(QModelIndex, QModelIndex)));
     connect(modelYerp, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(on_modelYerpDataChanged(QModelIndex, QModelIndex)));
+    connect(ui->tableViewPrey->horizontalScrollBar(), SIGNAL(sliderReleased()), this, SLOT(setFocus()));
+    connect(ui->tableViewPrey->verticalScrollBar(), SIGNAL(sliderReleased()), this, SLOT(setFocus()));
+    connect(ui->tableViewPrey->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(setFocus()));
+    connect(ui->tableViewYerp->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(setFocus()));
+    connect(ui->tableViewPrey, SIGNAL(clicked(QModelIndex)), this, SLOT(setFocus()));
+    connect(ui->tableViewYerp, SIGNAL(clicked(QModelIndex)), this, SLOT(setFocus()));
 }
 
 MainWindow::~MainWindow()
@@ -214,6 +223,10 @@ void MainWindow::setBestPlanToLineEditUsePlan()
     }
     toLineEdit.chop(1);
     ui->lineEditUsePlan->setText(toLineEdit);
+
+    QPalette palette;
+    palette.setColor(QPalette::Text, Qt::black);
+    ui->lineEditUsePlan->setPalette(palette); // lineEdit filled correctly
 }
 void MainWindow::on_sliderTime_valueChanged(int newV)
 {
@@ -346,6 +359,35 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
     }
     //===============//
 }
+void MainWindow::on_actionStart_triggered()
+{
+    setFocus();
+    if (!isDataReadyToUsePlan()) return;
+    if (view->prey.size()+view->yerp.size() > 13)
+    {
+        QMessageBox::critical(this, "MT-TSP", "Should be less than 13 Entities to look for the optimal plan.\nUse \"Use Plan\" option if you want to investigate one specified plan not to look for the optimal.");
+        return;
+    }
+
+    view->setEnabled(false);
+    view->setStatus(StatusScene::disabled);
+    ui->actionClear->setEnabled(false);
+    ui->actionLoad_from_file->setEnabled(false);
+    ui->rBConstruction->setEnabled(false);
+    ui->rBAnimation->setChecked(true);
+    ui->actionStart->setEnabled(false);
+    ui->actionRandom->setEnabled(false);
+    ui->actionBack->setEnabled(false);
+    view->setVisibleText(false);
+    view->genRect->hide();
+    view->eraseHlight();
+
+    FILE* initDataFile = fopen("initData.txt", "w+"); // Saving all the data to the default "initData.txt" file
+    saveDataToFile(initDataFile);
+
+    thread->start();
+    emit solve(view);
+}
 void MainWindow::on_playButton_clicked()
 {
     if (view->getStatus() != StatusScene::animationMode) return;
@@ -416,6 +458,14 @@ void MainWindow::on_actionShow_triggered()
 }
 void MainWindow::on_buttonUsePlan_clicked()
 {
+    if (!isDataReadyToUsePlan()) return;
+
+    if (ui->lineEditUsePlan->text().isEmpty())
+    {
+        QMessageBox::critical(this, "MT-TSP", "Provide the plan you want to use");
+        return;
+    }
+
     QVector<int> plan4FirstYerp;
     QVector<int> plan4SecondYerp;
     for (QString i : ui->lineEditUsePlan->text().split(";")[0].split("-"))
@@ -533,7 +583,6 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     ui->dSBTime->setValue(0);
     ui->sliderTime->setValue(0);
     ui->lineEditUsePlan->clear();
-    ui->lineEditUsePlan->setEnabled(false);
     ui->optimalZoomButton->setEnabled(false);
     ui->actionOptimalZoom->setEnabled(false);
     ui->playButton->setIcon(QIcon("playIcon.png"));
@@ -544,8 +593,6 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     ui->sliderTime->setEnabled(false);
     ui->speedUpButton->setEnabled(false);
     ui->actionSpeedUp->setEnabled(false);
-    ui->buttonUsePlan->setEnabled(false);
-    ui->actionUsePlan->setEnabled(false);
     ui->buttonBestPlan->setEnabled(false);
     ui->actionUseBestPlan->setEnabled(false);
 
@@ -595,7 +642,6 @@ void MainWindow::on_actionClear_triggered()
     ui->labelYerpsNum->setText("0");
     ui->labelT->setText("");
     ui->lineEditUsePlan->clear();
-    ui->lineEditUsePlan->setEnabled(false);
     view->genRect->show();
     ui->rBConstruction->setChecked(true);
     ui->rBAnimation->setEnabled(false);
@@ -611,8 +657,6 @@ void MainWindow::on_actionClear_triggered()
     ui->sliderTime->setEnabled(false);
     ui->speedUpButton->setEnabled(false);
     ui->actionSpeedUp->setEnabled(false);
-    ui->buttonUsePlan->setEnabled(false);
-    ui->actionUsePlan->setEnabled(false);
     ui->buttonBestPlan->setEnabled(false);
     ui->actionUseBestPlan->setEnabled(false);
 
@@ -655,7 +699,7 @@ void MainWindow::on_actionRandom_triggered()
     on_actionClear_triggered();
     srand(time(NULL));
     int M = ui->checkBoxRandomM->isChecked() ? rand()%2 + 1 : ui->spinBoxYerps->value();
-    int N = ui->checkBoxRandomN->isChecked() ? rand()%11 + 1 : ui->spinBoxPreys->value();
+    int N = ui->checkBoxRandomN->isChecked() ? rand()%20 + 1 : ui->spinBoxPreys->value();
 
     int parts;
     double r2fValue, x, y, v, xEnd, yEnd;
@@ -724,31 +768,6 @@ void MainWindow::on_actionRandom_triggered()
     fillFullYerpTable();
     fillFullPreyTableAfter();
 }
-void MainWindow::on_actionStart_triggered()
-{
-    setFocus();
-    if (!isDataReadyToStartProcess()) return;
-
-    view->setEnabled(false);
-    view->setStatus(StatusScene::disabled);
-    ui->actionClear->setEnabled(false);
-    ui->actionLoad_from_file->setEnabled(false);
-    ui->rBConstruction->setEnabled(false);
-    ui->rBAnimation->setChecked(true);
-    ui->actionStart->setEnabled(false);
-    ui->actionRandom->setEnabled(false);
-    ui->actionBack->setEnabled(false);
-    view->setVisibleText(false);
-    view->genRect->hide();
-    view->eraseHlight();
-
-    FILE* initDataFile = fopen("initData.txt", "w+"); // Saving all the data to the default "initData.txt" file
-    saveDataToFile(initDataFile);
-
-    thread->start();
-    emit solve(view);
-
-}
 void MainWindow::on_actionBack_triggered()
 {
     setFocus();
@@ -757,7 +776,7 @@ void MainWindow::on_actionBack_triggered()
 void MainWindow::on_actionSave_as_triggered()
 {
     setFocus();
-    if (!isDataReadyToStartProcess()) return;
+    if (!isDataReadyToUsePlan()) return;
 
     if (userHasntSeenOnlyLatinLettersWarning)
     {
@@ -820,7 +839,7 @@ void MainWindow::on_actionLoad_from_file_triggered()
     fgets(buffer1, 256, f);
     tmpstr1 = strtok(buffer1, " ");
     N = strtol(tmpstr1, &tmpstr1, 0); // Catching # of Yerps
-    if (N < 0 || N > 12) {
+    if (N < 0 || N > 20) {
         QMessageBox::critical(this, "MT-TSP", "Invalid amount of Preys");
         return;
     }
@@ -981,15 +1000,15 @@ void MainWindow::initTables()
     ui->tableViewPrey->setGridStyle(Qt::SolidLine);
     ui->tableViewPrey->verticalHeader()->hide();
     ui->tableViewPrey->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-    ui->tableViewPrey->verticalScrollBar()->setSingleStep(3);
+    ui->tableViewPrey->verticalScrollBar()->setSingleStep(8);
     ui->tableViewPrey->horizontalScrollBar()->setSingleStep(3);
     ui->tableViewPrey->setSortingEnabled(false);
 
     ui->tableViewYerp->setShowGrid(true);
     ui->tableViewYerp->setGridStyle(Qt::SolidLine);
     ui->tableViewYerp->verticalHeader()->hide();
-    ui->tableViewYerp->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-    ui->tableViewYerp->verticalScrollBar()->setSingleStep(3);
+    ui->tableViewYerp->verticalHeader()->setStretchLastSection(true);
+    ui->tableViewYerp->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableViewYerp->horizontalScrollBar()->setSingleStep(3);
     ui->tableViewYerp->setSortingEnabled(false);
 
@@ -1346,34 +1365,17 @@ void MainWindow::solvingEnded()
 {
     thread->exit(0);
 
+    enableUIAfterUsePlan();
     view->setEnabled(true);
-    view->setStatus(StatusScene::animationMode);
     ui->actionClear->setEnabled(true);
     ui->actionLoad_from_file->setEnabled(true);
     ui->rBConstruction->setEnabled(true);
-    ui->rBAnimation->setEnabled(true);
-    ui->rBAnimation->setChecked(true);
-
-    ui->lineEditUsePlan->setEnabled(true);
-    ui->progressBar->setValue(0);
     ui->dSBTime->setMaximum(solver->getResT());
-    ui->dSBTime->setValue(0);
     ui->sliderTime->setMaximum(100*solver->getResT()-(int)(solver->getResT()*100) < 0.5 ? (int)(solver->getResT()*100) : (int)(solver->getResT()*100)+1);
-    ui->sliderTime->setValue(0);
+    ui->progressBar->setValue(0);
     ui->labelT->setText(QString::number(solver->getResT(), 'f', 2));
-    ui->optimalZoomButton->setEnabled(true);
-    ui->actionOptimalZoom->setEnabled(true);
-    ui->playButton->setEnabled(true);
-    ui->actionPlay->setEnabled(true);
-    ui->dSBTime->setEnabled(true);
-    ui->sliderTime->setEnabled(true);
-    ui->speedUpButton->setEnabled(true);
-    ui->actionSpeedUp->setEnabled(true);
-    ui->buttonUsePlan->setEnabled(true);
-    ui->actionUsePlan->setEnabled(true);
     ui->buttonBestPlan->setEnabled(true);
     ui->actionUseBestPlan->setEnabled(true);
-    view->timer4Animation->stop();
 
     for (Prey* p : view->prey)
     {
@@ -1391,11 +1393,24 @@ void MainWindow::usePlanEnded()
 {
     thread->exit(0);
 
+    view->genRect->hide();
+    view->eraseHlight();
+
+    enableUIAfterUsePlan();
+
     double resT = qMax(view->yerp[0]->lastPrey->getDieTime(), view->yerp.size() == 2 ? view->yerp[1]->lastPrey->getDieTime() : view->yerp[0]->lastPrey->getDieTime());
     ui->labelT->setText(QString::number(resT, 'f', 2));
     ui->dSBTime->setMaximum(resT);
     ui->sliderTime->setMaximum(100*resT-(int)(resT*100) < 0.5 ? (int)(resT*100) : (int)(resT*100)+1);
-    view->timer4Animation->stop();
+
+    for (Prey* p : view->prey)
+    {
+        p->sEll->hide();
+        p->eEll->hide();
+        p->line->hide();
+        p->setPos(p->getSStart());
+        p->setCurr(p->getStart());
+    }
 
     afterPlanFillTable();
 }
@@ -1450,25 +1465,44 @@ void MainWindow::afterPlanFillTable()
 
     preyRowsRearrangement(planToRowsRearrangementByDieTime());
 }
+void MainWindow::enableUIAfterUsePlan()
+{
+    ui->rBAnimation->setEnabled(true);
+    ui->rBAnimation->setChecked(true);
+    ui->dSBTime->setEnabled(true);
+    ui->dSBTime->setValue(0);
+    ui->sliderTime->setEnabled(true);
+    ui->sliderTime->setValue(0);
+    ui->optimalZoomButton->setEnabled(true);
+    ui->actionOptimalZoom->setEnabled(true);
+    ui->playButton->setEnabled(true);
+    ui->actionPlay->setEnabled(true);
+    ui->speedUpButton->setEnabled(true);
+    ui->actionSpeedUp->setEnabled(true);
+
+    view->setStatus(StatusScene::animationMode);
+    view->timer4Animation->stop();
+}
 
 void MainWindow::changeProgressBar(long long vC, long long vAll)
 {
     ui->progressBar->setValue((int) ((double)vC / vAll * 100));
 }
 
-bool MainWindow::isDataReadyToStartProcess()
+bool MainWindow::isDataReadyToUsePlan()
 {
     if (view->getStatus() == StatusScene::settingPreyEnd || view->getStatus() == StatusScene::settingPreyVelocity) return false;
-    if (view->prey.size() > 12)
+    if (view->yerp.size() > 2)
     {
-        QMessageBox::critical(this, "MT-TSP", "Should be less then 13 Preys");
+        QMessageBox::critical(this, "MT-TSP", "Program supports only 1 or 2 Yerps");
         return false;
     }
     if (view->prey.size() == 0 || view->yerp.size() == 0)
     {
-        QMessageBox::information(this, "MT-TSP", "No Preys or Yerps");
+        QMessageBox::critical(this, "MT-TSP", "No Preys or Yerps");
         return false;
     }
+
     return true;
 }
 
