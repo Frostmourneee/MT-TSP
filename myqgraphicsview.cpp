@@ -719,10 +719,12 @@ bool MyQGraphicsView::onGenRect(QPointF pScene)
 {
     double x = pScene.x();
     double y = pScene.y();
-
     QRectF rect = genRect->rect();
-    return fabs(x-rect.x()) < 5 || fabs(x-(rect.x()+rect.width())) < 5 ||
-           fabs(y-rect.y()) < 5 || fabs(y-(rect.y()+rect.height())) < 5 ||
+    QPointF lu = QPointF(rect.x(), rect.y());
+    QPointF rd = QPointF(rect.x()+rect.width(), rect.y()+rect.height());
+
+    return (fabs(x-lu.x()) < 5 && lu.y() < y && y < rd.y()) || (fabs(x-rd.x()) < 5 && lu.y() < y && y < rd.y()) ||
+           (fabs(y-lu.y()) < 5 && lu.x() < x && x < rd.x()) || (fabs(y-rd.y()) < 5 && lu.x() < x && x < rd.x()) ||
            status == StatusScene::draggingGenRect;
 }
 
