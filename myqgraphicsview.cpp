@@ -303,10 +303,11 @@ void MyQGraphicsView::wheelEvent(QWheelEvent *e)
     double aDelta = e->angleDelta().y();
     sceneSF = aDelta > 0 ? 1.1 : 0.9;
 
-    if (unit*sceneSF < 0.01 || unit*sceneSF > 230)
+    if (unit*sceneSF > 230) return; // Zoom in up to x4
+    else if (unit*sceneSF < 0.01 || unit*sceneSF > 230)
     {
         QMessageBox::critical(this, "MT-TSP", "Enormous zoom (due to enormous time and/or coordinates) prevented. To make everything works properly please change the configuration in Construction Mode.\n");
-        return; // Zoom in up to x4 and zoom out up to x5000
+        return; // Zoom out up to x5000
     }
     sCoordCenter = sAnchor + sceneSF*(sCoordCenter-sAnchor);
     zoomGraphics(sceneSF);
@@ -569,10 +570,11 @@ void MyQGraphicsView::transformViewToOptimal()
     QPointF coordCenter = QPointF((xMin+xMax)/2, (yMin+yMax)/2);
     double sWidth = (coordCenter.x()-xMin)*baseUnit;
     double sHeight = (coordCenter.y()-yMin)*baseUnit;
-    if (baseUnit*qMin(0.45*w/sWidth, 0.45*h/sHeight) < 0.01 || baseUnit*qMin(0.45*w/sWidth, 0.45*h/sHeight) > 230)
+    if (baseUnit*qMin(0.45*w/sWidth, 0.45*h/sHeight) > 230) return; // Zoom in up to x4
+    else if (baseUnit*qMin(0.45*w/sWidth, 0.45*h/sHeight) < 0.01 || baseUnit*qMin(0.45*w/sWidth, 0.45*h/sHeight) > 230)
     {
         QMessageBox::critical(this, "MT-TSP", "Enormous zoom (due to enormous time and/or coordinates) prevented. \nTo make everything works properly please change the configuration in Construction Mode.\n");
-        return; // Zoom in up to x4 and zoom out up to x5000
+        return; // Zoom out up to x5000
     }
 
     sceneSF = 1;
