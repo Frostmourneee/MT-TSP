@@ -6,10 +6,12 @@ void Yerp::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+    bool isInAnimMode = dynamic_cast<MyQGraphicsView*>(scene()->parent())->getStatus() == StatusScene::animationMode;
+    int rad = GraphicsEntities::smallGraphicsUnit;
+
+    pen = QPen(isInAnimMode ? (yerpNum == 0 ? Qt::red : Qt::blue) : Qt::black, 3);
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setPen(pen);
-
-    int rad = GraphicsEntities::smallGraphicsUnit;
     if (yerpNum == 0) {
         painter->drawLine(QLineF(QPointF(0, -2*rad), QPointF(0, 2*rad)));
         painter->drawLine(QLineF(QPointF(-2*rad+4, 2*rad), QPointF(2*rad-4, 2*rad)));

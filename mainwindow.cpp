@@ -921,19 +921,8 @@ void MainWindow::on_tableViewYerp_clicked(const QModelIndex &index)
 {
     if (modelYerp->item(index.row(), index.column())->foreground().color() != Qt::blue) return;
 
-    if (index.column() == 3 && index.row() % 2 == 0) { // Plan
-        int i = index.row()/2;
-        if (view->yerp[i]->getIsHlighted()) {
-            view->eraseHlight(); // Can't write it at the beginning of func cause eraseHlight() affects getIsHlighted()
-            return;
-        }
-
-        view->eraseHlight(); // Can't write it at the beginning of func cause eraseHlight() affects getIsHlighted()
-        view->yerp[i]->setIsHlighted(true);
-        for (int ind : view->yerp[i]->curPlan) view->prey[ind]->setIsHlighted(true);
-    } else if (index.column() == 4 && index.row() % 2 == 0) { // Fly (working) time
-        ui->dSBTime->setValue(modelYerp->data(index, Qt::DisplayRole).toDouble());
-    }
+    // Fly (working) time
+    if (index.column() == 4 && index.row() % 2 == 0) ui->dSBTime->setValue(modelYerp->data(index, Qt::DisplayRole).toDouble());
 }
 void MainWindow::on_tableViewPrey_doubleClicked(const QModelIndex &index)
 {
@@ -1207,7 +1196,6 @@ void MainWindow::createPreyTableItem(Prey *p)
 
     item = new QStandardItem(); // yerpNum
     item->setFont(QFont("MS Shell Dlg 2", 11));
-    item->setForeground(QBrush(Qt::red));
     item->setFlags(Qt::ItemIsEnabled);
     item->setTextAlignment(Qt::AlignCenter);
     modelPrey->setItem(modelPrey->rowCount() - 1, 6, item);
@@ -1267,8 +1255,7 @@ void MainWindow::createYerpTableItem(Yerp *y)
     modelYerp->setItem(modelYerp->rowCount() - 1, 2, item);
 
     item = new QStandardItem(); // Plan
-    item->setFont(QFont("MS Shell Dlg 2", 11, QFont::Bold));
-    item->setForeground(QBrush(Qt::blue));
+    item->setFont(QFont("MS Shell Dlg 2", 11));
     item->setFlags(Qt::ItemIsEnabled);
     item->setTextAlignment(Qt::AlignCenter);
     modelYerp->setItem(modelYerp->rowCount() - 2, 3, item);

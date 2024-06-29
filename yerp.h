@@ -22,7 +22,7 @@ public:
     Prey* firstPrey;
 
 private:
-    QPen pen = QPen(Qt::red, 3);
+    QPen pen;
     double plan4APTime;
     int yerpNum;
 
