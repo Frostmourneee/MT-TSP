@@ -647,7 +647,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        controlPanel->setCurrentIndex(0);
+        controlPanel->setCurrentIndex(1);
         buttonUsePlan->setDefault(false);
         buttonBestPlan->setDefault(false);
         playButton->setDefault(false);

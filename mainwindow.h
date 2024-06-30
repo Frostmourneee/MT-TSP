@@ -7,6 +7,8 @@
 #include <solver.h>
 #include <QStandardItemModel>
 #include <QScrollBar>
+#include <QDialogButtonBox>
+#include <QFormLayout>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
