@@ -857,8 +857,10 @@ void MainWindow::on_actionLoad_from_file_triggered()
         layout->setSizeConstraint(QLayout::SetFixedSize);
 
         dlg.setLayout(layout);
+        dlg.exec();
+        if (chkbx.isChecked()) userHasntSeenOnlyLatinLettersWarning = false;
 
-        if(dlg.exec() == QDialog::Accepted && chkbx.isChecked()) userHasntSeenOnlyLatinLettersWarning = false;
+        delete layout;
     }
     QString filename = QFileDialog::getOpenFileName(this, "Load from", QDir::currentPath(), "Text files (*.txt)");
     if (strcmp(filename.toStdString().c_str(), "") == 0)
