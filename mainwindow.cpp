@@ -30,29 +30,29 @@ MainWindow::MainWindow(QWidget *parent)
     connect(solver, SIGNAL(changeProgressBar(long long, long long)), this, SLOT(changeProgressBar(long long, long long)));
     solver->moveToThread(thread);
 
-    ui->buttonUsePlan->setIcon(QIcon("usePlanIcon.png"));
-    ui->actionUsePlan->setIcon(QIcon("usePlanIcon.png"));
-    ui->buttonBestPlan->setIcon(QIcon("bestPlanIcon.png"));
-    ui->actionUseBestPlan->setIcon(QIcon("bestPlanIcon.png"));
-    ui->optimalZoomButton->setIcon(QIcon("optimalZoomIcon.png"));
-    ui->actionOptimalZoom->setIcon(QIcon("optimalZoomIcon.png"));
-    ui->actionStart->setIcon(QIcon("startIcon.png"));
+    ui->buttonUsePlan->setIcon(QIcon("icons\\usePlanIcon.png"));
+    ui->actionUsePlan->setIcon(QIcon("icons\\usePlanIcon.png"));
+    ui->buttonBestPlan->setIcon(QIcon("icons\\bestPlanIcon.png"));
+    ui->actionUseBestPlan->setIcon(QIcon("icons\\bestPlanIcon.png"));
+    ui->optimalZoomButton->setIcon(QIcon("icons\\optimalZoomIcon.png"));
+    ui->actionOptimalZoom->setIcon(QIcon("icons\\optimalZoomIcon.png"));
+    ui->actionStart->setIcon(QIcon("icons\\startIcon.png"));
     ui->actionStart->setText("Start Calculation\tShift+Enter");
-    ui->playButton->setIcon(QIcon("playIcon.png"));
-    ui->actionPlay->setIcon(QIcon("playIcon.png"));
-    ui->speedUpButton->setIcon(QIcon("speedUpIcon.png"));
-    ui->actionSpeedUp->setIcon(QIcon("speedUpIcon.png"));
-    ui->resetViewButton->setIcon(QIcon("resetIcon.png"));
-    ui->actionResetView->setIcon(QIcon("resetIcon.png"));
-    ui->optionsButton->setIcon(QIcon("optionsIcon.png"));
-    ui->actionShow->setIcon(QIcon("optionsIcon.png"));
-    ui->actionClear->setIcon(QIcon("restartIcon.png"));
-    ui->actionLoad_from_file->setIcon(QIcon("openConfigIcon.png"));
-    ui->actionSave_as->setIcon(QIcon("saveAsIcon.png"));
-    ui->actionBack->setIcon(QIcon("backIcon.png"));
-    ui->actionRandom->setIcon(QIcon("randomIcon.png"));
-    ui->actionFullscreen->setIcon(QIcon("fullscreenIcon.png"));
-    ui->actionExit->setIcon(QIcon("exitIcon.png"));
+    ui->playButton->setIcon(QIcon("icons\\playIcon.png"));
+    ui->actionPlay->setIcon(QIcon("icons\\playIcon.png"));
+    ui->speedUpButton->setIcon(QIcon("icons\\speedUpIcon.png"));
+    ui->actionSpeedUp->setIcon(QIcon("icons\\speedUpIcon.png"));
+    ui->resetViewButton->setIcon(QIcon("icons\\resetIcon.png"));
+    ui->actionResetView->setIcon(QIcon("icons\\resetIcon.png"));
+    ui->optionsButton->setIcon(QIcon("icons\\optionsIcon.png"));
+    ui->actionShow->setIcon(QIcon("icons\\optionsIcon.png"));
+    ui->actionClear->setIcon(QIcon("icons\\restartIcon.png"));
+    ui->actionLoad_from_file->setIcon(QIcon("icons\\openConfigIcon.png"));
+    ui->actionSave_as->setIcon(QIcon("icons\\saveAsIcon.png"));
+    ui->actionBack->setIcon(QIcon("icons\\backIcon.png"));
+    ui->actionRandom->setIcon(QIcon("icons\\randomIcon.png"));
+    ui->actionFullscreen->setIcon(QIcon("icons\\fullscreenIcon.png"));
+    ui->actionExit->setIcon(QIcon("icons\\exitIcon.png"));
 
     connect(view->timer4Animation, SIGNAL(timeout()), this, SLOT(sliderTick()));
     connect(view, SIGNAL(preyWasCreated(bool)), this, SLOT(preyWasCreated(bool)));
@@ -313,8 +313,8 @@ void MainWindow::on_dSBTime_valueChanged(double newT) // Main func for graphics 
     }
 
     if (newT == ui->dSBTime->maximum()) { // Animation has ended
-        ui->playButton->setIcon(QIcon("playIcon.png"));
-        ui->actionPlay->setIcon(QIcon("playIcon.png"));
+        ui->playButton->setIcon(QIcon("icons\\playIcon.png"));
+        ui->actionPlay->setIcon(QIcon("icons\\playIcon.png"));
         ui->sliderTime->setEnabled(true);
         view->timer4Animation->stop();
     } // Animation has ended
@@ -404,13 +404,13 @@ void MainWindow::on_playButton_clicked()
     if (view->getStatus() != StatusScene::animationMode) return;
     if (view->timer4Animation->isActive()) {
         view->timer4Animation->stop();
-        ui->playButton->setIcon(QIcon("playIcon.png"));
-        ui->actionPlay->setIcon(QIcon("playIcon.png"));
+        ui->playButton->setIcon(QIcon("icons\\playIcon.png"));
+        ui->actionPlay->setIcon(QIcon("icons\\playIcon.png"));
         ui->sliderTime->setEnabled(true);
     } else {
         view->timer4Animation->start(10);
-        ui->playButton->setIcon(QIcon("pauseIcon.png"));
-        ui->actionPlay->setIcon(QIcon("pauseIcon.png"));
+        ui->playButton->setIcon(QIcon("icons\\pauseIcon.png"));
+        ui->actionPlay->setIcon(QIcon("icons\\pauseIcon.png"));
         ui->sliderTime->setEnabled(false);
         if (ui->dSBTime->value() == ui->dSBTime->maximum()) { // Pressed when the whole animation was played
             ui->sliderTime->setValue(0);
@@ -596,9 +596,9 @@ void MainWindow::on_rBConstruction_toggled(bool checked)
     ui->lineEditUsePlan->clear();
     ui->optimalZoomButton->setEnabled(false);
     ui->actionOptimalZoom->setEnabled(false);
-    ui->playButton->setIcon(QIcon("playIcon.png"));
+    ui->playButton->setIcon(QIcon("icons\\playIcon.png"));
     ui->playButton->setEnabled(false);
-    ui->actionPlay->setIcon(QIcon("playIcon.png"));
+    ui->actionPlay->setIcon(QIcon("icons\\playIcon.png"));
     ui->actionPlay->setEnabled(false);
     ui->dSBTime->setEnabled(false);
     ui->sliderTime->setEnabled(false);
@@ -660,9 +660,9 @@ void MainWindow::on_actionClear_triggered()
     ui->sliderTime->setValue(0);
     ui->optimalZoomButton->setEnabled(false);
     ui->actionOptimalZoom->setEnabled(false);
-    ui->playButton->setIcon(QIcon("playIcon.png"));
+    ui->playButton->setIcon(QIcon("icons\\playIcon.png"));
     ui->playButton->setEnabled(false);
-    ui->actionPlay->setIcon(QIcon("playIcon.png"));
+    ui->actionPlay->setIcon(QIcon("icons\\playIcon.png"));
     ui->actionPlay->setEnabled(false);
     ui->dSBTime->setEnabled(false);
     ui->sliderTime->setEnabled(false);
