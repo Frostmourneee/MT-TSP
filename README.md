@@ -21,6 +21,16 @@ It's convenient here to talk about *preys* and *predators*, so preys move along 
 
 Look into [Advanced](#advanced) to get more!
 
+## How to 4 common users
+Download the first .zip archive from the Release, unpack it to some folder and launch MT-TSP.exe  
+https://github.com/Frostmourneee/MT-TSP/releases/tag/v1.0
+
+## How to 4 contributors
+Take into account that the project was made via Qt v5.14.2.
+
+Open Qt Creator, File --> New File of Project --> Import Project --> Git Clone. Paste https://github.com/Frostmourneee/MT-TSP.git into "Repository" and choose path you want.  
+To make icons work properly turn off "Shadow build" (google how to if needed)
+
 ## Advanced
 qwdqwd
 
