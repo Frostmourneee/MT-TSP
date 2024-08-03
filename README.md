@@ -17,7 +17,7 @@ It's convenient here to talk about *preys* and *predators*, so preys move along 
 * Play, pause or speed up the animation or use the timeline like in the yt videos
 * View the animation not of the optimal interception order but of the manually specified
 
-[<img width="300" alt="1" src="https://github.com/user-attachments/assets/a2b153f7-f8d8-43c0-9432-f61a2c2aebc6">](https://www.youtube.com/watch?v=NIMdXV8T8XY)    [<img width="300" alt="2" src="https://github.com/user-attachments/assets/1da1f86e-186b-48b5-b637-0ca116147a91">](https://www.youtube.com/watch?v=r9TA_sKBvik)
+[<img width="300" alt="1" src="https://github.com/user-attachments/assets/a2b153f7-f8d8-43c0-9432-f61a2c2aebc6">](https://www.youtube.com/watch?v=NIMdXV8T8XY)   [<img width="300" alt="2" src="https://github.com/user-attachments/assets/1da1f86e-186b-48b5-b637-0ca116147a91">](https://www.youtube.com/watch?v=r9TA_sKBvik)
 
 Look into [Advanced](#advanced) to get more!
 
