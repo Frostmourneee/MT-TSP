@@ -791,20 +791,20 @@ void MainWindow::on_actionSave_as_triggered()
 
     if (userHasntSeenOnlyLatinLettersWarning)
     {
-        QDialog dlg(this);
-        dlg.setWindowFlags(dlg.windowFlags() & ~Qt::WindowContextHelpButtonHint);
+        QDialog* dlg = new QDialog(this);
+        dlg->setWindowFlags(dlg->windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-        QLabel userLatinLetterWarn("Use only latin letters in the file name", &dlg);
+        QLabel userLatinLetterWarn("Use only latin letters in the file name", dlg);
         userLatinLetterWarn.setFont(QFont("MS Shell Dlg 2", 10));
 
         QSpacerItem verticalSpacer(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        QCheckBox chkbx("Don't show me this again", &dlg);
+        QCheckBox chkbx("Don't show me this again", dlg);
         chkbx.setFont(QFont("MS Shell Dlg 2", 8));
 
-        QDialogButtonBox btn_box(&dlg);
+        QDialogButtonBox btn_box(dlg);
         btn_box.setStandardButtons(QDialogButtonBox::Ok);
-        connect(&btn_box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+        connect(&btn_box, &QDialogButtonBox::accepted, dlg, &QDialog::accept);
 
         QVBoxLayout *layout = new QVBoxLayout();
         layout->addWidget(&userLatinLetterWarn);
@@ -813,9 +813,9 @@ void MainWindow::on_actionSave_as_triggered()
         layout->addWidget(&btn_box);
         layout->setSizeConstraint(QLayout::SetFixedSize);
 
-        dlg.setLayout(layout);
-
-        if(dlg.exec() == QDialog::Accepted && chkbx.isChecked()) userHasntSeenOnlyLatinLettersWarning = false;
+        dlg->setLayout(layout);
+        dlg->exec();
+        if (chkbx.isChecked()) userHasntSeenOnlyLatinLettersWarning = false;
     }
     QString filename = QFileDialog::getOpenFileName(this, "Save as", QDir::currentPath(), "Text files (*.txt)");
     if (strcmp(filename.toStdString().c_str(), "") == 0)
@@ -834,20 +834,20 @@ void MainWindow::on_actionLoad_from_file_triggered()
     setFocus();
     if (userHasntSeenOnlyLatinLettersWarning)
     {
-        QDialog dlg(this);
-        dlg.setWindowFlags(dlg.windowFlags() & ~Qt::WindowContextHelpButtonHint);
+        QDialog* dlg = new QDialog(this);
+        dlg->setWindowFlags(dlg->windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-        QLabel userLatinLetterWarn("Use only latin letters in the file name", &dlg);
+        QLabel userLatinLetterWarn("Use only latin letters in the file name", dlg);
         userLatinLetterWarn.setFont(QFont("MS Shell Dlg 2", 10));
 
         QSpacerItem verticalSpacer(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        QCheckBox chkbx("Don't show me this again", &dlg);
+        QCheckBox chkbx("Don't show me this again", dlg);
         chkbx.setFont(QFont("MS Shell Dlg 2", 8));
 
-        QDialogButtonBox btn_box(&dlg);
+        QDialogButtonBox btn_box(dlg);
         btn_box.setStandardButtons(QDialogButtonBox::Ok);
-        connect(&btn_box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+        connect(&btn_box, &QDialogButtonBox::accepted, dlg, &QDialog::accept);
 
         QVBoxLayout *layout = new QVBoxLayout();
         layout->addWidget(&userLatinLetterWarn);
@@ -856,11 +856,9 @@ void MainWindow::on_actionLoad_from_file_triggered()
         layout->addWidget(&btn_box);
         layout->setSizeConstraint(QLayout::SetFixedSize);
 
-        dlg.setLayout(layout);
-        dlg.exec();
+        dlg->setLayout(layout);
+        dlg->exec();
         if (chkbx.isChecked()) userHasntSeenOnlyLatinLettersWarning = false;
-
-        delete layout;
     }
     QString filename = QFileDialog::getOpenFileName(this, "Load from", QDir::currentPath(), "Text files (*.txt)");
     if (strcmp(filename.toStdString().c_str(), "") == 0)
