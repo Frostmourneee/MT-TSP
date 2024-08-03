@@ -7,8 +7,8 @@ The main purpose of the project is not to propose the fastest solving algorithm 
 
 * Moving target travelling salesman problem
 * MTTSP animated demonstration
-* Interception problem
 * UAV optimal interception
+* Interception problem
 * Travelling salesman problem
 * Optimization problem
 * Combinatorial problem
