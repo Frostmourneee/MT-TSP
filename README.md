@@ -16,7 +16,7 @@ It's convenient here to talk about *preys* and *predators*, so preys move along 
 * Zoom or translate the scene in animation mode
 * Play, pause or speed up the animation or use the timeline like in the yt videos
 
-Look into [Advanced](#keywords) to get more!
+Look into [Advanced](#advanced) to get more!
 
 ## Advanced
 qwdqwd
