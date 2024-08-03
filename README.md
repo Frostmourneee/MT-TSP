@@ -15,62 +15,15 @@ It's convenient here to talk about *preys* and *predators*, so preys move along 
 * View the animation of how yerps catch preys over time
 * Zoom or translate the scene in animation mode
 * Play, pause or speed up the animation or use the timeline like in the yt videos
+* View the animation not of the optimal interception order but of the manually specified
+
+[![Watch the video](<img width="1280" alt="1" src="https://github.com/user-attachments/assets/28fbbc5c-da4a-43a4-9d03-58d7a6a5a066">
+)](https://youtu.be/vt5fpE0bzSY)
 
 Look into [Advanced](#advanced) to get more!
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-v
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-v
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-v
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problemMoving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-
 
 ## Advanced
 qwdqwd
 
 ## Keywords
-
 Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
-
