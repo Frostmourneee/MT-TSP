@@ -19,7 +19,7 @@ It's convenient here to talk about *preys* and *predators*, so preys move along 
 
 [<img width="300" alt="1" src="https://github.com/user-attachments/assets/a2b153f7-f8d8-43c0-9432-f61a2c2aebc6">](https://www.youtube.com/watch?v=NIMdXV8T8XY)   [<img width="300" alt="2" src="https://github.com/user-attachments/assets/1da1f86e-186b-48b5-b637-0ca116147a91">](https://www.youtube.com/watch?v=r9TA_sKBvik)
 
-Look into [Advanced](#advanced) to get more!
+Look into [Advanced](https://github.com/Frostmourneee/MT-TSP/blob/main/AdvancedUsage.md) to get more!
 
 ## How to 4 common users
 Download the first .zip archive from the [Release](https://github.com/Frostmourneee/MT-TSP/releases/tag/v1.0), unpack it to some folder and launch MT-TSP.exe  
@@ -29,9 +29,6 @@ Take into account that the project was made via Qt v5.14.2.
 
 Open Qt Creator, File --> New File or Project --> Import Project --> Git Clone. Paste https://github.com/Frostmourneee/MT-TSP.git into "Repository" and choose path you want.  
 To make icons work properly turn off "Shadow build" (google how to if needed)
-
-## Advanced
-qwdqwd
 
 ## Keywords
 Moving target travelling salesman problem, MTTSP animated demonstration, Preys and predators, UAV optimal interception, Interception problem, Travelling salesman problem, Optimization problem, Combinatorial problem
