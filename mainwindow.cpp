@@ -1060,7 +1060,7 @@ void MainWindow::initTables()
     ui->tableViewYerp->setSortingEnabled(false);
 
     modelPrey = new QStandardItemModel();
-    QStringList labels = QString::fromUtf8("№, X(0), Y(0), Angle (deg), V, Died, Yerp, dieX, dieY").simplified().split(",");
+    QStringList labels = QString::fromUtf8("№, X(0), Y(0), Angle (deg), V, Died, Yerp, DieX, DieY").simplified().split(",");
     modelPrey->setHorizontalHeaderLabels(labels);
     for (int i = 0; i < 9; i++) modelPrey->horizontalHeaderItem(i)->setFont(QFont("MS Shell Dlg 2", 11));
     ui->tableViewPrey->setModel(modelPrey);
@@ -1619,7 +1619,7 @@ void MainWindow::afterPlanFillTable()
         modelPrey->item(i, 3)->setFlags(Qt::ItemIsEnabled);
         modelPrey->item(i, 4)->setFlags(Qt::ItemIsEnabled);
         modelPrey->item(i, 5)->setData(QString::number(tmpPrey->getDieTime(), 'f', 2).toDouble(), Qt::EditRole);
-        modelPrey->item(i, 6)->setData(1., Qt::EditRole);
+        modelPrey->item(i, 6)->setData(0, Qt::EditRole);
         modelPrey->item(i, 7)->setData(QString::number(tmpPrey->getDiePoint().x(), 'f', 2).toDouble(), Qt::EditRole);
         modelPrey->item(i, 8)->setData(QString::number(tmpPrey->getDiePoint().y(), 'f', 2).toDouble(), Qt::EditRole);
     }
@@ -1633,7 +1633,7 @@ void MainWindow::afterPlanFillTable()
         modelPrey->item(i, 3)->setFlags(Qt::ItemIsEnabled);
         modelPrey->item(i, 4)->setFlags(Qt::ItemIsEnabled);
         modelPrey->item(i, 5)->setData(QString::number(tmpPrey->getDieTime(), 'f', 2).toDouble(), Qt::EditRole);
-        modelPrey->item(i, 6)->setData(2., Qt::EditRole);
+        modelPrey->item(i, 6)->setData(1, Qt::EditRole);
         modelPrey->item(i, 7)->setData(QString::number(tmpPrey->getDiePoint().x(), 'f', 2).toDouble(), Qt::EditRole);
         modelPrey->item(i, 8)->setData(QString::number(tmpPrey->getDiePoint().y(), 'f', 2).toDouble(), Qt::EditRole);
     }
