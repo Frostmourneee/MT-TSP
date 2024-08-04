@@ -14,6 +14,7 @@ The GUI solves this problem with up to 20 preys and 1 yerp or with up to 14 prey
 
 * Instead of clicking on any action on the menu you can use shortcuts
 * You can *save* configuration to .txt file or *load* it from the .txt file
+* *Start Calculation Process* action automatically saves current configuration to "initData.txt" file in project folder
 * *Restart* action clears the scene
 * *Undo* action (Ctrl+Z) works in Construction mode and undo the previous action, which is one of the follows: prey start set, prey direction set, prey velocity set, yerp start set. This may be useful if user misclicks at some time and doesn't want to refresh the whole scene
 * Mouse scroll causes scene's zoom and WASD causes scene's translation
